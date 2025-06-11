@@ -9,4 +9,4 @@
 
 ### Información
 El repositorio donde se ubica la propuesta del trabajo completo se ubica por aquí:
-* [tp dsw hsm](https://github.com/MartinianoLeonCorrea/tpGestionSecundaria.git)
+* [tp dsw gs](https://github.com/MartinianoLeonCorrea/tpGestionSecundaria.git)
