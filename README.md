@@ -1,6 +1,5 @@
 # Plataforma digital de gestión académica para institutos secundarios - Repositorio de Aplicación Backend
 
-## Grupo
 ### Integrantes
 * 50851 - Achares, Jonatan Francisco Angel (Com304-2025)
 * 52858 - Correa, Martiniano León (Com304-2025)
