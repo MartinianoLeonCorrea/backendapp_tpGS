@@ -1,7 +1,6 @@
 const http = require ("http")
 
 function requestController() {
-  // Lógica de nuestra función
   console.log("Request recibida")
 }
 
