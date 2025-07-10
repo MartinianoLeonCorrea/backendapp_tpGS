@@ -7,4 +7,8 @@ function requestController() {
 // Configuración del servidor
 const server = http.createServer(requestController)
 
-server.listen(4000)
+const PORT = process.env.PORT
+
+server.listen(4000, function () {
+  console.log({ env: process.env })
+})
