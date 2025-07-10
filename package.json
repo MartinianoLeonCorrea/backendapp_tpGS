@@ -6,6 +6,9 @@
   "author": "MartinianoLeonCorrea <correamartinianoleon@gmail.com>",
   "license": "MIT",
   "private": false,
+  "scripts":{
+    "dev": "nodemon index.js"
+  },
   "dependencies": {
     "nodemon": "^3.1.10"
   }
