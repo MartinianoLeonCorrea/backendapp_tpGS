@@ -4,7 +4,7 @@ function requestController() {
   console.log("Request recibida")
 }
 
-// Configurar nuestro servidor
+// Configuración del servidor
 const server = http.createServer(requestController)
 
 server.listen(4000)
