@@ -3,7 +3,6 @@
 ### Integrantes
 * 50851 - Achares, Jonatan Francisco Angel (Com304-2025)
 * 52858 - Correa, Martiniano León (Com304-2025)
-* 53109 - Lopez, Evelyn Milagros (Com301-2025)
 * 52572 - Varrenti, Lara (Com304-2025)
 
 ### Información
