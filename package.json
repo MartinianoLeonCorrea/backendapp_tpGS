@@ -1,20 +1,9 @@
 {
-  "name": "backendapp_tpgs",
+  "name": "backendapp_tpGS",
   "version": "1.0.0",
-  "description": "tp gs project setup",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MartinianoLeonCorrea/backendapp_tpGS.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/MartinianoLeonCorrea/backendapp_tpGS/issues"
-  },
-  "homepage": "https://github.com/MartinianoLeonCorrea/backendapp_tpGS#readme"
+  "main": "index.js",
+  "repository": "https://github.com/MartinianoLeonCorrea/backendapp_tpGS.git",
+  "author": "MartinianoLeonCorrea <correamartinianoleon@gmail.com>",
+  "license": "MIT",
+  "private": false
 }
