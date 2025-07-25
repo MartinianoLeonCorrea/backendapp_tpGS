@@ -1,5 +1,5 @@
 require('dotenv').config();
-//librería para manejar archivos estáticos más facilmente
+//Librería para manejar archivos estáticos más facilmente
 const express = require('express');
 const app = express();
 const port = process.env.PORT; //4000
@@ -8,7 +8,7 @@ const port = process.env.PORT; //4000
 app.use(express.static('../frontendapp_tpGS'));
 
 // Middleware para parsear el body de las request
-// lo declaramos arriba de todo globalmente para que se aplique a todas las rutas
+// Lo declaramos arriba de todo globalmente para que se aplique a todas las rutas
 app.use(express.json());
 
 //A) Pasamos una función anónima
@@ -44,7 +44,7 @@ app.get('/users', function (req, res) {
   res.send([{ name: 'Lara' }, { name: 'Jonatan' }, { name: 'Martiniano' }]);
 });
 
-//Poner a escruchar la App en un puerto
+// Poner a escruchar la app en un puerto
 app.listen(port, function () {
   console.log('Aplicación corriendo en el puerto: ' + port);
 });
