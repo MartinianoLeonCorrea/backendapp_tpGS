@@ -1,50 +1,20 @@
-require('dotenv').config();
-//Librería para manejar archivos estáticos más facilmente
-const express = require('express');
-const app = express();
-const port = process.env.PORT; //4000
+// Carga de las variables de entorno e inicialización de Express.
 
-//Middleware para servir archivos estáticos
-app.use(express.static('../frontendapp_tpGS'));
+require('dotenv').config(); // Cargar variables de entorno al inicio
 
-// Middleware para parsear el body de las request
-// Lo declaramos arriba de todo globalmente para que se aplique a todas las rutas
-app.use(express.json());
+const app = require('./src/app'); // Importar la configuración de tu aplicación Express
+const { sequelize } = require('./src/config/database'); // Importar la instancia de Sequelize
 
-//A) Pasamos una función anónima
-app.use((req, res, next) => {
-  console.log('No especificamos como debe ser el inicio de la ruta');
-  console.log('Middleware 1');
-  next();
-});
+const port = process.env.PORT; // Usar el puerto de .env o 4000 por defecto
 
-//B) Pasamos una función RETORNADA por OTRA FUNCIÓN/MÉTODO
-const logger = {
-  logThis: (whatToLog) => {
-    return (req, res, next) => {
-      console.log('Middleware 2: ', whatToLog);
-      next();
-    };
-  },
-};
-app.use('/martin', logger.logThis('Logueame estooo'));
-
-// Middleware para parsear BODY de la REQUEST
-app.post('/api/tasks', function (req, res) {
-  const body = req.body;
-  console.log({ body });
-  res.status(201).json({ ok: true, message: 'Tarea creda con éxito' });
-});
-
-// Configurar las rutas
-app.get('/', function (req, res) {
-  res.send('Hola mundo');
-});
-app.get('/users', function (req, res) {
-  res.send([{ name: 'Lara' }, { name: 'Jonatan' }, { name: 'Martiniano' }]);
-});
-
-// Poner a escruchar la app en un puerto
-app.listen(port, function () {
-  console.log('Aplicación corriendo en el puerto: ' + port);
-});
+// Sincronizar la base de datos y luego iniciar el servidor
+sequelize.sync({ force: false }) // `force: true` recrea las tablas (¡cuidado con datos existentes!)
+    .then(() => {
+        console.log('Base de datos sincronizada correctamente.');
+        app.listen(port, () => {
+            console.log(`Aplicación corriendo en el puerto: ${port}`);
+        });
+    })
+    .catch(err => {
+        console.error('Error al sincronizar la base de datos:', err);
+    });
