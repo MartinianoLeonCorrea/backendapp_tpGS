@@ -8,7 +8,7 @@ const { sequelize } = require('./src/config/database'); // Importar la instancia
 const port = process.env.PORT; // Usar el puerto de .env o 4000 por defecto
 
 // Sincronizar la base de datos y luego iniciar el servidor
-sequelize.sync({ force: false }) // `force: true` recrea las tablas (¡cuidado con datos existentes!)
+sequelize.sync({ force: false }) // `force: true` recrea las tablas (¡cuidado con los datos existentes!)
     .then(() => {
         console.log('Base de datos sincronizada correctamente.');
         app.listen(port, () => {
