@@ -59,7 +59,16 @@ const Persona = sequelize.define('Persona', {
                 msg: 'El tipo de código no puede estar vacío.'
             },
         isIn: {
-                args: [['P', 'A', 'D']],
-                msg: 'El tipo de código debe ser "P"(personal),"A"(Alumno) o "D"(Docente).'
+                args: [['Personal', 'Alumno', 'Docente']],
+                msg: 'El tipo de código debe ser "Personal","Alumno" o "Docente".'
         }},
-    }})
+    },
+    especialidad: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        validate: {
+            notEmpty: {
+                msg: 'La especialidad no puede estar vacía.'
+            }
+        }},
+})
