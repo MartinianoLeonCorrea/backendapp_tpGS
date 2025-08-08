@@ -6,18 +6,21 @@ const app = express();
 // Middleware para parsear el body de las request como JSON
 app.use(express.json());
 
-// Middlewares de ejemplo (puedes eliminarlos o modificarlos según necesites)
+// Middlewares de ejemplo (muestrar las peticiones que llegan, cuando y de qué tipo)
 app.use((req, res, next) => {
-  console.log('Middleware Global: Petición recibida');
+  const now = new Date().toISOString();
+  console.log(`[${now}] ${req.method} ${req.originalUrl}`);
   next();
 });
 
 // Importar rutas (aquí es donde conectarás tus módulos de rutas)
 const materiaRoutes = require('./routes/materia.routes');
+const cursoRoutes = require('./routes/curso.routes');
 // ... importa otras rutas según tus CRUDs
 
 // Usar las rutas
 app.use('/api/materias', materiaRoutes);
+app.use('/api/cursos', cursoRoutes);
 // ... usa otras rutas
 
 // Ruta de prueba
