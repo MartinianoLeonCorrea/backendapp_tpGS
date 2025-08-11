@@ -1,4 +1,4 @@
-const { Persona } = require('../models');
+const { Persona } = require('../models/persona.model');
 const { Op } = require('sequelize');
 
 class PersonaService {
