@@ -16,16 +16,18 @@ app.use((req, res, next) => {
 // Importar rutas (aquí es donde conectarás tus módulos de rutas)
 const materiaRoutes = require('./routes/materia.routes');
 const cursoRoutes = require('./routes/curso.routes');
+const personaRoutes = require('./routes/persona.routes');
 // ... importa otras rutas según tus CRUDs
 
 // Usar las rutas
 app.use('/api/materias', materiaRoutes);
 app.use('/api/cursos', cursoRoutes);
+app.use('/api/personas', personaRoutes);
 // ... usa otras rutas
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-  res.send('Bienvenido a la API de Gestión Escolar');
+  res.send('API de Gestión Tu Secundaria corriendo en el backend');
 });
 
 // Middleware para manejar rutas no encontradas (404)
