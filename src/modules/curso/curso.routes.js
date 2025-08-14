@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const cursoController = require('../controllers/curso.controller'); // Importa el controlador
+const cursoController = require('./curso.controller'); // Importa el controlador
 
 // Rutas para Cursos
 router.get('/', cursoController.getAllCursos); // GET /api/cursos

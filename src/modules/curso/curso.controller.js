@@ -1,6 +1,6 @@
 // Lógica de los controladores para la entidad Curso
 
-const cursoService = require('../services/curso.service');
+const cursoService = require('./curso.service');
 
 // Obtener todos los cursos
 const getAllCursos = async (req, res, next) => {

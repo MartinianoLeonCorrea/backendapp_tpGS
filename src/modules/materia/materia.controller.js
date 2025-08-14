@@ -1,6 +1,6 @@
 // Lógica de los controladores para la entidad Materia
 
-const materiaService = require('../services/materia.service'); // Importa el servicio de Materia
+const materiaService = require('./materia.service'); // Importa el servicio de Materia
 
 // Obtener todas las materias
 const getAllMaterias = async (req, res, next) => {

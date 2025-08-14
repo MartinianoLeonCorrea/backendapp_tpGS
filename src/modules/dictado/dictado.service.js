@@ -1,9 +1,9 @@
 //Lógica de negocio para la entidad Dictado
 
 const { models } = require('../db/sequelize');
-const Persona = require('../models/persona.model');
-const Curso = require('../models/curso.model');
-const Dictado = require('../models/dictado.model');
+const Persona = require('../persona/persona.model');
+const Curso = require('../curso/curso.model');
+const Dictado = require('./dictado.model');
 
 // Obtener todas las personas, incluyendo su curso y dictados (si corresponde)
 const findAllPersonas = async () => {

@@ -1,7 +1,7 @@
 //Este script "seed (semilla)" se utiliza para generar una base de datos inicial con datos predefinidos para la entidad Materia.
 
-const { sequelize } = require('../config/database');
-const Materia = require('../models/materia.model');
+const { sequelize } = require('.../config/database');
+const Materia = require('./materia.model');
 
 const materiasIniciales = [
   {

@@ -1,6 +1,6 @@
 // Lógica de negocio para la entidad Materia
 
-const Materia = require('../models/materia.model'); // Importa el modelo Materia
+const Materia = require('./materia.model'); // Importa el modelo Materia
 
 // Encontrar todas las materias
 const findAllMaterias = async () => {

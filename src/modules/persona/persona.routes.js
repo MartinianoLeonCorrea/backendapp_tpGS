@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const personaController = require('../controllers/persona.controller'); // Importa el controlador
+const personaController = require('./persona.controller'); // Importa el controlador
 
 // Rutas para Personas
 router.get('/', personaController.getAllPersonas); // GET /api/personas

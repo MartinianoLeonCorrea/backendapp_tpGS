@@ -1,6 +1,6 @@
 //Lógica de negocio para la entidad Curso
 
-const Curso = require('../models/curso.model');
+const Curso = require('./curso.model');
 
 // Encontrar todos los cursos
 const findAllCursos = async () => {

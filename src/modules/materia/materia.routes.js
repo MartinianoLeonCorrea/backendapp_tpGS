@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const materiaController = require('../controllers/materia.controller'); // Importa el controlador
+const materiaController = require('./materia.controller'); // Importa el controlador
 
 // Rutas para Materias
 router.get('/', materiaController.getAllMaterias); // GET /api/materias

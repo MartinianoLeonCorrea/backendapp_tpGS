@@ -1,6 +1,6 @@
 // Definición del modelo Dictado con
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { sequelize } = require('../../config/database');
 
 const Dictado = sequelize.define('Dictado', {
   id: {
