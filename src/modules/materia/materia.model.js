@@ -23,10 +23,8 @@ const Materia = sequelize.define('Materia', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    // Sequelize automáticamente añade `createdAt` y `updatedAt` si `timestamps` es true en la configuración
 }, {
-    tableName: 'materias', // Nombre de la tabla en la base de datos
-    // Puedes añadir más opciones aquí, como índices, etc.
+    tableName: 'materias', 
 });
 
 module.exports = Materia;
