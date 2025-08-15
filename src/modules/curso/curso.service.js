@@ -76,10 +76,22 @@ const deleteCurso = async (id) => {
   }
 };
 
+const buscarCursosPorPersona = async (personaId) => {
+  try {
+    const persona = await Persona.findByPk(personaId, {
+      include: [{ model: Curso, as: 'cursos' }],
+    });
+    return persona ? persona.cursos : [];
+  } catch (error) {
+    throw new Error('Error al buscar cursos por persona: ' + error.message);
+  }
+};
+
 module.exports = {
   findAllCursos,
   findCursoById,
   createCurso,
   updateCurso,
   deleteCurso,
+  buscarCursosPorPersona,
 };

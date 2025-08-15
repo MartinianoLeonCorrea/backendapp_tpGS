@@ -1,4 +1,4 @@
-// Definición del modelo Dictado con
+// Definición del modelo Dictado
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../../config/database');
 
