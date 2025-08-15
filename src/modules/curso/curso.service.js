@@ -1,97 +1,218 @@
-//Lógica de negocio para la entidad Curso
-
 const Curso = require('./curso.model');
+const Persona = require('../persona/persona.model');
+const Dictado = require('../dictado/dictado.model');
 
-// Encontrar todos los cursos
-const findAllCursos = async () => {
-  try {
-    const cursos = await Curso.findAll();
-    return cursos;
-  } catch (error) {
-    throw new Error('Error al obtener todos los cursos: ' + error.message);
-  }
-};
+class CursoService {
 
-// Encontrar un curso por ID
-const findCursoById = async (id) => {
-  try {
-    const curso = await Curso.findByPk(id);
-    return curso;
-  } catch (error) {
-    throw new Error('Error al obtener curso por ID: ' + error.message);
-  }
-};
+  // ========================= CREATE =========================
 
-// Crear un nuevo curso
-const createCurso = async (cursoData) => {
-  try {
-    const newCurso = await Curso.create(cursoData);
-    return newCurso;
-  } catch (error) {
-    // Manejo de errores específicos de Sequelize, por ejemplo, validación
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      throw new Error('Ya existe un curso con ese año y letra.');
+  // Crear un nuevo curso
+
+  static async createCurso(cursoData) {
+    try {
+      const newCurso = await Curso.create(cursoData);
+      return newCurso;
+    } catch (error) {
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new Error('Ya existe un curso con ese año y letra.');
+      }
+      if (error.name === 'SequelizeValidationError') {
+        throw new Error(
+          'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
+        );
+      }
+      throw new Error('Error al crear curso: ' + error.message);
     }
-    if (error.name === 'SequelizeValidationError') {
-      throw new Error(
-        'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
+  }
+
+  // ========================= READ ===========================
+
+  // Obtener todos los cursos
+
+  static async findAllCursos(options = {}) {
+    try {
+      const { includeAlumnos = false, includeDictado = false } = options;
+      const include = [];
+
+      if (includeAlumnos) {
+        include.push({
+          model: Persona,
+          as: 'alumnos',
+          attributes: ['dni', 'nombre', 'apellido', 'email']
+        });
+      }
+
+      if (includeDictado) {
+        include.push({
+          model: Dictado,
+          as: 'dictado',
+          attributes: ['id', 'fecha_desde', 'fecha_hasta', 'dias_cursado']
+        });
+      }
+
+      const cursos = await Curso.findAll({
+        include,
+        order: [['anio_letra', 'ASC']]
+      });
+      return cursos;
+    } catch (error) {
+      throw new Error('Error al obtener todos los cursos: ' + error.message);
+    }
+  }
+
+  // Encontrar un curso por ID
+
+  static async findCursoById(id, options = {}) {
+    try {
+      const { includeAlumnos = false, includeDictado = false } = options;
+      const include = [];
+
+      if (includeAlumnos) {
+        include.push({
+          model: Persona,
+          as: 'alumnos',
+          attributes: ['dni', 'nombre', 'apellido', 'email', 'telefono']
+        });
+      }
+
+      if (includeDictado) {
+        include.push({
+          model: Dictado,
+          as: 'dictado'
+        });
+      }
+
+      const curso = await Curso.findByPk(id, { include });
+      return curso;
+    } catch (error) {
+      throw new Error('Error al obtener curso por ID: ' + error.message);
+    }
+  }
+
+  // Buscar cursos por turno
+
+  static async findCursosByTurno(turno) {
+    try {
+      const cursos = await Curso.findAll({
+        where: { turno },
+        order: [['anio_letra', 'ASC']]
+      });
+      return cursos;
+    } catch (error) {
+      throw new Error('Error al buscar cursos por turno: ' + error.message);
+    }
+  }
+
+  // Obtener estadísticas de un curso
+
+  static async getCursoStats(id) {
+    try {
+      const curso = await Curso.findByPk(id, {
+        include: [
+          {
+            model: Persona,
+            as: 'alumnos',
+            attributes: []
+          },
+          {
+            model: Dictado,
+            as: 'dictado',
+            attributes: []
+          }
+        ],
+        attributes: {
+          include: [
+            [sequelize.fn('COUNT', sequelize.col('alumnos.dni')), 'totalAlumnos'],
+            [sequelize.fn('CASE', 
+              sequelize.col('dictado.id'), 
+              sequelize.literal('1'), 
+              sequelize.literal('0')
+            ), 'tieneDictado']
+          ]
+        },
+        group: ['curso.id']
+      });
+      return curso;
+    } catch (error) {
+      throw new Error('Error al obtener estadísticas del curso: ' + error.message);
+    }
+  }
+
+  // ========================= UPDATE =========================
+  
+  // Actualizar un curso
+
+  static async updateCurso(id, cursoData) {
+    try {
+      const [updatedRows] = await Curso.update(cursoData, {
+        where: { id: id },
+      });
+      
+      if (updatedRows > 0) {
+        return await Curso.findByPk(id); // Retorna el curso actualizado
+      }
+      return null; // Si no se encontró el curso
+    } catch (error) {
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new Error('Ya existe un curso con ese año y letra.');
+      }
+      if (error.name === 'SequelizeValidationError') {
+        throw new Error(
+          'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
+        );
+      }
+      throw new Error('Error al actualizar curso: ' + error.message);
+    }
+  }
+
+  // ========================= DELETE =========================
+  
+  // Eliminar un curso
+
+  static async deleteCurso(id) {
+    try {
+
+      // Verificar si hay alumnos asignados
+
+      const alumnosCount = await Persona.count({
+        where: { cursoId: id, tipoCodigo: 'Alumno' }
+      });
+
+      if (alumnosCount > 0) {
+        throw new Error('No se puede eliminar el curso porque tiene alumnos asignados.');
+      }
+
+      const deletedRows = await Curso.destroy({
+        where: { id: id },
+      });
+      
+      return deletedRows > 0; // Retorna true si se eliminó al menos un curso
+    } catch (error) {
+      throw new Error('Error al eliminar curso: ' + error.message);
+    }
+  }
+
+  // Eliminar curso forzado (con sus relaciones)
+
+  static async forceDeleteCurso(id) {
+    try {
+
+      // Eliminar relaciones primero
+      
+      await Persona.update(
+        { cursoId: null },
+        { where: { cursoId: id } }
       );
-    }
-    throw new Error('Error al crear curso: ' + error.message);
-  }
-};
 
-// Actualizar un curso
-const updateCurso = async (id, cursoData) => {
-  try {
-    const [updatedRows] = await Curso.update(cursoData, {
-      where: { id: id },
-    });
-    if (updatedRows > 0) {
-      return Curso.findByPk(id); // Retorna el curso actualizado
+      const deletedRows = await Curso.destroy({
+        where: { id: id },
+      });
+      
+      return deletedRows > 0;
+    } catch (error) {
+      throw new Error('Error al eliminar curso forzado: ' + error.message);
     }
-    return null; // Si no se encontró el curso
-  } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      throw new Error('Ya existe un curso con ese año y letra.');
-    }
-    if (error.name === 'SequelizeValidationError') {
-      throw new Error(
-        'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
-      );
-    }
-    throw new Error('Error al actualizar curso: ' + error.message);
   }
-};
+}
 
-// Eliminar un curso
-const deleteCurso = async (id) => {
-  try {
-    const deletedRows = await Curso.destroy({
-      where: { id: id },
-    });
-    return deletedRows > 0; // Retorna true si se eliminó al menos un curso
-  } catch (error) {
-    throw new Error('Error al eliminar curso: ' + error.message);
-  }
-};
-
-const buscarCursosPorPersona = async (personaId) => {
-  try {
-    const persona = await Persona.findByPk(personaId, {
-      include: [{ model: Curso, as: 'cursos' }],
-    });
-    return persona ? persona.cursos : [];
-  } catch (error) {
-    throw new Error('Error al buscar cursos por persona: ' + error.message);
-  }
-};
-
-module.exports = {
-  findAllCursos,
-  findCursoById,
-  createCurso,
-  updateCurso,
-  deleteCurso,
-  buscarCursosPorPersona,
-};
+module.exports = CursoService;

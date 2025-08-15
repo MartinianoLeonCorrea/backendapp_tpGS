@@ -1,14 +1,25 @@
-// Definición de las rutas de la API para la entidad Curso
-
 const express = require('express');
 const router = express.Router();
-const cursoController = require('./curso.controller'); // Importa el controlador
+const CursoController = require('./curso.controller');
 
-// Rutas para Cursos
-router.get('/', cursoController.getAllCursos); // GET /api/cursos
-router.get('/:id', cursoController.getCursoById); // GET /api/cursos/:id
-router.post('/', cursoController.createCurso); // POST /api/cursos
-router.put('/:id', cursoController.updateCurso); // PUT /api/cursos/:id
-router.delete('/:id', cursoController.deleteCurso); // DELETE /api/cursos/:id
+// ========================= CREATE =========================
+
+router.post('/', CursoController.createCurso); // POST /api/cursos
+
+// ========================= READ ===========================
+
+router.get('/', CursoController.getAllCursos); // GET /api/cursos
+router.get('/turno/:turno', CursoController.getCursosByTurno); // GET /api/cursos/turno/:turno
+router.get('/:id', CursoController.getCursoById); // GET /api/cursos/:id
+router.get('/:id/stats', CursoController.getCursoStats); // GET /api/cursos/:id/stats
+
+// ========================= UPDATE =========================
+
+router.put('/:id', CursoController.updateCurso); // PUT /api/cursos/:id
+
+// ========================= DELETE =========================
+
+router.delete('/:id', CursoController.deleteCurso); // DELETE /api/cursos/:id
+router.delete('/:id/force', CursoController.forceDeleteCurso); // DELETE /api/cursos/:id/force
 
 module.exports = router;

@@ -1,76 +1,179 @@
-// Lógica de los controladores para la entidad Curso
+const CursoService = require('./curso.service');
 
-const cursoService = require('./curso.service');
+class CursoController {
 
-// Obtener todos los cursos
-const getAllCursos = async (req, res, next) => {
-  try {
-    const cursos = await cursoService.findAllCursos();
-    res.status(200).json(cursos);
-  } catch (error) {
-    next(error); // Pasa el error al middleware de manejo de errores global
-  }
-};
+  // ========================= CREATE =========================
 
-// Obtener un curso por ID
-const getCursoById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const curso = await cursoService.findCursoById(id);
-    if (!curso) {
-      return res.status(404).json({ message: 'Curso no encontrado' });
+  // Crear un nuevo curso
+
+  static async createCurso(req, res, next) {
+    try {
+      const cursoData = req.body;
+      
+      // Validaciones básicas
+
+      if (!cursoData.anio_letra || !cursoData.turno) {
+        return res.status(400).json({ 
+          message: 'Los campos año_letra y turno son obligatorios' 
+        });
+      }
+
+      const newCurso = await CursoService.createCurso(cursoData);
+      res.status(201).json({
+        message: 'Curso creado exitosamente',
+        data: newCurso
+      });
+    } catch (error) {
+      next(error);
     }
-    res.status(200).json(curso);
-  } catch (error) {
-    next(error);
   }
-};
 
-// Crear un nuevo curso
-const createCurso = async (req, res, next) => {
-  try {
-    const cursoData = req.body;
-    const newCurso = await cursoService.createCurso(cursoData);
-    res.status(201).json(newCurso);
-  } catch (error) {
-    next(error);
-  }
-};
+  // ========================= READ ===========================
 
-// Actualizar un curso existente
-const updateCurso = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const cursoData = req.body;
+  // Obtener todos los cursos
 
-    const updatedCurso = await cursoService.updateCurso(id, cursoData);
-    if (!updatedCurso) {
-      return res.status(404).json({ message: 'Curso no encontrado' });
+  static async getAllCursos(req, res, next) {
+    try {
+      const { includeAlumnos, includeDictados } = req.query;
+      const options = {
+        includeAlumnos: includeAlumnos === 'true',
+        includeDictados: includeDictados === 'true'
+      };
+
+      const cursos = await CursoService.findAllCursos(options);
+      res.status(200).json({
+        message: 'Cursos obtenidos exitosamente',
+        data: cursos,
+        count: cursos.length
+      });
+    } catch (error) {
+      next(error);
     }
-    res.status(200).json(updatedCurso);
-  } catch (error) {
-    next(error);
   }
-};
 
-// Eliminar un curso
-const deleteCurso = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const deletedCurso = await cursoService.deleteCurso(id);
-    if (!deletedCurso) {
-      return res.status(404).json({ message: 'Curso no encontrado' });
+  // Obtener un curso por ID
+
+  static async getCursoById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { includeAlumnos, includeDictados } = req.query;
+      
+      const options = {
+        includeAlumnos: includeAlumnos === 'true',
+        includeDictados: includeDictados === 'true'
+      };
+
+      const curso = await CursoService.findCursoById(id, options);
+      
+      if (!curso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+
+      res.status(200).json({
+        message: 'Curso obtenido exitosamente',
+        data: curso
+      });
+    } catch (error) {
+      next(error);
     }
-    res.status(204).send(); // No content
-  } catch (error) {
-    next(error);
   }
-};
 
-module.exports = {
-  getAllCursos,
-  getCursoById,
-  createCurso,
-  updateCurso,
-  deleteCurso,
-};
+  // Obtener cursos por turno
+
+  static async getCursosByTurno(req, res, next) {
+    try {
+      const { turno } = req.params;
+      const cursos = await CursoService.findCursosByTurno(turno.toUpperCase());
+      
+      res.status(200).json({
+        message: `Cursos del turno ${turno} obtenidos exitosamente`,
+        data: cursos,
+        count: cursos.length
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Obtener estadísticas de un curso
+
+  static async getCursoStats(req, res, next) {
+    try {
+      const { id } = req.params;
+      const stats = await CursoService.getCursoStats(id);
+      
+      if (!stats) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+
+      res.status(200).json({
+        message: 'Estadísticas del curso obtenidas exitosamente',
+        data: stats
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ========================= UPDATE =========================
+
+  // Actualizar un curso existente
+
+  static async updateCurso(req, res, next) {
+    try {
+      const { id } = req.params;
+      const cursoData = req.body;
+
+      const updatedCurso = await CursoService.updateCurso(id, cursoData);
+      
+      if (!updatedCurso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+
+      res.status(200).json({
+        message: 'Curso actualizado exitosamente',
+        data: updatedCurso
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ========================= DELETE =========================
+
+  // Eliminar un curso
+
+  static async deleteCurso(req, res, next) {
+    try {
+      const { id } = req.params;
+      const deletedCurso = await CursoService.deleteCurso(id);
+      
+      if (!deletedCurso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+
+      res.status(200).json({ message: 'Curso eliminado exitosamente' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Eliminar curso forzado
+  
+  static async forceDeleteCurso(req, res, next) {
+    try {
+      const { id } = req.params;
+      const deletedCurso = await CursoService.forceDeleteCurso(id);
+      
+      if (!deletedCurso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+
+      res.status(200).json({ message: 'Curso eliminado forzadamente exitosamente' });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+module.exports = CursoController;
