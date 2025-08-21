@@ -32,7 +32,7 @@ class PersonaService {
         }
     }
 
-    // Crear un docente (NO puede tener curso)
+    // Crear un docente 
 
     static async createDocente(docenteData) {
         try {
@@ -235,41 +235,6 @@ class PersonaService {
         }
     }
 
-    // Buscar personas por nombre o apellido
-
-    static async searchByName(searchTerm) {
-        try {
-            const personas = await Persona.findAll({
-                where: {
-                    [Op.or]: [
-                        {
-                            nombre: {
-                                [Op.iLike]: `%${searchTerm}%`
-                            }
-                        },
-                        {
-                            apellido: {
-                                [Op.iLike]: `%${searchTerm}%`
-                            }
-                        }
-                    ]
-                },
-                include: [
-                    {
-                        model: Curso,
-                        as: 'curso',
-                        attributes: ['id', 'anio_letra', 'turno']
-                    }
-                ],
-                order: [['apellido', 'ASC'], ['nombre', 'ASC']]
-            });
-
-            return personas;
-        } catch (error) {
-            throw new Error('Error al buscar personas por nombre: ' + error.message);
-        }
-    }
-
     // Obtener alumnos por curso
 
     static async findAlumnosByCurso(cursoId) {
@@ -291,31 +256,6 @@ class PersonaService {
             return alumnos;
         } catch (error) {
             throw new Error('Error al obtener alumnos por curso: ' + error.message);
-        }
-    }
-
-    // Obtener docentes por dictado
-
-    static async findDocentesByDictado(dictadoId) {
-        try {
-            const docentes = await Persona.findAll({
-                where: {
-                    tipoCodigo: 'Docente'
-                },
-                include: [
-                    {
-                        model: Dictado,
-                        as: 'dictados',
-                        where: { id: dictadoId },
-                        through: { attributes: [] }
-                    }
-                ],
-                order: [['apellido', 'ASC'], ['nombre', 'ASC']]
-            });
-
-            return docentes;
-        } catch (error) {
-            throw new Error('Error al obtener docentes por dictado: ' + error.message);
         }
     }
 
@@ -346,59 +286,6 @@ class PersonaService {
         }
     }
 
-    // Asignar dictado a docente
-
-    static async asignarDictadoADocente(docenteDni, dictadoId) {
-        try {
-            const docente = await Persona.findOne({
-                where: {
-                    dni: docenteDni,
-                    tipoCodigo: 'Docente'
-                }
-            });
-
-            if (!docente) {
-                throw new Error('Docente no encontrado');
-            }
-
-            const dictado = await Dictado.findByPk(dictadoId);
-            if (!dictado) {
-                throw new Error('Dictado no encontrado');
-            }
-
-            await docente.addDictado(dictado);
-            return true;
-        } catch (error) {
-            throw new Error('Error al asignar dictado a docente: ' + error.message);
-        }
-    }
-
-    // Cambiar curso de un alumno
-
-    static async asignarCursoAlumno(alumnoDni, nuevoCursoId) {
-        try {
-            const alumno = await Persona.findOne({
-                where: {
-                    dni: alumnoDni,
-                    tipoCodigo: 'Alumno'
-                }
-            });
-
-            if (!alumno) {
-                throw new Error('Alumno no encontrado');
-            }
-
-            const curso = await Curso.findByPk(nuevoCursoId);
-            if (!curso) {
-                throw new Error('Curso no encontrado');
-            }
-
-            return await PersonaService.updatePersona(alumnoDni, { cursoId: nuevoCursoId });
-        } catch (error) {
-            throw new Error('Error al cambiar curso del alumno: ' + error.message);
-        }
-    }
-
     // ========================= DELETE =========================
     
     // Eliminar una persona
@@ -425,60 +312,6 @@ class PersonaService {
             throw new Error('Error al eliminar persona: ' + error.message);
         }
     }
-
-    // Remover dictado de docente
-
-    static async removerDictadoDeDocente(docenteDni, dictadoId) {
-        try {
-            const docente = await Persona.findOne({
-                where: {
-                    dni: docenteDni,
-                    tipoCodigo: 'Docente'
-                }
-            });
-
-            if (!docente) {
-                throw new Error('Docente no encontrado');
-            }
-
-            const dictado = await Dictado.findByPk(dictadoId);
-            if (!dictado) {
-                throw new Error('Dictado no encontrado');
-            }
-
-            await docente.removeDictado(dictado);
-            return true;
-        } catch (error) {
-            throw new Error('Error al remover dictado del docente: ' + error.message);
-        }
-    }
-
-    // Remover curso de alumno
-
-    static async removerCursoDeAlumno(alumnoDni, CursoId) {
-        try {
-            const alumno = await Persona.findOne({
-                where: {
-                    dni: alumnoDni,
-                    tipoCodigo: 'Alumno'
-                }
-            });
-
-            if (!alumno) {
-                throw new Error('Alumno no encontrado');
-            }
-
-            const curso = await Curso.findByPk(CursoId);
-            if (!curso) {
-                throw new Error('Curso no encontrado');
-            }
-
-            await alumno.removeCurso(curso);
-            return true;
-        } catch (error) {
-            throw new Error('Error al remover curso del alumno: ' + error.message);
-        }
-    }    
 }
 
 module.exports = PersonaService;

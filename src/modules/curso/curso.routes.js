@@ -9,7 +9,6 @@ router.post('/', CursoController.createCurso); // POST /api/cursos
 // ========================= READ ===========================
 
 router.get('/', CursoController.getAllCursos); // GET /api/cursos
-router.get('/turno/:turno', CursoController.getCursosByTurno); // GET /api/cursos/turno/:turno
 router.get('/:id', CursoController.getCursoById); // GET /api/cursos/:id
 
 // ========================= UPDATE =========================

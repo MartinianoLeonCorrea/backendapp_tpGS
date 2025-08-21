@@ -118,49 +118,6 @@ class MateriaController {
         }
     }
 
-    // Buscar materias por nombre
-
-    async searchMaterias(req, res, next) {
-        try {
-            const { q } = req.query;
-            
-            if (!q || q.trim() === '') {
-                return res.status(400).json(MateriaService._errorResponse(
-                    'Parámetro de búsqueda requerido',
-                    ['El parámetro "q" es requerido para la búsqueda']
-                ));
-            }
-
-            const materias = await MateriaService.materiaService.findMateriasByName(q);
-            
-            res.status(200).json(MateriaService._successResponse(
-                `Búsqueda completada para "${q}"`,
-                materias,
-                {
-                    searchTerm: q,
-                    resultCount: materias.length
-                }
-            ));
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Obtener estadísticas de materias
-
-    async getMateriaStats(req, res, next) {
-        try {
-            const stats = await MateriaService.materiaService.getMateriaStats();
-
-            res.status(200).json(MateriaService._successResponse(
-                'Estadísticas obtenidas exitosamente',
-                stats
-            ));
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // ========================= UPDATE =========================
 
     // Actualizar una materia existente
@@ -188,47 +145,6 @@ class MateriaController {
             }
 
             const updatedMateria = await MateriaService.materiaService.updateMateria(id, { nombre, descripcion });
-            
-            if (!updatedMateria) {
-                return res.status(404).json(MateriaService._errorResponse(
-                    'Materia no encontrada para actualizar',
-                    [`No existe una materia con ID ${id}`]
-                ));
-            }
-
-            res.status(200).json(MateriaService._successResponse(
-                'Materia actualizada exitosamente',
-                updatedMateria
-            ));
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Actualización parcial de una materia
-
-    async patchMateria(req, res, next) {
-        try {
-            const { id } = req.params;
-            const updateData = req.body;
-
-            // Validaciones
-
-            if (!MateriaService._isValidId(id)) {
-                return res.status(400).json(MateriaService._errorResponse(
-                    'ID de materia inválido',
-                    ['ID debe ser un número válido']
-                ));
-            }
-
-            if (Object.keys(updateData).length === 0) {
-                return res.status(400).json(MateriaService._errorResponse(
-                    'No se proporcionaron datos para actualizar',
-                    ['Se requiere al menos un campo para actualizar']
-                ));
-            }
-
-            const updatedMateria = await MateriaService.materiaService.updateMateria(id, updateData);
             
             if (!updatedMateria) {
                 return res.status(404).json(MateriaService._errorResponse(

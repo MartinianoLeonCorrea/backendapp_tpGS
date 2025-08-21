@@ -89,20 +89,6 @@ class CursoService {
     }
   }
 
-  // Buscar cursos por turno
-
-  static async findCursosByTurno(turno) {
-    try {
-      const cursos = await Curso.findAll({
-        where: { turno },
-        order: [['anio_letra', 'ASC']]
-      });
-      return cursos;
-    } catch (error) {
-      throw new Error('Error al buscar cursos por turno: ' + error.message);
-    }
-  }
-
   // ========================= UPDATE =========================
   
   // Actualizar un curso

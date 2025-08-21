@@ -78,23 +78,6 @@ class CursoController {
     }
   }
 
-  // Obtener cursos por turno
-
-  static async getCursosByTurno(req, res, next) {
-    try {
-      const { turno } = req.params;
-      const cursos = await CursoService.findCursosByTurno(turno.toUpperCase());
-      
-      res.status(200).json({
-        message: `Cursos del turno ${turno} obtenidos exitosamente`,
-        data: cursos,
-        count: cursos.length
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // ========================= UPDATE =========================
 
   // Actualizar un curso existente

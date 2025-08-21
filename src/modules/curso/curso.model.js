@@ -7,17 +7,17 @@ const Curso = sequelize.define('curso', {
     primaryKey: true,
     autoIncrement: true,
   },
-  anio_letra: {
+  nro_letra: {
     type: DataTypes.STRING(3),
     allowNull: false,
-    unique: true, // Agregado para evitar duplicados
+    unique: false, 
     validate: {
       notEmpty: {
-        msg: 'El año y letra del curso no pueden estar vacíos.',
+        msg: 'El nro y letra del curso no pueden estar vacíos.',
       },
       len: {
         args: [1, 3],
-        msg: 'El año y letra debe tener entre 1 y 3 caracteres.',
+        msg: 'El nro y letra debe tener entre 1 y 3 caracteres.',
       },
     },
   },

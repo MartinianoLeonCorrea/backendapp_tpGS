@@ -154,29 +154,6 @@ class PersonaController {
         }
     }
 
-    // Buscar personas por nombre
-
-    static async searchByName(req, res, next) {
-        try {
-            const { q } = req.query;
-
-            if (!q || q.length < 2) {
-                return res.status(400).json({
-                    message: 'El término de búsqueda debe tener al menos 2 caracteres'
-                });
-            }
-
-            const personas = await PersonaService.searchByName(q);
-            res.status(200).json({
-                message: 'Búsqueda completada exitosamente',
-                data: personas,
-                count: personas.length
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // Obtener alumnos por curso
 
     static async getAlumnosByCurso(req, res, next) {
@@ -188,23 +165,6 @@ class PersonaController {
                 message: 'Alumnos del curso obtenidos exitosamente',
                 data: alumnos,
                 count: alumnos.length
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Obtener docentes por dictado
-
-    static async getDocentesByDictado(req, res, next) {
-        try {
-            const { dictadoId } = req.params;
-            const docentes = await PersonaService.findDocentesByDictado(parseInt(dictadoId));
-
-            res.status(200).json({
-                message: 'Docentes del dictado obtenidos exitosamente',
-                data: docentes,
-                count: docentes.length
             });
         } catch (error) {
             next(error);
@@ -235,40 +195,6 @@ class PersonaController {
         }
     }
 
-    // Asignar dictado a docente
-
-    static async asignarDictadoADocente(req, res, next) {
-        try {
-            const { dni, dictadoId } = req.params;
-            
-            await PersonaService.asignarDictadoADocente(parseInt(dni), parseInt(dictadoId));
-            
-            res.status(200).json({
-                message: 'Dictado asignado al docente exitosamente'
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Cambiar curso de alumno
-
-    static async asignarCursoAlumno(req, res, next) {
-        try {
-            const { dni } = req.params;
-            const { cursoId } = req.body;
-
-            const alumnoActualizado = await PersonaService.asignarCursoAlumno(parseInt(dni), parseInt(cursoId));
-
-            res.status(200).json({
-                message: 'Curso del alumno asignado exitosamente',
-                data: alumnoActualizado
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // ========================= DELETE =========================
     
     // Eliminar una persona
@@ -288,39 +214,7 @@ class PersonaController {
         } catch (error) {
             next(error);
         }
-    }
-
-    // Remover dictado de docente
-
-    static async removerDictadoDeDocente(req, res, next) {
-        try {
-            const { dni, dictadoId } = req.params;
-            
-            await PersonaService.removerDictadoDeDocente(parseInt(dni), parseInt(dictadoId));
-            
-            res.status(200).json({
-                message: 'Dictado removido del docente exitosamente'
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-// Remover curso de alumno
-
-    static async removerCursoDeAlumno(req, res, next) {
-        try {
-            const { dni, cursoId } = req.params;
-            
-            await PersonaService.removerCursoDeAlumno(parseInt(dni), parseInt(cursoId));
-            
-            res.status(200).json({
-                message: 'Curso removido del alumno exitosamente'
-            });
-        } catch (error) {
-            next(error);
-        }
-    }    
+    }  
 }
 
 module.exports = PersonaController;
