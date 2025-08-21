@@ -95,26 +95,6 @@ class CursoController {
     }
   }
 
-  // Obtener estadísticas de un curso
-
-  static async getCursoStats(req, res, next) {
-    try {
-      const { id } = req.params;
-      const stats = await CursoService.getCursoStats(id);
-      
-      if (!stats) {
-        return res.status(404).json({ message: 'Curso no encontrado' });
-      }
-
-      res.status(200).json({
-        message: 'Estadísticas del curso obtenidas exitosamente',
-        data: stats
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // ========================= UPDATE =========================
 
   // Actualizar un curso existente
@@ -153,23 +133,6 @@ class CursoController {
       }
 
       res.status(200).json({ message: 'Curso eliminado exitosamente' });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  // Eliminar curso forzado
-  
-  static async forceDeleteCurso(req, res, next) {
-    try {
-      const { id } = req.params;
-      const deletedCurso = await CursoService.forceDeleteCurso(id);
-      
-      if (!deletedCurso) {
-        return res.status(404).json({ message: 'Curso no encontrado' });
-      }
-
-      res.status(200).json({ message: 'Curso eliminado forzadamente exitosamente' });
     } catch (error) {
       next(error);
     }

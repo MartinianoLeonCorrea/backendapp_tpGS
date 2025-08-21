@@ -13,7 +13,6 @@ router.get('/', PersonaController.getAllPersonas); // GET /api/personas
 router.get('/search', PersonaController.searchByName); // GET /api/personas/search?q=nombre
 router.get('/alumnos', PersonaController.getAllAlumnos); // GET /api/personas/alumnos
 router.get('/docentes', PersonaController.getAllDocentes); // GET /api/personas/docentes
-router.get('/estadisticas', PersonaController.getEstadisticas); // GET /api/personas/estadisticas
 router.get('/curso/:cursoId/alumnos', PersonaController.getAlumnosByCurso); // GET /api/personas/curso/:cursoId/alumnos
 router.get('/dictado/:dictadoId/docentes', PersonaController.getDocentesByDictado); // GET /api/personas/dictado/:dictadoId/docentes
 router.get('/:dni', PersonaController.getPersonaByDni); // GET /api/personas/:dni

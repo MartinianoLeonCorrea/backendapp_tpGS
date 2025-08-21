@@ -103,41 +103,6 @@ class CursoService {
     }
   }
 
-  // Obtener estadísticas de un curso
-
-  static async getCursoStats(id) {
-    try {
-      const curso = await Curso.findByPk(id, {
-        include: [
-          {
-            model: Persona,
-            as: 'alumnos',
-            attributes: []
-          },
-          {
-            model: Dictado,
-            as: 'dictado',
-            attributes: []
-          }
-        ],
-        attributes: {
-          include: [
-            [sequelize.fn('COUNT', sequelize.col('alumnos.dni')), 'totalAlumnos'],
-            [sequelize.fn('CASE', 
-              sequelize.col('dictado.id'), 
-              sequelize.literal('1'), 
-              sequelize.literal('0')
-            ), 'tieneDictado']
-          ]
-        },
-        group: ['curso.id']
-      });
-      return curso;
-    } catch (error) {
-      throw new Error('Error al obtener estadísticas del curso: ' + error.message);
-    }
-  }
-
   // ========================= UPDATE =========================
   
   // Actualizar un curso
@@ -189,28 +154,6 @@ class CursoService {
       return deletedRows > 0; // Retorna true si se eliminó al menos un curso
     } catch (error) {
       throw new Error('Error al eliminar curso: ' + error.message);
-    }
-  }
-
-  // Eliminar curso forzado (con sus relaciones)
-
-  static async forceDeleteCurso(id) {
-    try {
-
-      // Eliminar relaciones primero
-      
-      await Persona.update(
-        { cursoId: null },
-        { where: { cursoId: id } }
-      );
-
-      const deletedRows = await Curso.destroy({
-        where: { id: id },
-      });
-      
-      return deletedRows > 0;
-    } catch (error) {
-      throw new Error('Error al eliminar curso forzado: ' + error.message);
     }
   }
 }

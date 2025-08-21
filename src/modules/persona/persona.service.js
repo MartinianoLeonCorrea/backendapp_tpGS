@@ -319,48 +319,6 @@ class PersonaService {
         }
     }
 
-    // Obtener estadísticas generales
-
-    static async getEstadisticas() {
-        try {
-            const totalPersonas = await Persona.count();
-            const totalAlumnos = await Persona.count({ 
-                where: { tipoCodigo: 'Alumno' } 
-            });
-            const totalDocentes = await Persona.count({ 
-                where: { tipoCodigo: 'Docente' } 
-            });
-
-            // Estadísticas por curso (solo alumnos)
-
-            const alumnosPorCurso = await Persona.findAll({
-                where: { tipoCodigo: 'Alumno' },
-                attributes: [
-                    'cursoId',
-                    [sequelize.fn('COUNT', sequelize.col('dni')), 'cantidad']
-                ],
-                include: [
-                    {
-                        model: Curso,
-                        as: 'curso',
-                        attributes: ['anio_letra', 'turno']
-                    }
-                ],
-                group: ['cursoId', 'curso.id'],
-                raw: false
-            });
-
-            return {
-                totalPersonas,
-                totalAlumnos,
-                totalDocentes,
-                alumnosPorCurso
-            };
-        } catch (error) {
-            throw new Error('Error al obtener estadísticas: ' + error.message);
-        }
-    }
-
     // ========================= UPDATE =========================
     
     // Actualizar una persona

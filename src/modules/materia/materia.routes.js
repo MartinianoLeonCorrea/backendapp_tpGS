@@ -1,14 +1,25 @@
-// Definición de las rutas de la API para la entidad Materia
-
 const express = require('express');
 const router = express.Router();
-const materiaController = require('./materia.controller'); // Importa el controlador
+const MateriaController = require('./materia.controller'); 
 
-// Rutas para Materias
-router.get('/', materiaController.getAllMaterias); // GET /api/materias
-router.get('/:id', materiaController.getMateriaById); // GET /api/materias/:id
-router.post('/', materiaController.createMateria); // POST /api/materias
-router.put('/:id', materiaController.updateMateria); // PUT /api/materias/:id
-router.delete('/:id', materiaController.deleteMateria); // DELETE /api/materias/:id
+// ========================= CREATE =========================
+
+router.post('/', MateriaController.createMateria); // POST /api/materias
+
+// ========================= READ ===========================
+
+router.get('/stats', MateriaController.getMateriaStats); // GET /api/materias/stats
+router.get('/search', MateriaController.searchMaterias); // GET /api/materias/search?q=nombremateria
+router.get('/', MateriaController.getAllMaterias); // GET /api/materias?page=1&limit=10&search=nombremateria&include=relations
+router.get('/:id', MateriaController.getMateriaById); // GET /api/materias/:id?include=relations
+
+// ========================= UPDATE =========================
+
+router.put('/:id', MateriaController.updateMateria); // PUT /api/materias/:id
+router.patch('/:id', MateriaController.patchMateria); // PATCH /api/materias/:id
+
+// ========================= DELETE =========================
+
+router.delete('/:id', MateriaController.deleteMateria); // DELETE /api/materias/:id
 
 module.exports = router;

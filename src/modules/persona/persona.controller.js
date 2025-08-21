@@ -211,20 +211,6 @@ class PersonaController {
         }
     }
 
-    // Obtener estadísticas
-
-    static async getEstadisticas(req, res, next) {
-        try {
-            const stats = await PersonaService.getEstadisticas();
-            res.status(200).json({
-                message: 'Estadísticas obtenidas exitosamente',
-                data: stats
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // ========================= UPDATE =========================
 
     // Actualizar una persona
