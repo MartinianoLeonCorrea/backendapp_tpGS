@@ -90,6 +90,124 @@ class MateriaService {
       throw new Error('Error al obtener materia por ID: ' + error.message);
     }
   }
+  // ========================= READ ===========================
+
+  // Obtener todas las materias
+
+  async findAllMaterias(options = {}) {
+    try {
+      const { page, limit, search, includeRelations = false } = options;
+
+      let queryOptions = {
+        order: [['nombre', 'ASC']],
+      };
+
+      // Paginación
+
+      if (page && limit) {
+        const offset = (page - 1) * limit;
+        queryOptions.limit = parseInt(limit);
+        queryOptions.offset = offset;
+      }
+
+      // Búsqueda por nombre
+
+      if (search) {
+        queryOptions.where = {
+          nombre: {
+            [Op.iLike]: `%${search}%`,
+          },
+        };
+      }
+
+      // Incluir relaciones si se solicita
+
+      if (includeRelations) {
+        queryOptions.include = this._getRelationIncludes();
+      }
+
+      const materias = await Materia.findAll(queryOptions);
+      return materias;
+    } catch (error) {
+      throw new Error('Error al obtener todas las materias: ' + error.message);
+    }
+  }
+
+  // Obtener una materia por ID
+
+  async findMateriaById(id, includeRelations = false) {
+    try {
+      this._validateId(id);
+
+      let queryOptions = {
+        where: { id },
+      };
+
+      if (includeRelations) {
+        queryOptions.include = this._getRelationIncludes();
+      }
+
+      const materia = await Materia.findOne(queryOptions);
+      return materia;
+    } catch (error) {
+      throw new Error('Error al obtener materia por ID: ' + error.message);
+    }
+  }
+
+  // ========================= HELPER FUNCTIONS ===========================
+
+  // Función para construir una respuesta de éxito estandarizada
+  _successResponse(message, data) {
+    return {
+      success: true,
+      message,
+      data,
+    };
+  }
+
+  // Función para construir una respuesta de error estandarizada
+  _errorResponse(message, errors = []) {
+    return {
+      success: false,
+      message,
+      errors,
+    };
+  }
+
+  // Función para construir metadatos de paginación
+  _buildPaginationMeta(page, limit, totalCount) {
+    const totalPages = Math.ceil(totalCount / limit);
+    return {
+      totalItems: totalCount,
+      totalPages: totalPages,
+      currentPage: page,
+      itemsPerPage: limit,
+    };
+  }
+
+  // Función para validar parámetros de paginación
+  _validatePaginationParams({ page, limit }) {
+    const errors = [];
+    if (page && !limit) {
+      errors.push("'limit' es requerido si se especifica 'page'.");
+    }
+    if (page) {
+      const pageNumber = parseInt(page, 10);
+      if (isNaN(pageNumber) || pageNumber < 1) {
+        errors.push("'page' debe ser un número entero mayor que 0.");
+      }
+    }
+    if (limit) {
+      const limitNumber = parseInt(limit, 10);
+      if (isNaN(limitNumber) || limitNumber < 1) {
+        errors.push("'limit' debe ser un número entero mayor que 0.");
+      }
+    }
+    return {
+      isValid: errors.length === 0,
+      errors: errors,
+    };
+  }
 
   // ========================= UPDATE =========================
 
@@ -159,4 +277,4 @@ class MateriaService {
   }
 }
 
-module.exports = MateriaService;
+module.exports = new MateriaService();
