@@ -1,6 +1,6 @@
 // src/models/examen.model.js
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { sequelize } = require('../../config/database');
 
 const Examen = sequelize.define('Examen', {
   id: {

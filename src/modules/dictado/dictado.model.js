@@ -8,16 +8,12 @@ const Dictado = sequelize.define('Dictado', {
     primaryKey: true,
     autoIncrement: true,
   },
-  fecha_desde: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  fecha_hasta: {
-    type: DataTypes.DATE,
+  anio: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   dias_cursado: {
-    type: DataTypes.STRING(50), // Por ejemplo, "Lunes, Miércoles, Viernes"
+    type: DataTypes.STRING(100), // Por ejemplo, "Lunes, Miércoles, Viernes"
     allowNull: false,
     validate: {
       notEmpty: {

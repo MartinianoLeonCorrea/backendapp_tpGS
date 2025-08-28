@@ -3,7 +3,7 @@ const { models, Op } = require('../db/sequelize');
 const Persona = require('../persona/persona.model');
 const Curso = require('../curso/curso.model');
 const Materia = require('../materia/materia.model');
-const Dictado = require('./dictado.model');
+const Dictado = require('../dictado/dictado.model');
 
 // ========== CREATE ==========
 // Crear un nuevo dictado
