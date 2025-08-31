@@ -1,9 +1,8 @@
 const Curso = require('./curso.model');
-const Persona = require('../persona/persona.model');
+const Alumno = require('../persona/persona.model');
 const Dictado = require('../dictado/dictado.model');
 
 class CursoService {
-
   // ========================= CREATE =========================
 
   // Crear un nuevo curso
@@ -18,7 +17,8 @@ class CursoService {
       }
       if (error.name === 'SequelizeValidationError') {
         throw new Error(
-          'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
+          'Error de validación: ' +
+            error.errors.map((e) => e.message).join(', ')
         );
       }
       throw new Error('Error al crear curso: ' + error.message);
@@ -38,7 +38,7 @@ class CursoService {
         include.push({
           model: Persona,
           as: 'alumnos',
-          attributes: ['dni', 'nombre', 'apellido', 'email']
+          attributes: ['dni', 'nombre', 'apellido', 'email'],
         });
       }
 
@@ -46,13 +46,13 @@ class CursoService {
         include.push({
           model: Dictado,
           as: 'dictado',
-          attributes: ['id', 'fecha_desde', 'fecha_hasta', 'dias_cursado']
+          attributes: ['id', 'fecha_desde', 'fecha_hasta', 'dias_cursado'],
         });
       }
 
       const cursos = await Curso.findAll({
         include,
-        order: [['anio_letra', 'ASC']]
+        order: [['anio_letra', 'ASC']],
       });
       return cursos;
     } catch (error) {
@@ -69,16 +69,16 @@ class CursoService {
 
       if (includeAlumnos) {
         include.push({
-          model: Persona,
+          model: Alumno,
           as: 'alumnos',
-          attributes: ['dni', 'nombre', 'apellido', 'email', 'telefono']
+          attributes: ['dni', 'nombre', 'apellido', 'email', 'telefono'],
         });
       }
 
       if (includeDictado) {
         include.push({
           model: Dictado,
-          as: 'dictado'
+          as: 'dictado',
         });
       }
 
@@ -90,7 +90,7 @@ class CursoService {
   }
 
   // ========================= UPDATE =========================
-  
+
   // Actualizar un curso
 
   static async updateCurso(id, cursoData) {
@@ -98,7 +98,7 @@ class CursoService {
       const [updatedRows] = await Curso.update(cursoData, {
         where: { id: id },
       });
-      
+
       if (updatedRows > 0) {
         return await Curso.findByPk(id); // Retorna el curso actualizado
       }
@@ -109,7 +109,8 @@ class CursoService {
       }
       if (error.name === 'SequelizeValidationError') {
         throw new Error(
-          'Error de validación: ' + error.errors.map((e) => e.message).join(', ')
+          'Error de validación: ' +
+            error.errors.map((e) => e.message).join(', ')
         );
       }
       throw new Error('Error al actualizar curso: ' + error.message);
@@ -117,26 +118,27 @@ class CursoService {
   }
 
   // ========================= DELETE =========================
-  
+
   // Eliminar un curso
 
   static async deleteCurso(id) {
     try {
-
       // Verificar si hay alumnos asignados
 
       const alumnosCount = await Persona.count({
-        where: { cursoId: id, tipoCodigo: 'Alumno' }
+        where: { cursoId: id, tipo: 'Alumno' },
       });
 
       if (alumnosCount > 0) {
-        throw new Error('No se puede eliminar el curso porque tiene alumnos asignados.');
+        throw new Error(
+          'No se puede eliminar el curso porque tiene alumnos asignados.'
+        );
       }
 
       const deletedRows = await Curso.destroy({
         where: { id: id },
       });
-      
+
       return deletedRows > 0; // Retorna true si se eliminó al menos un curso
     } catch (error) {
       throw new Error('Error al eliminar curso: ' + error.message);

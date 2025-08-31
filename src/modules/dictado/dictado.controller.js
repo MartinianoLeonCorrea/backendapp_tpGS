@@ -1,5 +1,5 @@
 // src/controllers/dictado.controller.js
-const dictadoService = require('../services/dictado.service');
+const dictadoService = require('../dictado/dictado.service');
 
 // ========== CREATE ==========
 const createDictadoWithRelations = async (req, res, next) => {

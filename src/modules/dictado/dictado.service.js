@@ -1,5 +1,5 @@
 //Lógica de negocio para la entidad Dictado
-const { models, Op } = require('../db/sequelize');
+const { Op } = require('sequelize');
 const Persona = require('../persona/persona.model');
 const Curso = require('../curso/curso.model');
 const Materia = require('../materia/materia.model');
@@ -20,20 +20,20 @@ const createDictadoWithRelations = async (
 ) => {
   const dictado = await Dictado.create(dictadoData);
 
-  // Asociar docentes si se proporcionan
-  if (docentesIds.length > 0) {
-    const docentes = await Persona.findAll({
-      where: { id: docentesIds },
+  // Asociar docente si se proporcionan
+  if (docenteId.length > 0) {
+    const docente = await Persona.findAll({
+      where: { id: docenteId },
     });
-    await dictado.setDocentes(docentes);
+    await dictado.setDocente(docente);
   }
 
-  // Asociar materias si se proporcionan
-  if (materiasIds.length > 0) {
-    const materias = await Materia.findAll({
-      where: { id: materiasIds },
+  // Asociar materia si se proporcionan
+  if (materiaId.length > 0) {
+    const materia = await Materia.findAll({
+      where: { id: materiaId },
     });
-    await dictado.setMaterias(materias);
+    await dictado.setMateria(materia);
   }
 
   return dictado;
@@ -45,8 +45,8 @@ const getAllDictados = async () => {
   const dictados = await Dictado.findAll({
     include: [
       { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materias', through: { attributes: [] } },
-      { model: Persona, as: 'docentes', through: { attributes: [] } },
+      { model: Materia, as: 'materia', through: { attributes: [] } },
+      { model: Persona, as: 'docente', through: { attributes: [] } },
     ],
   });
   return dictados;
@@ -57,8 +57,8 @@ const getDictadoById = async (id) => {
   const dictado = await Dictado.findByPk(id, {
     include: [
       { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materias', through: { attributes: [] } },
-      { model: Persona, as: 'docentes', through: { attributes: [] } },
+      { model: Materia, as: 'materia', through: { attributes: [] } },
+      { model: Persona, as: 'docente', through: { attributes: [] } },
     ],
   });
   return dictado;
@@ -70,16 +70,16 @@ const getDictadosByCurso = async (cursoId) => {
     where: { curso_id: cursoId },
     include: [
       { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materias', through: { attributes: [] } },
-      { model: Persona, as: 'docentes', through: { attributes: [] } },
+      { model: Materia, as: 'materia', through: { attributes: [] } },
+      { model: Persona, as: 'docente', through: { attributes: [] } },
     ],
   });
   return dictados;
 };
 
-// Obtener dictados de una persona específica (corregido)
+// Obtener dictados de una persona específica
 const getDictadosByPersona = async (id) => {
-  const persona = await Persona.findByPk(id, {
+  const docente = await Persona.findByPk(id, {
     include: [
       {
         model: Dictado,
@@ -87,19 +87,19 @@ const getDictadosByPersona = async (id) => {
         through: { attributes: [] },
         include: [
           { model: Curso, as: 'curso' },
-          { model: Materia, as: 'materias', through: { attributes: [] } },
-          { model: Persona, as: 'docentes', through: { attributes: [] } },
+          { model: Materia, as: 'materia', through: { attributes: [] } },
+          { model: Persona, as: 'docente', through: { attributes: [] } },
         ],
       },
     ],
   });
-  return persona ? persona.dictados : [];
+  return docente ? docente.dictados : [];
 };
 
-// Obtener dictados activos de una persona (corregido)
+// Obtener dictados activos de una persona
 const getDictadosActivosByPersona = async (id) => {
   const now = new Date();
-  const persona = await Persona.findByPk(id, {
+  const docente = await Persona.findByPk(id, {
     include: [
       {
         model: Dictado,
@@ -111,12 +111,12 @@ const getDictadosActivosByPersona = async (id) => {
         through: { attributes: [] },
         include: [
           { model: Curso, as: 'curso' },
-          { model: Materia, as: 'materias', through: { attributes: [] } },
+          { model: Materia, as: 'materia', through: { attributes: [] } },
         ],
       },
     ],
   });
-  return persona ? persona.dictados : [];
+  return docente ? docente.dictados : [];
 };
 
 // Obtener dictados activos
@@ -129,8 +129,8 @@ const getDictadosActivos = async () => {
     },
     include: [
       { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materias', through: { attributes: [] } },
-      { model: Persona, as: 'docentes', through: { attributes: [] } },
+      { model: Materia, as: 'materia', through: { attributes: [] } },
+      { model: Persona, as: 'docente', through: { attributes: [] } },
     ],
   });
   return dictados;
@@ -146,7 +146,7 @@ const getDictadosByMateria = async (materiaId) => {
         through: { attributes: [] },
         include: [
           { model: Curso, as: 'curso' },
-          { model: Persona, as: 'docentes', through: { attributes: [] } },
+          { model: Persona, as: 'docente', through: { attributes: [] } },
         ],
       },
     ],
@@ -172,8 +172,8 @@ const updateDictado = async (id, updateData) => {
 const updateDictadoWithRelations = async (
   id,
   updateData,
-  docentesIds = null,
-  materiasIds = null
+  docenteId = null,
+  materiaId = null
 ) => {
   // Actualizar datos básicos
   const [updatedRowsCount] = await Dictado.update(updateData, {
@@ -187,26 +187,26 @@ const updateDictadoWithRelations = async (
   const dictado = await Dictado.findByPk(id);
 
   // Actualizar docentes si se proporcionan
-  if (docentesIds !== null) {
-    if (docentesIds.length > 0) {
-      const docentes = await Persona.findAll({
-        where: { id: docentesIds },
+  if (docenteId !== null) {
+    if (docenteId.length > 0) {
+      const docente = await Persona.findAll({
+        where: { id: docenteId },
       });
-      await dictado.setDocentes(docentes);
+      await dictado.setDocente(docente);
     } else {
-      await dictado.setDocentes([]);
+      await dictado.setDocente([]);
     }
   }
 
   // Actualizar materias si se proporcionan
-  if (materiasIds !== null) {
-    if (materiasIds.length > 0) {
+  if (materiaId !== null) {
+    if (materiaId.length > 0) {
       const materias = await Materia.findAll({
-        where: { id: materiasIds },
+        where: { id: materiaId },
       });
-      await dictado.setMaterias(materias);
+      await dictado.setMateria(materias);
     } else {
-      await dictado.setMaterias([]);
+      await dictado.setMateria([]);
     }
   }
 
@@ -288,8 +288,8 @@ const deleteDictadoSafe = async (id) => {
   }
 
   // Limpiar relaciones manualmente (opcional, Sequelize lo hace automáticamente)
-  await dictado.setDocentes([]);
-  await dictado.setMaterias([]);
+  await dictado.setDocente([]);
+  await dictado.setMateria([]);
 
   await dictado.destroy();
   return dictado;

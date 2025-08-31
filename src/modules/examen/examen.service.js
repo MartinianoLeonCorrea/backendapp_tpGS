@@ -1,5 +1,8 @@
 // src/services/examen.service.js
-const { Examen, Materia, Dictado, Persona } = require('../models');
+const Persona = require('../persona/persona.model');
+const Examen = require('../examen/examen.model');
+const Materia = require('../materia/materia.model');
+const Dictado = require('../dictado/dictado.model');
 
 // Función para obtener todos los exámenes con sus relaciones
 const getAllExamenes = async () => {

@@ -1,7 +1,7 @@
 // src/routes/examen.routes.js
 const express = require('express');
 const router = express.Router();
-const examenController = require('../controllers/examen.controller');
+const examenController = require('../examen/examen.controller');
 
 // Rutas de CRUD
 router

@@ -1,5 +1,5 @@
 // src/controllers/examen.controller.js
-const examenService = require('../services/examen.service');
+const examenService = require('../examen/examen.service');
 
 // Obtener todos los exámenes
 const getAllExamenes = async (req, res, next) => {

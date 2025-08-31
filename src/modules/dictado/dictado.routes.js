@@ -1,7 +1,7 @@
 // src/routes/dictado.routes.js
 const express = require('express');
 const router = express.Router();
-const dictadoController = require('../controllers/dictado.controller');
+const dictadoController = require('../dictado/dictado.controller');
 
 // Rutas principales de CRUD
 router
