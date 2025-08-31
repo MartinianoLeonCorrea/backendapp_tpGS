@@ -1,5 +1,6 @@
 // Configuración de la conexión a la base de datos con Sequelize
-
+console.log('Conectando a MySQL con usuario:', process.env.DB_USER);
+// ...existing code...
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
