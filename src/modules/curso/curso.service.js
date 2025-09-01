@@ -28,38 +28,16 @@ class CursoService {
   // ========================= READ ===========================
 
   // Obtener todos los cursos
-
-  static async findAllCursos(options = {}) {
+  static async findAllCursos() {
     try {
-      const { includeAlumnos = false, includeDictado = false } = options;
-      const include = [];
-
-      if (includeAlumnos) {
-        include.push({
-          model: Persona,
-          as: 'alumnos',
-          attributes: ['dni', 'nombre', 'apellido', 'email'],
-        });
-      }
-
-      if (includeDictado) {
-        include.push({
-          model: Dictado,
-          as: 'dictado',
-          attributes: ['id', 'fecha_desde', 'fecha_hasta', 'dias_cursado'],
-        });
-      }
-
       const cursos = await Curso.findAll({
-        include,
-        order: [['anio_letra', 'ASC']],
+        order: [['nro_letra', 'ASC']],
       });
       return cursos;
     } catch (error) {
-      throw new Error('Error al obtener todos los cursos: ' + error.message);
+      throw new Error('Error al obtener cursos: ' + error.message);
     }
   }
-
   // Encontrar un curso por ID
 
   static async findCursoById(id, options = {}) {

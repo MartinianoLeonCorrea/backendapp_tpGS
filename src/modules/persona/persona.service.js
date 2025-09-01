@@ -5,24 +5,31 @@ const Dictado = require('../dictado/dictado.model');
 const Materia = require('../materia/materia.model');
 
 class PersonaService {
+  // ========================= CREATE =========================
+  static async createPersona(personaData) {
+    try {
+      // Solo crea la persona y asocia el curso por cursoId si es alumno
+      const persona = await Persona.create(personaData);
+      return persona;
+    } catch (error) {
+      throw new Error('Error al crear persona: ' + error.message);
+    }
+  }
+
   // ========================= READ ===========================
 
   // Obtener todas las personas
 
   static async findAllPersonas(options = {}) {
     try {
-      const {
-        tipoCodigo,
-        includeCurso = false,
-        includeDictados = false,
-      } = options;
+      const { tipo, includeCurso = false, includeDictados = false } = options;
       const where = {};
       const include = [];
 
       // Filtrar por tipo si se especifica
 
-      if (tipoCodigo) {
-        where.tipoCodigo = tipoCodigo;
+      if (tipo) {
+        where.tipo = tipo;
       }
 
       // Incluir curso si se solicita
@@ -31,7 +38,7 @@ class PersonaService {
         include.push({
           model: Curso,
           as: 'curso',
-          attributes: ['id', 'anio_letra', 'turno'],
+          attributes: ['id', 'nro_letra', 'turno'],
         });
       }
 
@@ -47,7 +54,7 @@ class PersonaService {
             {
               model: Curso,
               as: 'curso',
-              attributes: ['id', 'anio_letra', 'turno'],
+              attributes: ['id', 'nro_letra', 'turno'],
             },
           ],
         });
@@ -149,7 +156,7 @@ class PersonaService {
 
       // Si es docente, remover relaciones con dictados
 
-      if (persona.tipoCodigo === 'Docente') {
+      if (persona.tipo === 'Docente') {
         await persona.setDictados([]);
       }
 

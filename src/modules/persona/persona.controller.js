@@ -7,18 +7,13 @@ class PersonaController {
 
   static async createAlumno(req, res, next) {
     try {
-      const alumnoData = req.body;
-      const { cursoId } = req.body;
-
-      // Validaciones básicas
-
+      const alumnoData = { ...req.body, tipo: 'alumno' };
       if (!alumnoData.dni || !alumnoData.nombre || !alumnoData.apellido) {
         return res.status(400).json({
           message: 'Los campos dni, nombre y apellido son obligatorios',
         });
       }
-
-      const newAlumno = await PersonaService.createAlumno(alumnoData, cursoId);
+      const newAlumno = await PersonaService.createPersona(alumnoData);
       res.status(201).json({
         message: 'Alumno creado exitosamente',
         data: newAlumno,

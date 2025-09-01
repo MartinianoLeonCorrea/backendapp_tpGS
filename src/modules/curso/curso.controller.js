@@ -1,7 +1,6 @@
 const CursoService = require('./curso.service');
 
 class CursoController {
-
   // ========================= CREATE =========================
 
   // Crear un nuevo curso
@@ -9,19 +8,19 @@ class CursoController {
   static async createCurso(req, res, next) {
     try {
       const cursoData = req.body;
-      
+
       // Validaciones básicas
 
-      if (!cursoData.anio_letra || !cursoData.turno) {
-        return res.status(400).json({ 
-          message: 'Los campos año_letra y turno son obligatorios' 
+      if (!cursoData.nro_letra || !cursoData.turno) {
+        return res.status(400).json({
+          message: 'Los campos nro_letra y turno son obligatorios',
         });
       }
 
       const newCurso = await CursoService.createCurso(cursoData);
       res.status(201).json({
         message: 'Curso creado exitosamente',
-        data: newCurso
+        data: newCurso,
       });
     } catch (error) {
       next(error);
@@ -34,17 +33,11 @@ class CursoController {
 
   static async getAllCursos(req, res, next) {
     try {
-      const { includeAlumnos, includeDictados } = req.query;
-      const options = {
-        includeAlumnos: includeAlumnos === 'true',
-        includeDictados: includeDictados === 'true'
-      };
-
-      const cursos = await CursoService.findAllCursos(options);
+      const cursos = await CursoService.findAllCursos();
       res.status(200).json({
         message: 'Cursos obtenidos exitosamente',
         data: cursos,
-        count: cursos.length
+        count: cursos.length,
       });
     } catch (error) {
       next(error);
@@ -57,21 +50,21 @@ class CursoController {
     try {
       const { id } = req.params;
       const { includeAlumnos, includeDictados } = req.query;
-      
+
       const options = {
         includeAlumnos: includeAlumnos === 'true',
-        includeDictados: includeDictados === 'true'
+        includeDictados: includeDictados === 'true',
       };
 
       const curso = await CursoService.findCursoById(id, options);
-      
+
       if (!curso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
 
       res.status(200).json({
         message: 'Curso obtenido exitosamente',
-        data: curso
+        data: curso,
       });
     } catch (error) {
       next(error);
@@ -88,14 +81,14 @@ class CursoController {
       const cursoData = req.body;
 
       const updatedCurso = await CursoService.updateCurso(id, cursoData);
-      
+
       if (!updatedCurso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
 
       res.status(200).json({
         message: 'Curso actualizado exitosamente',
-        data: updatedCurso
+        data: updatedCurso,
       });
     } catch (error) {
       next(error);
@@ -110,7 +103,7 @@ class CursoController {
     try {
       const { id } = req.params;
       const deletedCurso = await CursoService.deleteCurso(id);
-      
+
       if (!deletedCurso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
