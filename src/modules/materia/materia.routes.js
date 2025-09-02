@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const MateriaController = require('./materia.controller');
-const materiaController = new MateriaController();
+const materiaController = require('./materia.controller');
 
 // ========================= CREATE =========================
 

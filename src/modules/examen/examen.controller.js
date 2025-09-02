@@ -5,7 +5,14 @@ const examenService = require('../examen/examen.service');
 const getAllExamenes = async (req, res, next) => {
   try {
     const examenes = await examenService.getAllExamenes();
-    res.status(200).json(examenes);
+    res
+      .status(200)
+      .json(
+        examenService._successResponse(
+          'Exámenes obtenidos exitosamente',
+          examenes
+        )
+      );
   } catch (error) {
     next(error);
   }
@@ -16,9 +23,19 @@ const getExamenById = async (req, res, next) => {
   try {
     const examen = await examenService.getExamenById(req.params.id);
     if (!examen) {
-      return res.status(404).json({ message: 'Examen no encontrado' });
+      return res
+        .status(404)
+        .json(
+          examenService._errorResponse('Examen no encontrado', [
+            `No existe un examen con ID ${req.params.id}`,
+          ])
+        );
     }
-    res.status(200).json(examen);
+    res
+      .status(200)
+      .json(
+        examenService._successResponse('Examen encontrado exitosamente', examen)
+      );
   } catch (error) {
     next(error);
   }

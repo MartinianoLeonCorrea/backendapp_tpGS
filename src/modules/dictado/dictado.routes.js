@@ -7,7 +7,7 @@ const dictadoController = require('../dictado/dictado.controller');
 router
   .route('/')
   // POST /api/dictados - Crear un nuevo dictado con o sin relaciones
-  .post(dictadoController.createDictadoWithRelations)
+  .post(dictadoController.createDictado)
   // GET /api/dictados - Obtener todos los dictados
   .get(dictadoController.getAllDictados);
 
@@ -17,7 +17,7 @@ router
   // GET /api/dictados/:id - Obtener un dictado por ID
   .get(dictadoController.getDictadoById)
   // PUT /api/dictados/:id - Actualizar un dictado (datos o relaciones)
-  .put(dictadoController.updateDictadoWithRelations)
+  .put(dictadoController.updateDictado)
   // DELETE /api/dictados/:id - Eliminar un dictado
   .delete(dictadoController.deleteDictado);
 

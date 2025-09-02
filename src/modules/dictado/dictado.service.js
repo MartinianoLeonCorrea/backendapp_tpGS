@@ -4,332 +4,147 @@ const Persona = require('../persona/persona.model');
 const Curso = require('../curso/curso.model');
 const Materia = require('../materia/materia.model');
 const Dictado = require('../dictado/dictado.model');
+const Examen = require('../examen/examen.model');
 
-// ========== CREATE ==========
-// Crear un nuevo dictado
-const createDictado = async (dictadoData) => {
-  const dictado = await Dictado.create(dictadoData);
-  return dictado;
-};
+class DictadoService {
+  // ========================== CREATE ==========================
+  // Crear un nuevo dictado
+  async createDictado(dictadoData) {
+    const dictado = await Dictado.create(dictadoData);
+    return dictado;
+  }
 
-// Crear dictado con relaciones (docentes y materias)
-const createDictadoWithRelations = async (
-  dictadoData,
-  docentesIds = [],
-  materiasIds = []
-) => {
-  const dictado = await Dictado.create(dictadoData);
-
-  // Asociar docente si se proporcionan
-  if (docenteId.length > 0) {
-    const docente = await Persona.findAll({
-      where: { id: docenteId },
+  // ========================== READ ============================
+  // Obtener todos los dictados
+  async getAllDictados() {
+    return await Dictado.findAll({
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
     });
-    await dictado.setDocente(docente);
   }
 
-  // Asociar materia si se proporcionan
-  if (materiaId.length > 0) {
-    const materia = await Materia.findAll({
-      where: { id: materiaId },
+  // Obtener dictado por ID
+  async getDictadoById(id) {
+    return await Dictado.findByPk(id, {
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
     });
-    await dictado.setMateria(materia);
   }
 
-  return dictado;
-};
-
-// ========== READ ==========
-// Obtener todos los dictados
-const getAllDictados = async () => {
-  const dictados = await Dictado.findAll({
-    include: [
-      { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materia', through: { attributes: [] } },
-      { model: Persona, as: 'docente', through: { attributes: [] } },
-    ],
-  });
-  return dictados;
-};
-
-// Obtener dictado por ID
-const getDictadoById = async (id) => {
-  const dictado = await Dictado.findByPk(id, {
-    include: [
-      { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materia', through: { attributes: [] } },
-      { model: Persona, as: 'docente', through: { attributes: [] } },
-    ],
-  });
-  return dictado;
-};
-
-// Obtener dictados por curso
-const getDictadosByCurso = async (cursoId) => {
-  const dictados = await Dictado.findAll({
-    where: { curso_id: cursoId },
-    include: [
-      { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materia', through: { attributes: [] } },
-      { model: Persona, as: 'docente', through: { attributes: [] } },
-    ],
-  });
-  return dictados;
-};
-
-// Obtener dictados de una persona específica
-const getDictadosByPersona = async (id) => {
-  const docente = await Persona.findByPk(id, {
-    include: [
-      {
-        model: Dictado,
-        as: 'dictados',
-        through: { attributes: [] },
-        include: [
-          { model: Curso, as: 'curso' },
-          { model: Materia, as: 'materia', through: { attributes: [] } },
-          { model: Persona, as: 'docente', through: { attributes: [] } },
-        ],
-      },
-    ],
-  });
-  return docente ? docente.dictados : [];
-};
-
-// Obtener dictados activos de una persona
-const getDictadosActivosByPersona = async (id) => {
-  const now = new Date();
-  const docente = await Persona.findByPk(id, {
-    include: [
-      {
-        model: Dictado,
-        as: 'dictados',
-        where: {
-          fecha_desde: { [Op.lte]: now },
-          fecha_hasta: { [Op.gte]: now },
-        },
-        through: { attributes: [] },
-        include: [
-          { model: Curso, as: 'curso' },
-          { model: Materia, as: 'materia', through: { attributes: [] } },
-        ],
-      },
-    ],
-  });
-  return docente ? docente.dictados : [];
-};
-
-// Obtener dictados activos
-const getDictadosActivos = async () => {
-  const now = new Date();
-  const dictados = await Dictado.findAll({
-    where: {
-      fecha_desde: { [Op.lte]: now },
-      fecha_hasta: { [Op.gte]: now },
-    },
-    include: [
-      { model: Curso, as: 'curso' },
-      { model: Materia, as: 'materia', through: { attributes: [] } },
-      { model: Persona, as: 'docente', through: { attributes: [] } },
-    ],
-  });
-  return dictados;
-};
-
-// Obtener dictados por materia
-const getDictadosByMateria = async (materiaId) => {
-  const materia = await Materia.findByPk(materiaId, {
-    include: [
-      {
-        model: Dictado,
-        as: 'dictados',
-        through: { attributes: [] },
-        include: [
-          { model: Curso, as: 'curso' },
-          { model: Persona, as: 'docente', through: { attributes: [] } },
-        ],
-      },
-    ],
-  });
-  return materia ? materia.dictados : [];
-};
-
-// ========== UPDATE ==========
-// Actualizar dictado básico
-const updateDictado = async (id, updateData) => {
-  const [updatedRowsCount] = await Dictado.update(updateData, {
-    where: { id: id },
-  });
-
-  if (updatedRowsCount === 0) {
-    return null;
+  // Obtener dictados por curso
+  async getDictadosByCurso(cursoId) {
+    return await Dictado.findAll({
+      where: { cursoId },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
   }
 
-  return await getDictadoById(id);
-};
-
-// Actualizar dictado con relaciones
-const updateDictadoWithRelations = async (
-  id,
-  updateData,
-  docenteId = null,
-  materiaId = null
-) => {
-  // Actualizar datos básicos
-  const [updatedRowsCount] = await Dictado.update(updateData, {
-    where: { id: id },
-  });
-
-  if (updatedRowsCount === 0) {
-    return null;
+  // Obtener dictados de un docente específico
+  async getDictadosByPersona(docenteId) {
+    return await Dictado.findAll({
+      where: { docenteId },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
   }
 
-  const dictado = await Dictado.findByPk(id);
+  // Obtener dictados activos de una persona
+  async getDictadosActivosByPersona(id) {
+    const now = new Date();
+    return await Dictado.findAll({
+      where: {
+        docenteId: id,
+        fecha_desde: { [Op.lte]: now },
+        fecha_hasta: { [Op.gte]: now },
+      },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
+  }
 
-  // Actualizar docentes si se proporcionan
-  if (docenteId !== null) {
-    if (docenteId.length > 0) {
-      const docente = await Persona.findAll({
-        where: { id: docenteId },
-      });
-      await dictado.setDocente(docente);
-    } else {
-      await dictado.setDocente([]);
+  // Obtener dictados activos
+  async getDictadosActivos() {
+    const now = new Date();
+    return await Dictado.findAll({
+      where: {
+        fecha_desde: { [Op.lte]: now },
+        fecha_hasta: { [Op.gte]: now },
+      },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
+  }
+
+  // Obtener dictados por materia
+  async getDictadosByMateria(materiaId) {
+    return await Dictado.findAll({
+      where: { materiaId },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
+  }
+
+  // ========================== UPDATE ==========================
+  // Actualizar dictado básico
+  async updateDictado(id, updateData) {
+    const [updatedRowsCount] = await Dictado.update(updateData, {
+      where: { id: id },
+    });
+
+    if (updatedRowsCount === 0) {
+      return null;
     }
+
+    return await getDictadoById(id);
   }
 
-  // Actualizar materias si se proporcionan
-  if (materiaId !== null) {
-    if (materiaId.length > 0) {
-      const materias = await Materia.findAll({
-        where: { id: materiaId },
-      });
-      await dictado.setMateria(materias);
-    } else {
-      await dictado.setMateria([]);
-    }
+  // ========================= DELETE =========================
+  // Eliminar dictado por ID
+  async deleteDictado(id) {
+    const dictado = await Dictado.findByPk(id);
+    if (!dictado) return null;
+    await dictado.destroy();
+    return dictado;
   }
 
-  return await getDictadoById(id);
-};
+  // Eliminar dictados por curso
+  async deleteDictadosByCurso(cursoId) {
+    const dictados = await getDictadosByCurso(cursoId);
 
-// Agregar docente a dictado
-const addDocenteToDictado = async (dictadoId, docenteId) => {
-  const dictado = await Dictado.findByPk(dictadoId);
-  const docente = await Persona.findByPk(docenteId);
+    const deletedCount = await Dictado.destroy({
+      where: { curso_id: cursoId },
+    });
 
-  if (!dictado || !docente) {
-    return null;
+    return { deletedCount, deletedDictados: dictados };
   }
-
-  await dictado.addDocente(docente);
-  return await getDictadoById(dictadoId);
-};
-
-// Remover docente de dictado
-const removeDocenteFromDictado = async (dictadoId, docenteId) => {
-  const dictado = await Dictado.findByPk(dictadoId);
-  const docente = await Persona.findByPk(docenteId);
-
-  if (!dictado || !docente) {
-    return null;
-  }
-
-  await dictado.removeDocente(docente);
-  return await getDictadoById(dictadoId);
-};
-
-// Agregar materia a dictado
-const addMateriaToDictado = async (dictadoId, materiaId) => {
-  const dictado = await Dictado.findByPk(dictadoId);
-  const materia = await Materia.findByPk(materiaId);
-
-  if (!dictado || !materia) {
-    return null;
-  }
-
-  await dictado.addMateria(materia);
-  return await getDictadoById(dictadoId);
-};
-
-// Remover materia de dictado
-const removeMateriaFromDictado = async (dictadoId, materiaId) => {
-  const dictado = await Dictado.findByPk(dictadoId);
-  const materia = await Materia.findByPk(materiaId);
-
-  if (!dictado || !materia) {
-    return null;
-  }
-
-  await dictado.removeMateria(materia);
-  return await getDictadoById(dictadoId);
-};
-
-// ========== DELETE ==========
-// Eliminar dictado por ID
-const deleteDictado = async (id) => {
-  const dictado = await Dictado.findByPk(id);
-
-  if (!dictado) {
-    return null;
-  }
-
-  // Sequelize automáticamente limpia las relaciones many-to-many
-  await dictado.destroy();
-  return dictado;
-};
-
-// Eliminar dictado con verificación de relaciones
-const deleteDictadoSafe = async (id) => {
-  const dictado = await getDictadoById(id);
-
-  if (!dictado) {
-    return null;
-  }
-
-  // Limpiar relaciones manualmente (opcional, Sequelize lo hace automáticamente)
-  await dictado.setDocente([]);
-  await dictado.setMateria([]);
-
-  await dictado.destroy();
-  return dictado;
-};
-
-// Eliminar dictados por curso
-const deleteDictadosByCurso = async (cursoId) => {
-  const dictados = await getDictadosByCurso(cursoId);
-
-  const deletedCount = await Dictado.destroy({
-    where: { curso_id: cursoId },
-  });
-
-  return { deletedCount, deletedDictados: dictados };
-};
-
-module.exports = {
-  // CREATE
-  createDictado,
-  createDictadoWithRelations,
-
-  // READ
-  getAllDictados,
-  getDictadoById,
-  getDictadosByCurso,
-  getDictadosByPersona,
-  getDictadosActivosByPersona,
-  getDictadosActivos,
-  getDictadosByMateria,
-
-  // UPDATE
-  updateDictado,
-  updateDictadoWithRelations,
-  addDocenteToDictado,
-  removeDocenteFromDictado,
-  addMateriaToDictado,
-  removeMateriaFromDictado,
-
-  // DELETE
-  deleteDictado,
-  deleteDictadoSafe,
-  deleteDictadosByCurso,
-};
+}
+module.exports = new DictadoService();

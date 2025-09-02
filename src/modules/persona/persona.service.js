@@ -171,4 +171,4 @@ class PersonaService {
   }
 }
 
-module.exports = PersonaService;
+module.exports = new PersonaService();

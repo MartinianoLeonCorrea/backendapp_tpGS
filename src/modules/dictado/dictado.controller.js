@@ -2,15 +2,10 @@
 const dictadoService = require('../dictado/dictado.service');
 
 // ========== CREATE ==========
-const createDictadoWithRelations = async (req, res, next) => {
+const createDictado = async (req, res, next) => {
   try {
-    const { docentesIds, materiasIds, ...dictadoData } = req.body;
-    const newDictado = await dictadoService.createDictadoWithRelations(
-      dictadoData,
-      docentesIds,
-      materiasIds
-    );
-    res.status(201).json(newDictado);
+    const dictado = await dictadoService.createDictado(req.body);
+    res.status(201).json(dictado);
   } catch (error) {
     next(error);
   }
@@ -93,10 +88,10 @@ const getDictadosByMateria = async (req, res, next) => {
 
 // ========== UPDATE ==========
 
-const updateDictadoWithRelations = async (req, res, next) => {
+const updateDictado = async (req, res, next) => {
   try {
     const { docentesIds, materiasIds, ...updateData } = req.body;
-    const updatedDictado = await dictadoService.updateDictadoWithRelations(
+    const updatedDictado = await dictadoService.updateDictado(
       req.params.id,
       updateData,
       docentesIds,
@@ -201,7 +196,6 @@ const deleteDictado = async (req, res, next) => {
 };
 
 module.exports = {
-  createDictadoWithRelations,
   getAllDictados,
   getDictadoById,
   getDictadosByCurso,
@@ -209,10 +203,11 @@ module.exports = {
   getDictadosActivosByPersona,
   getDictadosActivos,
   getDictadosByMateria,
-  updateDictadoWithRelations,
+  updateDictado,
   addDocenteToDictado,
   removeDocenteFromDictado,
   addMateriaToDictado,
   removeMateriaFromDictado,
   deleteDictado,
+  createDictado,
 };

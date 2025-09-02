@@ -124,4 +124,4 @@ class CursoService {
   }
 }
 
-module.exports = CursoService;
+module.exports = new CursoService();
