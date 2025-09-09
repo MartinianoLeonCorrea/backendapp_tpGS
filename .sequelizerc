@@ -1,0 +1,11 @@
+const path = require('path');
+// Carga el .env para que el CLI pueda acceder a las variables
+require('dotenv').config();
+
+module.exports = {
+  // Le dice al CLI que use el archivo de configuración de base de datos
+  config: path.resolve(__dirname, 'src/config', 'database.js'),
+  'models-path': path.resolve(__dirname, 'src/modules'),
+  'seeders-path': path.resolve(__dirname, 'seeders'),
+  'migrations-path': path.resolve(__dirname, 'migrations'),
+};
