@@ -46,9 +46,11 @@ const getDictadosByCurso = async (req, res, next) => {
 
 const getDictadosByPersona = async (req, res, next) => {
   try {
-    const dictados = await dictadoService.getDictadosByPersona(
-      req.params.personaId
-    );
+    const docenteId = req.params.personaId;
+    if (!docenteId) {
+      return res.status(400).json({ message: 'Falta personaId en la ruta' });
+    }
+    const dictados = await dictadoService.getDictadosByPersona(docenteId);
     res.status(200).json(dictados);
   } catch (error) {
     next(error);

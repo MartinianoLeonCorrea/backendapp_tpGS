@@ -31,7 +31,18 @@ class DictadoService {
   async getDictadoById(id) {
     return await Dictado.findByPk(id, {
       include: [
-        { model: Curso, as: 'curso' },
+        {
+          model: Curso,
+          as: 'curso',
+          include: [
+            {
+              model: Persona,
+              as: 'alumnos',
+              where: { tipo: 'alumno' },
+              required: false,
+            },
+          ],
+        },
         { model: Materia, as: 'materia' },
         { model: Persona, as: 'docente' },
         { model: Examen, as: 'examenes' },
