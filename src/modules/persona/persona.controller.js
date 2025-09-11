@@ -89,11 +89,12 @@ const getPersonaByDni = async (req, res, next) => {
       includeCurso: includeCurso === 'true',
       includeDictados: includeDictados === 'true',
     };
-
-    const persona = await PersonaService.findPersonaByDni(
-      parseInt(dni),
-      options
-    );
+    console.log('DNI recibido:', req.params.dni);
+    const dniNum = parseInt(dni);
+    if (isNaN(dniNum)) {
+      return res.status(400).json({ message: 'DNI inválido' });
+    }
+    const persona = await PersonaService.findPersonaByDni(dniNum, options);
 
     if (!persona) {
       return res.status(404).json({ message: 'Persona no encontrada' });
@@ -167,6 +168,19 @@ const getAlumnosByCurso = async (req, res, next) => {
   }
 };
 
+// Obtener materias por DNI de alumno
+
+const getMateriasByAlumnoDni = async (req, res, next) => {
+  try {
+    const materias = await PersonaService.getMateriasByAlumnoDni(
+      req.params.dni
+    );
+    res.status(200).json({ data: materias });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ========================= UPDATE =========================
 
 // Actualizar una persona
@@ -223,6 +237,7 @@ module.exports = {
   getAllAlumnos,
   getAllDocentes,
   getAlumnosByCurso,
+  getMateriasByAlumnoDni,
   updatePersona,
   deletePersona,
 };

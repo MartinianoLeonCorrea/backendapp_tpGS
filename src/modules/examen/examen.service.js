@@ -71,30 +71,62 @@ class ExamenService {
 
   // Funciones para búsquedas por relaciones
   async getExamenesByMateria(materiaId) {
-    //Busco los dictados de la materia
+    // Buscar dictados de la materia
     const dictados = await Dictado.findAll({
       where: { materiaId },
       attributes: ['id'],
     });
     const dictadoIds = dictados.map((d) => d.id);
-    return await Examen.findAll({
-      where: { dictadoId: dictadoIds.length > 0 ? dictadoIds : null },
+
+    console.log('Dictado IDs:', dictadoIds);
+    if (!dictadoIds.length) {
+      return [];
+    }
+    const examenes = await Examen.findAll({
+      where: { dictadoId: dictadoIds },
       include: [
         {
           model: Dictado,
           as: 'dictado',
-          attributes: ['id', 'dias_cursado', 'materiaId'],
+          attributes: ['id', 'dias_cursado', 'materiaId', 'docenteId'],
           include: [
             { model: Materia, as: 'materia', attributes: ['id', 'nombre'] },
+            {
+              model: Persona,
+              as: 'docente',
+              attributes: ['id', 'nombre', 'apellido'],
+            },
           ],
-        },
-        {
-          model: Persona,
-          as: 'docente',
-          attributes: ['nombre', 'apellido'],
         },
       ],
     });
+    console.log('Examenes encontrados:', examenes);
+    return examenes;
+  }
+  async getExamenesByDictadoId(dictadoId) {
+    try {
+      return await Examen.findAll({
+        where: { dictadoId },
+        include: [
+          {
+            model: Dictado,
+            as: 'dictado',
+            attributes: ['id', 'dias_cursado', 'materiaId', 'docenteId'],
+            include: [
+              { model: Materia, as: 'materia', attributes: ['id', 'nombre'] },
+              {
+                model: Persona,
+                as: 'docente',
+                attributes: ['dni', 'nombre', 'apellido'],
+              },
+            ],
+          },
+        ],
+      });
+    } catch (error) {
+      console.error('Error en getExamenesByDictadoId:', error);
+      return [];
+    }
   }
 
   // ========================= HELPER FUNCTIONS ===========================

@@ -114,7 +114,7 @@ const getMateriaById = async (req, res, next) => {
 
     // Validación básica del ID
 
-    if (!MateriaService._isValidId(id)) {
+    if (!MateriaService._validateId(id)) {
       return res
         .status(400)
         .json(
@@ -161,7 +161,7 @@ const updateMateria = async (req, res, next) => {
 
     // Validaciones
 
-    if (!MateriaService._isValidId(id)) {
+    if (!MateriaService._validateId(id)) {
       return res
         .status(400)
         .json(
@@ -223,7 +223,7 @@ const deleteMateria = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if (!MateriaService._isValidId(id)) {
+    if (!MateriaService._validateId(id)) {
       return res
         .status(400)
         .json(

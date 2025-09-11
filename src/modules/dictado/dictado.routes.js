@@ -11,6 +11,7 @@ router
   // GET /api/dictados - Obtener todos los dictados
   .get(dictadoController.getAllDictados);
 
+router.get('/by-curso-materia', dictadoController.getDictadosByCursoAndMateria);
 // Rutas para acciones específicas sobre un dictado por ID
 router
   .route('/:id')

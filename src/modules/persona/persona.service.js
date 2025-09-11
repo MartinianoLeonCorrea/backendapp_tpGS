@@ -77,7 +77,7 @@ class PersonaService {
 
   // Encontrar persona por DNI
 
-  static async findPersonaByDni(dni, options = {}) {
+  async findPersonaByDni(dni, options = {}) {
     try {
       const { includeCurso = false, includeDictados = false } = options;
       const include = [];
@@ -113,6 +113,22 @@ class PersonaService {
     } catch (error) {
       throw new Error('Error al obtener persona por DNI: ' + error.message);
     }
+  }
+
+  async getMateriasByAlumnoDni(dni) {
+    // Busca el alumno por DNI
+    const alumno = await Persona.findOne({ where: { dni } });
+    if (!alumno || !alumno.cursoId) return [];
+    // Busca los dictados del curso del alumno
+    const dictados = await Dictado.findAll({
+      where: { cursoId: alumno.cursoId },
+      include: [{ model: Materia, as: 'materia' }],
+    });
+    // Extrae materias únicas
+    const materias = dictados
+      .map((d) => d.materia)
+      .filter((m, i, arr) => m && arr.findIndex((x) => x.id === m.id) === i);
+    return materias;
   }
 
   // ========================= UPDATE =========================

@@ -11,7 +11,7 @@ const models = require('./src/modules/db');
 // Sincronizar la base de datos y luego iniciar el servidor
 
 sequelize
-  .sync({ force: true })
+  .sync()
   .then(() => {
     console.log('Base de datos sincronizada correctamente.');
     app.listen(port, () => {

@@ -91,6 +91,18 @@ const getExamenesByMateria = async (req, res, next) => {
     next(error);
   }
 };
+const getExamenesByDictadoId = async (req, res, next) => {
+  try {
+    const { dictadoId } = req.query;
+    if (!dictadoId) {
+      return res.status(400).json({ message: 'Falta el parámetro dictadoId' });
+    }
+    const examenes = await examenService.getExamenesByDictadoId(dictadoId);
+    res.status(200).json({ data: examenes });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getAllExamenes,
@@ -99,4 +111,5 @@ module.exports = {
   updateExamen,
   deleteExamen,
   getExamenesByMateria,
+  getExamenesByDictadoId,
 };

@@ -85,6 +85,23 @@ const getDictadosByMateria = async (req, res, next) => {
     next(error);
   }
 };
+const getDictadosByCursoAndMateria = async (req, res, next) => {
+  try {
+    const { cursoId, materiaId } = req.query;
+    if (!cursoId || !materiaId) {
+      return res
+        .status(400)
+        .json({ message: 'Faltan parámetros cursoId o materiaId' });
+    }
+    const dictados = await dictadoService.getDictadosByCursoAndMateria(
+      cursoId,
+      materiaId
+    );
+    res.status(200).json({ data: dictados });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // ========== UPDATE ==========
 
@@ -203,6 +220,7 @@ module.exports = {
   getDictadosActivosByPersona,
   getDictadosActivos,
   getDictadosByMateria,
+  getDictadosByCursoAndMateria,
   updateDictado,
   addDocenteToDictado,
   removeDocenteFromDictado,

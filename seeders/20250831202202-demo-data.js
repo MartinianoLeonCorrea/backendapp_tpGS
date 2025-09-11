@@ -223,7 +223,7 @@ module.exports = {
           dias_cursado: 'Martes, Jueves',
           notas_alumnos: null,
           asistencias_alumnos: null,
-          curso_id: 2,
+          curso_id: 1,
           materia_id: 2,
           docente_id: 10000002,
           created_at: new Date(),
@@ -239,7 +239,7 @@ module.exports = {
       [
         {
           id: 1,
-          fecha_examen: new Date(),
+          fecha_examen: new Date('2025-09-25'),
           temas: 'Sumas y restas',
           copias: 20,
           dictado_id: 1,
@@ -248,10 +248,19 @@ module.exports = {
         },
         {
           id: 2,
-          fecha_examen: new Date(),
+          fecha_examen: new Date('2025-09-25'),
           temas: 'Lectura comprensiva',
           copias: 18,
           dictado_id: 2,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 3,
+          fecha_examen: new Date('2025-10-01'),
+          temas: '2do examen: Multiplicación y división',
+          copias: 18,
+          dictado_id: 1,
           created_at: new Date(),
           updated_at: new Date(),
         },

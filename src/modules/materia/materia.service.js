@@ -208,6 +208,10 @@ class MateriaService {
       errors: errors,
     };
   }
+  _validateId(id) {
+    const num = Number(id);
+    return Number.isInteger(num) && num > 0;
+  }
 
   // ========================= UPDATE =========================
 

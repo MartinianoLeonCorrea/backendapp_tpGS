@@ -112,7 +112,17 @@ class DictadoService {
       ],
     });
   }
-
+  async getDictadosByCursoAndMateria(cursoId, materiaId) {
+    return await Dictado.findAll({
+      where: { cursoId, materiaId },
+      include: [
+        { model: Curso, as: 'curso' },
+        { model: Materia, as: 'materia' },
+        { model: Persona, as: 'docente' },
+        { model: Examen, as: 'examenes' },
+      ],
+    });
+  }
   // ========================== UPDATE ==========================
   // Actualizar dictado básico
   async updateDictado(id, updateData) {

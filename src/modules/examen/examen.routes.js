@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const examenController = require('../examen/examen.controller');
 
+router.get('/', examenController.getExamenesByDictadoId);
 // Rutas de CRUD
 router
   .route('/')
