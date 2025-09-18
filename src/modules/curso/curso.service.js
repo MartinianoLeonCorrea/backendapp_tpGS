@@ -7,7 +7,7 @@ class CursoService {
 
   // Crear un nuevo curso
 
-  static async createCurso(cursoData) {
+  async createCurso(cursoData) {
     try {
       const newCurso = await Curso.create(cursoData);
       return newCurso;
@@ -28,7 +28,7 @@ class CursoService {
   // ========================= READ ===========================
 
   // Obtener todos los cursos
-  static async findAllCursos() {
+  async findAllCursos() {
     try {
       const cursos = await Curso.findAll({
         order: [['nro_letra', 'ASC']],
@@ -40,7 +40,7 @@ class CursoService {
   }
   // Encontrar un curso por ID
 
-  static async findCursoById(id, options = {}) {
+  async findCursoById(id, options = {}) {
     try {
       const { includeAlumnos = false, includeDictado = false } = options;
       const include = [];
@@ -71,7 +71,7 @@ class CursoService {
 
   // Actualizar un curso
 
-  static async updateCurso(id, cursoData) {
+  async updateCurso(id, cursoData) {
     try {
       const [updatedRows] = await Curso.update(cursoData, {
         where: { id: id },
@@ -99,7 +99,7 @@ class CursoService {
 
   // Eliminar un curso
 
-  static async deleteCurso(id) {
+  async deleteCurso(id) {
     try {
       // Verificar si hay alumnos asignados
 
