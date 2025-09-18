@@ -1,5 +1,12 @@
 'use strict';
-//Para que se creen tenes que ejecutar el comando: npx sequelize-cli db:seed:all
+//Para eliminar datos existentes tenés que ejecutar el comando:
+// npx sequelize-cli db:seed:undo:all
+
+//Para que se creen los datos tenés que ejecutar el comando: 
+// npx sequelize-cli db:seed:all
+
+//Los seed se ejecutan en una terminal aparte pero en la carpeta del backend
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     // 1. Cursos
@@ -27,27 +34,6 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         },
-        {
-          id: 4,
-          nro_letra: '2B',
-          turno: 'TARDE',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 5,
-          nro_letra: '3A',
-          turno: 'MAÑANA',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 6,
-          nro_letra: '3B',
-          turno: 'TARDE',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
       ],
       {}
     );
@@ -65,7 +51,7 @@ module.exports = {
         },
         {
           id: 2,
-          nombre: 'Lengua y literatura',
+          nombre: 'Lengua y Literatura',
           descripcion: 'Análisis de textos, gramática y producción de ensayos.',
           created_at: new Date(),
           updated_at: new Date(),
@@ -79,33 +65,8 @@ module.exports = {
         },
         {
           id: 4,
-          nombre: 'Geografía',
-          descripcion:
-            'Análisis del espacio geográfico y sus interacciones sociales, económicas y ambientales.',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 5,
           nombre: 'Física',
-          descripcion:
-            'Principios de la mecánica, termodinámica y electromagnetismo.',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 6,
-          nombre: 'Química',
-          descripcion:
-            'Estudio de la composición, estructura y propiedades de la materia.',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id: 7,
-          nombre: 'Biología',
-          descripcion:
-            'Ciencia que estudia los seres vivos y sus procesos vitales.',
+          descripcion: 'Principios de la mecánica, termodinámica y electromagnetismo.',
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -117,14 +78,14 @@ module.exports = {
     await queryInterface.bulkInsert(
       'personas',
       [
-        // Docentes
+        // ===================== DOCENTES =====================
         {
-          dni: 10000001,
-          nombre: 'Ana',
-          apellido: 'García',
-          telefono: '123456789',
-          direccion: 'Ayacucho 123',
-          email: 'ana@escuela.com',
+          dni: 12345678,
+          nombre: 'Ana María',
+          apellido: 'García López',
+          telefono: '341-2345678',
+          direccion: 'Ayacucho 123, Rosario',
+          email: 'ana.garcia@escuela.edu.ar',
           tipo: 'docente',
           especialidad: 'Matemática',
           curso_id: null,
@@ -132,26 +93,53 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          dni: 10000002,
-          nombre: 'Luis',
-          apellido: 'Gomez',
-          telefono: '987654321',
-          direccion: 'España 456',
-          email: 'luis@escuela.com',
+          dni: 23456789,
+          nombre: 'Luis Alberto',
+          apellido: 'Gómez Ruiz',
+          telefono: '341-3456789',
+          direccion: 'España 456, Rosario',
+          email: 'luis.gomez@escuela.edu.ar',
           tipo: 'docente',
-          especialidad: 'Lengua',
+          especialidad: 'Lengua y Literatura',
           curso_id: null,
           created_at: new Date(),
           updated_at: new Date(),
         },
-        // Alumnos
         {
-          dni: 20000001,
-          nombre: 'Juan',
-          apellido: 'Pérez',
-          telefono: '555555555',
-          direccion: 'Pellegrini 1230',
-          email: 'juan@escuela.com',
+          dni: 34567890,
+          nombre: 'Carmen Elena',
+          apellido: 'Rodríguez Silva',
+          telefono: '341-4567890',
+          direccion: 'San Martín 789, Rosario',
+          email: 'carmen.rodriguez@escuela.edu.ar',
+          tipo: 'docente',
+          especialidad: 'Historia',
+          curso_id: null,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          dni: 45678901,
+          nombre: 'Roberto Carlos',
+          apellido: 'Fernández Torres',
+          telefono: '341-5678901',
+          direccion: 'Belgrano 321, Rosario',
+          email: 'roberto.fernandez@escuela.edu.ar',
+          tipo: 'docente',
+          especialidad: 'Física',
+          curso_id: null,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+
+        // ===================== ALUMNOS =====================
+        {
+          dni: 44123456,
+          nombre: 'Martín Alejandro',
+          apellido: 'Pérez González',
+          telefono: '341-1234567',
+          direccion: 'Pellegrini 1230, Rosario',
+          email: 'martin.perez@estudiante.edu.ar',
           tipo: 'alumno',
           especialidad: null,
           curso_id: 1,
@@ -159,12 +147,12 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          dni: 20000002,
-          nombre: 'María',
-          apellido: 'Martínez',
-          telefono: '444444444',
-          direccion: 'Zeballos 456',
-          email: 'maria@escuela.com',
+          dni: 44234567,
+          nombre: 'Sofía Valentina',
+          apellido: 'Martínez Díaz',
+          telefono: '341-2345678',
+          direccion: 'Zeballos 456, Rosario',
+          email: 'sofia.martinez@estudiante.edu.ar',
           tipo: 'alumno',
           especialidad: null,
           curso_id: 1,
@@ -172,28 +160,28 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          dni: 20000003,
-          nombre: 'Carlos',
-          apellido: 'Martinez',
-          telefono: '333333333',
-          direccion: 'San Martín 789',
-          email: 'carlos@escuela.com',
+          dni: 45123456,
+          nombre: 'Nicolás Benjamín',
+          apellido: 'Jiménez Vargas',
+          telefono: '341-7890123',
+          direccion: 'Urquiza 890, Rosario',
+          email: 'nicolas.jimenez@estudiante.edu.ar',
           tipo: 'alumno',
           especialidad: null,
-          curso_id: 1,
+          curso_id: 2,
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          dni: 20000004,
-          nombre: 'Lucía',
-          apellido: 'Fernández',
-          telefono: '222222222',
-          direccion: 'Belgrano 101',
-          email: 'lucia@escuela.com',
+          dni: 46123456,
+          nombre: 'Catalina Luz',
+          apellido: 'Morales Gómez',
+          telefono: '341-1357924',
+          direccion: 'Tucumán 789, Rosario',
+          email: 'catalina.morales@estudiante.edu.ar',
           tipo: 'alumno',
           especialidad: null,
-          curso_id: 1,
+          curso_id: 3,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -205,15 +193,16 @@ module.exports = {
     await queryInterface.bulkInsert(
       'dictados',
       [
+        // ========== DICTADOS CURSO 1A ==========
         {
           id: 1,
           anio: 2025,
-          dias_cursado: 'Lunes, Miércoles',
+          dias_cursado: 'Lunes, Miércoles, Viernes',
           notas_alumnos: null,
           asistencias_alumnos: null,
           curso_id: 1,
-          materia_id: 1,
-          docente_id: 10000001,
+          materia_id: 1, // Matemática
+          docente_id: 12345678, // Ana García
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -224,8 +213,132 @@ module.exports = {
           notas_alumnos: null,
           asistencias_alumnos: null,
           curso_id: 1,
-          materia_id: 2,
-          docente_id: 10000002,
+          materia_id: 2, // Lengua y Literatura
+          docente_id: 23456789, // Luis Gómez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 3,
+          anio: 2025,
+          dias_cursado: 'Viernes',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 1,
+          materia_id: 3, // Historia
+          docente_id: 34567890, // Carmen Rodríguez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 4,
+          anio: 2025,
+          dias_cursado: 'Lunes',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 1,
+          materia_id: 4, // Física
+          docente_id: 45678901, // Roberto Fernández
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+
+        // ========== DICTADOS CURSO 1B ==========
+        {
+          id: 5,
+          anio: 2025,
+          dias_cursado: 'Martes, Jueves',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 2,
+          materia_id: 1, // Matemática
+          docente_id: 12345678, // Ana García
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 6,
+          anio: 2025,
+          dias_cursado: 'Lunes, Miércoles',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 2,
+          materia_id: 2, // Lengua y Literatura
+          docente_id: 23456789, // Luis Gómez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 7,
+          anio: 2025,
+          dias_cursado: 'Viernes',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 2,
+          materia_id: 3, // Historia
+          docente_id: 34567890, // Carmen Rodríguez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 8,
+          anio: 2025,
+          dias_cursado: 'Miércoles',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 2,
+          materia_id: 4, // Física
+          docente_id: 45678901, // Roberto Fernández
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+
+        // ========== DICTADOS CURSO 2A ==========
+        {
+          id: 9,
+          anio: 2025,
+          dias_cursado: 'Lunes, Viernes',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 3,
+          materia_id: 1, // Matemática
+          docente_id: 12345678, // Ana García
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 10,
+          anio: 2025,
+          dias_cursado: 'Martes, Jueves',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 3,
+          materia_id: 2, // Lengua y Literatura
+          docente_id: 23456789, // Luis Gómez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 11,
+          anio: 2025,
+          dias_cursado: 'Miércoles',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 3,
+          materia_id: 3, // Historia
+          docente_id: 34567890, // Carmen Rodríguez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 12,
+          anio: 2025,
+          dias_cursado: 'Martes, Jueves, Viernes',
+          notas_alumnos: null,
+          asistencias_alumnos: null,
+          curso_id: 3,
+          materia_id: 4, // Física
+          docente_id: 45678901, // Roberto Fernández
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -237,30 +350,80 @@ module.exports = {
     await queryInterface.bulkInsert(
       'examenes',
       [
+        // Exámenes Curso 1A
         {
           id: 1,
-          fecha_examen: new Date('2025-09-25'),
-          temas: 'Sumas y restas',
+          fecha_examen: new Date('2025-10-15'),
+          temas: 'Operaciones básicas: suma, resta, multiplicación',
           copias: 20,
-          dictado_id: 1,
+          dictado_id: 1, // Matemática 1A
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
           id: 2,
-          fecha_examen: new Date('2025-09-25'),
-          temas: 'Lectura comprensiva',
-          copias: 18,
-          dictado_id: 2,
+          fecha_examen: new Date('2025-10-22'),
+          temas: 'Comprensión lectora y análisis de texto',
+          copias: 20,
+          dictado_id: 2, // Lengua 1A
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
           id: 3,
-          fecha_examen: new Date('2025-10-01'),
-          temas: '2do examen: Multiplicación y división',
+          fecha_examen: new Date('2025-11-05'),
+          temas: 'Civilizaciones antiguas: Egipto',
+          copias: 20,
+          dictado_id: 3, // Historia 1A
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 4,
+          fecha_examen: new Date('2025-10-30'),
+          temas: 'Fuerzas y movimiento básico',
+          copias: 20,
+          dictado_id: 4, // Física 1A
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        
+        // Exámenes Curso 1B
+        {
+          id: 5,
+          fecha_examen: new Date('2025-11-12'),
+          temas: 'Fracciones y decimales',
           copias: 18,
-          dictado_id: 1,
+          dictado_id: 5, // Matemática 1B
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 6,
+          fecha_examen: new Date('2025-11-18'),
+          temas: 'Redacción y ortografía',
+          copias: 18,
+          dictado_id: 6, // Lengua 1B
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        
+        // Exámenes Curso 2A
+        {
+          id: 7,
+          fecha_examen: new Date('2025-11-25'),
+          temas: 'Ecuaciones lineales simples',
+          copias: 15,
+          dictado_id: 9, // Matemática 2A
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 8,
+          fecha_examen: new Date('2025-12-02'),
+          temas: 'Cinemática: movimiento rectilíneo uniforme',
+          copias: 15,
+          dictado_id: 12, // Física 2A
           created_at: new Date(),
           updated_at: new Date(),
         },

@@ -89,11 +89,14 @@ const getPersonaByDni = async (req, res, next) => {
       includeCurso: includeCurso === 'true',
       includeDictados: includeDictados === 'true',
     };
+    
     console.log('DNI recibido:', req.params.dni);
     const dniNum = parseInt(dni);
     if (isNaN(dniNum)) {
       return res.status(400).json({ message: 'DNI inválido' });
     }
+    
+    // Cambiar de instancia a método estático
     const persona = await PersonaService.findPersonaByDni(dniNum, options);
 
     if (!persona) {
@@ -172,10 +175,12 @@ const getAlumnosByCurso = async (req, res, next) => {
 
 const getMateriasByAlumnoDni = async (req, res, next) => {
   try {
-    const materias = await PersonaService.getMateriasByAlumnoDni(
-      req.params.dni
-    );
-    res.status(200).json({ data: materias });
+    const { dni } = req.params;
+    const materias = await PersonaService.getMateriasByAlumnoDni(parseInt(dni));
+    res.status(200).json({ 
+      message: 'Materias obtenidas exitosamente',
+      data: materias 
+    });
   } catch (error) {
     next(error);
   }
