@@ -44,6 +44,22 @@ const getExamenById = async (req, res, next) => {
 // Crear un nuevo examen
 const createExamen = async (req, res, next) => {
   try {
+    const { fecha_examen, temas, copias, dictadoId } = req.body;
+
+    // Validar datos requeridos
+    if (!fecha_examen || !temas || !dictadoId) {
+      return res.status(400).json({
+        message: 'Faltan datos obligatorios: fecha_examen, temas o dictadoId',
+      });
+    }
+
+    // Validar que dictadoId sea un número válido
+    if (isNaN(dictadoId)) {
+      return res.status(400).json({
+        message: 'El dictadoId debe ser un número válido',
+      });
+    }
+
     const newExamen = await examenService.createExamen(req.body);
     res.status(201).json(newExamen);
   } catch (error) {

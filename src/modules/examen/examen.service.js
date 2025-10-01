@@ -28,23 +28,28 @@ class ExamenService {
 
   // Función para obtener un examen por ID
   async getExamenById(id) {
-    return await Examen.findByPk(id, {
-      include: [
-        {
-          model: Dictado,
-          as: 'dictado',
-          attributes: ['id', 'dias_cursado', 'materiaId'],
-          include: [
-            { model: Materia, as: 'materia', attributes: ['dni', 'nombre'] },
-          ],
-        },
-        {
-          model: Persona,
-          as: 'docente',
-          attributes: ['nombre', 'apellido'],
-        },
-      ],
-    });
+    try {
+      const examen = await Examen.findByPk(id, {
+        include: [
+          {
+            model: Dictado,
+            as: 'dictado',
+            attributes: ['id', 'dias_cursado', 'materiaId'],
+            include: [
+              { model: Materia, as: 'materia', attributes: ['nombre'] },
+              {
+                model: Persona,
+                as: 'docente',
+                attributes: ['nombre', 'apellido'],
+              },
+            ],
+          },
+        ],
+      });
+      return examen;
+    } catch (error) {
+      throw error;
+    }
   }
 
   // Función para crear un nuevo examen
