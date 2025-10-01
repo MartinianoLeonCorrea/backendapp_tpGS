@@ -7,11 +7,42 @@ const PersonaService = require('./persona.service');
 const createAlumno = async (req, res, next) => {
   try {
     const alumnoData = { ...req.body, tipo: 'alumno' };
+
+    // Validaciones
     if (!alumnoData.dni || !alumnoData.nombre || !alumnoData.apellido) {
       return res.status(400).json({
-        message: 'Los campos dni, nombre y apellido son obligatorios',
+        message: 'Los campos DNI, nombre y apellido son obligatorios',
       });
     }
+
+    if (!/^[\d]{7,9}$/.test(alumnoData.dni)) {
+      return res.status(400).json({
+        message: 'El DNI debe ser un número entre 1,000,000 y 999,999,999',
+      });
+    }
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(alumnoData.email)) {
+      return res.status(400).json({
+        message: 'El email debe tener un formato válido',
+      });
+    }
+
+    if (!/^[\d\s\-\+\(\)]*$/.test(alumnoData.telefono)) {
+      return res.status(400).json({
+        message: 'El teléfono contiene caracteres no válidos',
+      });
+    }
+
+    // Verificar si el DNI ya existe
+    const existingAlumno = await PersonaService.findPersonaByDni(
+      alumnoData.dni
+    );
+    if (existingAlumno) {
+      return res.status(400).json({
+        message: 'El DNI ya está registrado',
+      });
+    }
+
     const newAlumno = await PersonaService.createPersona(alumnoData);
     res.status(201).json({
       message: 'Alumno creado exitosamente',
@@ -89,13 +120,13 @@ const getPersonaByDni = async (req, res, next) => {
       includeCurso: includeCurso === 'true',
       includeDictados: includeDictados === 'true',
     };
-    
+
     console.log('DNI recibido:', req.params.dni);
     const dniNum = parseInt(dni);
     if (isNaN(dniNum)) {
       return res.status(400).json({ message: 'DNI inválido' });
     }
-    
+
     // Cambiar de instancia a método estático
     const persona = await PersonaService.findPersonaByDni(dniNum, options);
 
@@ -177,9 +208,9 @@ const getMateriasByAlumnoDni = async (req, res, next) => {
   try {
     const { dni } = req.params;
     const materias = await PersonaService.getMateriasByAlumnoDni(parseInt(dni));
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Materias obtenidas exitosamente',
-      data: materias 
+      data: materias,
     });
   } catch (error) {
     next(error);
