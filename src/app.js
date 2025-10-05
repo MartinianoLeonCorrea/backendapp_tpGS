@@ -21,6 +21,7 @@ const cursoRoutes = require('./modules/curso/curso.routes');
 const personaRoutes = require('./modules/persona/persona.routes');
 const dictadoRoutes = require('./modules/dictado/dictado.routes');
 const examenRoutes = require('./modules/examen/examen.routes');
+const evaluacionRoutes = require('./modules/evaluacion/evaluacion.routes');
 
 // Usar las rutas
 app.use('/api/materias', materiaRoutes);
@@ -28,6 +29,7 @@ app.use('/api/cursos', cursoRoutes);
 app.use('/api/personas', personaRoutes);
 app.use('/api/dictados', dictadoRoutes);
 app.use('/api/examenes', examenRoutes);
+app.use('/api/evaluaciones', evaluacionRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

@@ -24,6 +24,15 @@ Examen.init(
       defaultValue: 0,
       allowNull: false,
     },
+    dictadoId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'dictados',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+    },
   },
   {
     sequelize,
@@ -39,8 +48,12 @@ Examen.associate = (models) => {
     foreignKey: 'dictadoId',
     as: 'dictado',
   });
-  //Con esta relación ya puedo obtener el docente y la materia del examen
-  //ya que el dictado también tiene esas relaciones.
+
+  // Relación con Evaluaciones: un Examen puede tener muchas Evaluaciones
+  Examen.hasMany(models.Evaluacion, {
+    foreignKey: 'examenId',
+    as: 'evaluaciones',
+  });
 };
 
 module.exports = Examen;

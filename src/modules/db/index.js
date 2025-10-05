@@ -6,6 +6,7 @@ const Curso = require('../curso/curso.model');
 const Dictado = require('../dictado/dictado.model');
 const Materia = require('../materia/materia.model');
 const Examen = require('../examen/examen.model');
+const Evaluacion = require('../evaluacion/evaluacion.model');
 
 Object.values(sequelize.models).forEach((model) => {
   if (model.associate) {
@@ -20,4 +21,5 @@ module.exports = {
   Dictado,
   Materia,
   Examen,
+  Evaluacion,
 };

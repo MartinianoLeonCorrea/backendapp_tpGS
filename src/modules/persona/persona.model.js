@@ -1,7 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../../config/database');
 
-class Persona extends Model { }
+class Persona extends Model {}
 Persona.init(
   {
     dni: {
@@ -104,6 +104,12 @@ Persona.init(
         },
       },
     },
+    cursoId: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // Solo para alumnos
+      references: { model: 'cursos', key: 'id' },
+      onDelete: 'SET NULL', // Si borras curso, null en alumno
+    },
   },
   {
     sequelize,
@@ -122,6 +128,12 @@ Persona.associate = (models) => {
   Persona.hasMany(models.Dictado, {
     foreignKey: 'docenteId',
     as: 'dictados',
+  });
+
+  // Relación con Evaluaciones: un Alumno puede tener muchas Evaluaciones
+  Persona.hasMany(models.Evaluacion, {
+    foreignKey: 'alumnoId',
+    as: 'evaluaciones',
   });
 };
 
