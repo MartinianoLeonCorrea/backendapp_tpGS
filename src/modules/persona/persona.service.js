@@ -8,9 +8,9 @@ const Evaluacion = require('../evaluacion/evaluacion.model'); // Asumiendo que e
 const Materia = require('../materia/materia.model');
 
 class PersonaService {
-  // ========================= HELPERS DE VALIDACIÓN (PRIVADOS) =========================
+  // ========================= HELPERS DE VALIDACIÓN (PÚBLICOS) =========================
   // Validar datos para crear alumno (retorna { isValid, errors })
-  static _validateCreateAlumnoData(data) {
+  validateCreateAlumnoData(data) {
     const errors = [];
     let isValid = true;
 
@@ -93,18 +93,18 @@ class PersonaService {
   }
 
   // Validar DNI (para queries y updates)
-  static _validateDni(dni) {
+  _validateDni(dni) {
     return !isNaN(dni) && dni >= 1000000 && dni <= 99999999;
   }
 
   // Validar si un curso existe
-  static async _validateCursoExists(cursoId) {
+  async validateCursoExists(cursoId) {
     const curso = await Curso.findByPk(cursoId);
     return !!curso;
   }
 
   // Chequear si una persona tiene dependientes (e.g., evaluaciones para alumnos, dictados para docentes)
-  static async _checkDependents(dni) {
+  async checkDependents(dni) {
     const persona = await Persona.findByPk(dni);
     if (!persona) return false;
 
@@ -122,7 +122,7 @@ class PersonaService {
 
   // ========================= CREATE =========================
   // Método unificado para crear persona (alumno o docente)
-  static async createPersona(personaData) {
+  async createPersona(personaData) {
     try {
       // Convierte a números
       if (personaData.cursoId)
@@ -173,7 +173,7 @@ class PersonaService {
     }
   }
 
-  static async createDocente(docenteData) {
+  async createDocente(docenteData) {
     try {
       // Asegurarse de que sea docente y no tenga curso
       const docente = await Persona.create({
@@ -199,7 +199,7 @@ class PersonaService {
   // ========================= READ ===========================
 
   // Obtener todas las personas
-  static async findAllPersonas(options = {}) {
+  async findAllPersonas(options = {}) {
     try {
       const { tipo, includeCurso = false, includeDictados = false } = options;
       const where = {};
@@ -251,7 +251,7 @@ class PersonaService {
   }
 
   // Encontrar persona por DNI
-  static async findPersonaByDni(dni, options = {}) {
+  async findPersonaByDni(dni, options = {}) {
     try {
       const { includeCurso = false, includeDictados = false } = options;
       const include = [];
@@ -292,7 +292,7 @@ class PersonaService {
   }
 
   // Método corregido para obtener alumnos
-  static async findAllAlumnos(options = {}) {
+  async findAllAlumnos(options = {}) {
     try {
       const { cursoId, includeCurso = true } = options;
       const where = { tipo: 'alumno' };
@@ -328,7 +328,7 @@ class PersonaService {
   }
 
   // Método corregido para obtener docentes
-  static async findAllDocentes(options = {}) {
+  async findAllDocentes(options = {}) {
     try {
       const {
         especialidad,
@@ -392,7 +392,7 @@ class PersonaService {
   }
 
   // Obtener alumnos por curso (con paginación opcional)
-  static async findAlumnosByCurso(cursoId, options = {}) {
+  async findAlumnosByCurso(cursoId, options = {}) {
     try {
       const { page = 1, limit = null } = options; // limit null para no paginar por defecto
       const offset = limit ? (page - 1) * limit : 0;
@@ -427,9 +427,9 @@ class PersonaService {
   }
 
   // Método para obtener materias por alumno (mejorado con chequeo de existencia)
-  static async getMateriasByAlumnoDni(dni) {
+  async getMateriasByAlumnoDni(dni) {
     try {
-      if (!this._validateDni(dni)) {
+      if (!this.validateDni(dni)) {
         throw new Error('DNI inválido para consulta de materias.');
       }
 
@@ -478,10 +478,10 @@ class PersonaService {
   // ========================= UPDATE =========================
 
   // Actualizar una persona (integra validación async)
-  static async updatePersona(dni, personaData) {
+  async updatePersona(dni, personaData) {
     try {
       const dniNum = parseInt(dni);
-      if (!this._validateDni(dniNum)) {
+      if (!this.validateDni(dniNum)) {
         throw new Error('DNI inválido para actualización.');
       }
 
@@ -512,15 +512,15 @@ class PersonaService {
   // ========================= DELETE =========================
 
   // Eliminar una persona (integra chequeo de dependientes)
-  static async deletePersona(dni) {
+  async deletePersona(dni) {
     try {
       const dniNum = parseInt(dni);
-      if (!this._validateDni(dniNum)) {
+      if (!this.validateDni(dniNum)) {
         throw new Error('DNI inválido para eliminación.');
       }
 
       // Chequear dependientes
-      const hasDependents = await this._checkDependents(dniNum);
+      const hasDependents = await this.checkDependents(dniNum);
       if (hasDependents) {
         throw new Error(
           'Persona tiene dependencias activas (notas o dictados). No se puede eliminar.'
@@ -553,7 +553,7 @@ class PersonaService {
   // ========================= MÉTODOS DE COUNT (para paginación en controller) =========================
 
   // Contar personas (con filtros, sin includes para eficiencia)
-  static async countPersonas(options = {}) {
+  async countPersonas(options = {}) {
     try {
       const { tipo, search } = options;
       const where = {};
@@ -576,7 +576,7 @@ class PersonaService {
   }
 
   // Contar alumnos (con filtros)
-  static async countAlumnos(options = {}) {
+  async countAlumnos(options = {}) {
     try {
       const { cursoId, search } = options;
       const where = { tipo: 'alumno' };
@@ -599,7 +599,7 @@ class PersonaService {
   }
 
   // Contar docentes (con filtros)
-  static async countDocentes(options = {}) {
+  async countDocentes(options = {}) {
     try {
       const { especialidad, search } = options;
       const where = { tipo: 'docente' };
@@ -623,7 +623,7 @@ class PersonaService {
   }
 
   // Contar alumnos por curso
-  static async countAlumnosByCurso(cursoId) {
+  async countAlumnosByCurso(cursoId) {
     try {
       if (!this._validateId(cursoId)) {
         throw new Error('Curso ID inválido para conteo.');
@@ -634,6 +634,58 @@ class PersonaService {
     } catch (error) {
       throw new Error('Error al contar alumnos por curso: ' + error.message);
     }
+  }
+  // Método para generar respuestas de success (ahora público)
+  successResponse(message, data) {
+    return {
+      success: true,
+      message,
+      data,
+    };
+  }
+  // Método para generar respuestas de error (ahora público)
+  errorResponse(message, errors) {
+    return {
+      success: false,
+      message,
+      errors,
+    };
+  }
+
+  // Validar parámetros de paginación
+  validatePaginationParams({ page, limit }) {
+    const errors = [];
+    let isValid = true;
+
+    if (page && (isNaN(page) || page <= 0)) {
+      errors.push('El parámetro "page" debe ser un número entero positivo.');
+      isValid = false;
+    }
+
+    if (limit && (isNaN(limit) || limit <= 0)) {
+      errors.push('El parámetro "limit" debe ser un número entero positivo.');
+      isValid = false;
+    }
+
+    return { isValid, errors };
+  }
+
+  // Validar parámetros de filtro
+  validateFilterParams({ tipo, search }) {
+    const errors = [];
+    let isValid = true;
+
+    if (tipo && !['alumno', 'docente'].includes(tipo)) {
+      errors.push('El parámetro "tipo" debe ser "alumno" o "docente".');
+      isValid = false;
+    }
+
+    if (search && typeof search !== 'string') {
+      errors.push('El parámetro "search" debe ser una cadena de texto.');
+      isValid = false;
+    }
+
+    return { isValid, errors };
   }
 }
 

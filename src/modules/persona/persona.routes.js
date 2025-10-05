@@ -10,8 +10,6 @@ router.post('/docentes', PersonaController.createDocente); // POST /api/personas
 // ========================= READ ===========================
 
 router.get('/', PersonaController.getAllPersonas); // GET /api/personas
-router.get('/alumnos', PersonaController.getAllAlumnos); // GET /api/personas/alumnos
-router.get('/docentes', PersonaController.getAllDocentes); // GET /api/personas/docentes
 router.get('/curso/:cursoId/alumnos', PersonaController.getAlumnosByCurso); // GET /api/personas/curso/:cursoId/alumnos
 router.get('/:dni', PersonaController.getPersonaByDni); // GET /api/personas/:dni
 router.get('/:dni/materias', PersonaController.getMateriasByAlumnoDni); // GET /api/personas/:dni/materias

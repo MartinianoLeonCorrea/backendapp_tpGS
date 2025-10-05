@@ -9,12 +9,12 @@ const createAlumno = async (req, res, next) => {
 
     // Validación unificada usando el service (similar a Materia)
     const validationResult =
-      PersonaService._validateCreateAlumnoData(alumnoData);
+      PersonaService.validateCreateAlumnoData(alumnoData);
     if (!validationResult.isValid) {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Error de validación en el registro de alumno',
             validationResult.errors
           )
@@ -29,7 +29,7 @@ const createAlumno = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('DNI duplicado', [
+          PersonaService.errorResponse('DNI duplicado', [
             'El DNI ya está registrado en el sistema. Verifique los datos.',
           ])
         );
@@ -37,14 +37,14 @@ const createAlumno = async (req, res, next) => {
 
     // Si se proporciona cursoId, validar que exista
     if (alumnoData.cursoId) {
-      const cursoExists = await PersonaService._validateCursoExists(
+      const cursoExists = await PersonaService.validateCursoExists(
         alumnoData.cursoId
       );
       if (!cursoExists) {
         return res
           .status(400)
           .json(
-            PersonaService._errorResponse('Curso inválido', [
+            PersonaService.errorResponse('Curso inválido', [
               `El curso con ID ${alumnoData.cursoId} no existe. No se puede asignar al alumno.`,
             ])
           );
@@ -55,7 +55,7 @@ const createAlumno = async (req, res, next) => {
     res
       .status(201)
       .json(
-        PersonaService._successResponse(
+        PersonaService.successResponse(
           'Alumno registrado exitosamente en la aplicación',
           newAlumno
         )
@@ -68,7 +68,7 @@ const createAlumno = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('Conflicto de unicidad', [
+          PersonaService.errorResponse('Conflicto de unicidad', [
             'El email o DNI ya está en uso. Intente con datos únicos.',
           ])
         );
@@ -78,7 +78,7 @@ const createAlumno = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Error de validación en el modelo',
             validationErrors
           )
@@ -96,12 +96,12 @@ const createDocente = async (req, res, next) => {
 
     // Validación unificada
     const validationResult =
-      PersonaService._validateCreateDocenteData(docenteData);
+      PersonaService.validateCreateDocenteData(docenteData);
     if (!validationResult.isValid) {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Error de validación en el registro de docente',
             validationResult.errors
           )
@@ -113,7 +113,7 @@ const createDocente = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('Campo no permitido', [
+          PersonaService.errorResponse('Campo no permitido', [
             'Los docentes no pueden ser asignados a un curso. Remueva el campo cursoId.',
           ])
         );
@@ -121,14 +121,14 @@ const createDocente = async (req, res, next) => {
 
     // Validar especialidad si se proporciona (opcional, pero si está, debe ser válida)
     if (docenteData.especialidad) {
-      const especialidadValidation = PersonaService._validateEspecialidad(
+      const especialidadValidation = PersonaService.validateEspecialidad(
         docenteData.especialidad
       );
       if (!especialidadValidation.isValid) {
         return res
           .status(400)
           .json(
-            PersonaService._errorResponse(
+            PersonaService.errorResponse(
               'Especialidad inválida',
               especialidadValidation.errors
             )
@@ -140,7 +140,7 @@ const createDocente = async (req, res, next) => {
     res
       .status(201)
       .json(
-        PersonaService._successResponse(
+        PersonaService.successResponse(
           'Docente registrado exitosamente en la aplicación',
           newDocente
         )
@@ -151,7 +151,7 @@ const createDocente = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('Conflicto de unicidad', [
+          PersonaService.errorResponse('Conflicto de unicidad', [
             'El email o DNI ya está en uso. Intente con datos únicos.',
           ])
         );
@@ -161,7 +161,7 @@ const createDocente = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Error de validación en el modelo',
             validationErrors
           )
@@ -180,7 +180,7 @@ const getAllPersonas = async (req, res, next) => {
       req.query;
 
     // Validar parámetros de paginación
-    const paginationValidation = PersonaService._validatePaginationParams({
+    const paginationValidation = PersonaService.validatePaginationParams({
       page,
       limit,
     });
@@ -188,7 +188,7 @@ const getAllPersonas = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Parámetros de paginación inválidos',
             paginationValidation.errors
           )
@@ -196,7 +196,7 @@ const getAllPersonas = async (req, res, next) => {
     }
 
     // Validar filtros
-    const filterValidation = PersonaService._validateFilterParams({
+    const filterValidation = PersonaService.validateFilterParams({
       tipo,
       search,
     });
@@ -204,7 +204,7 @@ const getAllPersonas = async (req, res, next) => {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse(
+          PersonaService.errorResponse(
             'Filtros inválidos',
             filterValidation.errors
           )
@@ -228,7 +228,7 @@ const getAllPersonas = async (req, res, next) => {
       totalCount = await PersonaService.countPersonas(options);
     }
 
-    const response = PersonaService._successResponse(
+    const response = PersonaService.successResponse(
       'Personas obtenidas exitosamente',
       personas
     );
@@ -254,13 +254,13 @@ const getPersonaByDni = async (req, res, next) => {
     const { dni } = req.params;
     const { includeCurso, includeDictados } = req.query;
 
-    // Validación del DNI (similar a _validateId, pero para DNI)
+    // Validación del DNI
     if (!PersonaService._validateDni(dni)) {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('DNI inválido', [
-            'El DNI debe ser un número entero entre 1,000,000 y 99,999,999.',
+          PersonaService.errorResponse('DNI inválido', [
+            'El DNI debe ser un número válido',
           ])
         );
     }
@@ -277,8 +277,8 @@ const getPersonaByDni = async (req, res, next) => {
       return res
         .status(404)
         .json(
-          PersonaService._errorResponse('Persona no encontrada', [
-            `No existe una persona con DNI ${dniNum}.`,
+          PersonaService.errorResponse('Persona no encontrada', [
+            `No existe una persona con DNI ${dni}`,
           ])
         );
     }
@@ -286,14 +286,100 @@ const getPersonaByDni = async (req, res, next) => {
     res
       .status(200)
       .json(
-        PersonaService._successResponse(
-          'Persona obtenida exitosamente',
-          persona
+        PersonaService.successResponse('Persona obtenida exitosamente', persona)
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Obtener alumnos por curso
+const getAlumnosByCurso = async (req, res, next) => {
+  try {
+    const { cursoId } = req.params;
+
+    // Validar cursoId
+    if (!PersonaService._validateId(cursoId)) {
+      return res
+        .status(400)
+        .json(
+          PersonaService.errorResponse('Curso ID inválido', [
+            'El cursoId debe ser un número válido.',
+          ])
+        );
+    }
+
+    const alumnos = await PersonaService.findAlumnosByCurso(cursoId);
+
+    if (!alumnos || alumnos.length === 0) {
+      return res
+        .status(404)
+        .json(
+          PersonaService.errorResponse('Alumnos no encontrados', [
+            `No se encontraron alumnos para el curso con ID ${cursoId}.`,
+          ])
+        );
+    }
+
+    res
+      .status(200)
+      .json(
+        PersonaService.successResponse(
+          'Alumnos obtenidos exitosamente',
+          alumnos
         )
       );
   } catch (error) {
     next(error);
   }
+};
+
+// Obtener materias por DNI de alumno
+const getMateriasByAlumnoDni = async (req, res, next) => {
+  try {
+    const { dni } = req.params;
+
+    // Validar DNI
+    if (!PersonaService._validateDni(dni)) {
+      return res
+        .status(400)
+        .json(
+          PersonaService.errorResponse('DNI inválido', [
+            'El DNI debe ser un número entero válido.',
+          ])
+        );
+    }
+
+    const materias = await PersonaService.getMateriasByAlumnoDni(dni);
+
+    if (!materias || materias.length === 0) {
+      return res
+        .status(404)
+        .json(
+          PersonaService.errorResponse('Materias no encontradas', [
+            `No se encontraron materias para el alumno con DNI ${dni}.`,
+          ])
+        );
+    }
+
+    res
+      .status(200)
+      .json(
+        PersonaService.successResponse(
+          'Materias obtenidas exitosamente',
+          materias
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ========================= UPDATE =========================
+
+// Actualizar una persona
+const updatePersona = async (req, res, next) => {
+  // ... (ya implementado)
 };
 
 // ========================= DELETE =========================
@@ -303,23 +389,23 @@ const deletePersona = async (req, res, next) => {
   try {
     const { dni } = req.params;
 
-    if (!PersonaService._validateDni(dni)) {
+    if (!PersonaService.validateDni(dni)) {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('DNI inválido', [
+          PersonaService.errorResponse('DNI inválido', [
             'El DNI debe ser un número entero válido.',
           ])
         );
     }
 
     // Chequear dependientes (e.g., si es alumno con notas, o docente con dictados)
-    const hasDependents = await PersonaService._checkDependents(parseInt(dni));
+    const hasDependents = await PersonaService.checkDependents(parseInt(dni));
     if (hasDependents) {
       return res
         .status(400)
         .json(
-          PersonaService._errorResponse('Eliminación bloqueada', [
+          PersonaService.errorResponse('Eliminación bloqueada', [
             'No se puede eliminar esta persona porque tiene registros asociados (notas, dictados, etc.). Use soft delete o resuelva dependencias.',
           ])
         );
@@ -331,19 +417,17 @@ const deletePersona = async (req, res, next) => {
       return res
         .status(404)
         .json(
-          PersonaService._errorResponse('Persona no encontrada', [
+          PersonaService.errorResponse('Persona no encontrada', [
             `No se encontró la persona con DNI ${dni} para eliminar.`,
           ])
         );
     }
 
-    res
-      .status(200)
-      .json(
-        PersonaService._successResponse('Persona eliminada exitosamente', {
-          dni: parseInt(dni),
-        })
-      );
+    res.status(200).json(
+      PersonaService.successResponse('Persona eliminada exitosamente', {
+        dni: parseInt(dni),
+      })
+    );
   } catch (error) {
     next(error);
   }
@@ -354,5 +438,8 @@ module.exports = {
   createDocente,
   getAllPersonas,
   getPersonaByDni,
+  getAlumnosByCurso,
+  getMateriasByAlumnoDni,
+  updatePersona,
   deletePersona,
 };
