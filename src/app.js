@@ -2,7 +2,9 @@
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
+app.use(cors());
 // Middleware para parsear el body de las request como JSON
 app.use(express.json());
 

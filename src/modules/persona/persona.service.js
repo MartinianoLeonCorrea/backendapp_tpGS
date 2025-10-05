@@ -10,11 +10,36 @@ class PersonaService {
   // ========================= CREATE =========================
   static async createPersona(personaData) {
     try {
-      // Solo crea la persona y asocia el curso por cursoId si es alumno
+      // Convierte cursoId y dni a número
+      if (personaData.cursoId) personaData.cursoId = Number(personaData.cursoId);
+      if (personaData.dni) personaData.dni = Number(personaData.dni);
+
+      // Si tipo es 'alumno', especialidad debe ser null
+      if (personaData.tipo === 'alumno') personaData.especialidad = null;
+
+      console.log('Datos que se van a guardar:', personaData);
       const persona = await Persona.create(personaData);
       return persona;
     } catch (error) {
-      throw new Error('Error al crear persona: ' + error.message);
+      // Manejar el error de validación de unicidad
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        const field = error.errors[0].path;
+        if (field === 'dni') {
+          throw new Error('El DNI ya se encuentra registrado.');
+        }
+        // if (field === 'email') {
+        //   throw new Error('El email ya se encuentra registrado.');
+        // }
+      }
+
+      // Manejar otros errores de validación (por ejemplo, formato de email, longitud)
+      if (error.name === 'SequelizeValidationError') {
+        const validationMessage = error.errors[0].message;
+        throw new Error('Error de validación: ' + validationMessage);
+      }
+
+      // Manejar cualquier otro tipo de error desconocido
+      throw new Error('Error al crear la persona: ' + error.message);
     }
   }
 
@@ -224,9 +249,9 @@ class PersonaService {
   static async findAlumnosByCurso(cursoId) {
     try {
       const alumnos = await Persona.findAll({
-        where: { 
+        where: {
           tipo: 'alumno',
-          cursoId: cursoId 
+          cursoId: cursoId
         },
         include: [{
           model: Curso,
@@ -255,9 +280,9 @@ class PersonaService {
           attributes: ['id', 'nro_letra', 'turno']
         }]
       });
-      
+
       if (!alumno || !alumno.cursoId) return [];
-      
+
       // Busca los dictados del curso del alumno
       const dictados = await Dictado.findAll({
         where: { cursoId: alumno.cursoId },
@@ -267,12 +292,12 @@ class PersonaService {
           attributes: ['id', 'nombre', 'descripcion']
         }],
       });
-      
+
       // Extrae materias únicas
       const materias = dictados
         .map((d) => d.materia)
         .filter((m, i, arr) => m && arr.findIndex((x) => x.id === m.id) === i);
-      
+
       return materias;
     } catch (error) {
       throw new Error('Error al obtener materias por DNI de alumno: ' + error.message);
@@ -299,7 +324,7 @@ class PersonaService {
       if (error.name === 'SequelizeValidationError') {
         throw new Error(
           'Error de validación: ' +
-            error.errors.map((e) => e.message).join(', ')
+          error.errors.map((e) => e.message).join(', ')
         );
       }
       throw new Error('Error al actualizar persona: ' + error.message);

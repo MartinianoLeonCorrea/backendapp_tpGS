@@ -5,6 +5,7 @@ const PersonaService = require('./persona.service');
 // Crear un alumno
 
 const createAlumno = async (req, res, next) => {
+  console.log('Datos recibidos en createAlumno:', req.body); //sacar
   try {
     const alumnoData = { ...req.body, tipo: 'alumno' };
 
@@ -49,7 +50,19 @@ const createAlumno = async (req, res, next) => {
       data: newAlumno,
     });
   } catch (error) {
-    next(error);
+    console.error('Error en createAlumno:', error);
+    if (error.name) console.error('Error name:', error.name);
+    if (error.message) console.error('Error message:', error.message);
+    if (error.stack) console.error('Error stack:', error.stack);
+    if (error.errors) console.error('Error errors:', error.errors);
+
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ message: 'El email ya está registrado.' });
+    }
+    if (error.name === 'SequelizeValidationError' && error.errors) {
+      return res.status(400).json({ message: error.errors[0].message });
+    }
+    res.status(500).json({ message: 'Error interno', error: error.message });
   }
 };
 

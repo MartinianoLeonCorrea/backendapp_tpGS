@@ -1,7 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../../config/database');
 
-class Persona extends Model {}
+class Persona extends Model { }
 Persona.init(
   {
     dni: {
@@ -76,13 +76,17 @@ Persona.init(
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: true, // Agregado para evitar duplicados
+      //unique: true, // Agregado para evitar duplicados
       validate: {
         notEmpty: {
           msg: 'El email no puede estar vacío.',
         },
         isEmail: {
           msg: 'El email debe ser válido.',
+        },
+        len: {
+          args: [6, 255],
+          msg: 'El email debe tener entre 6 y 255 caracteres',
         },
       },
     },
