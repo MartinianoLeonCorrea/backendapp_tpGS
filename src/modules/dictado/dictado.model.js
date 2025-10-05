@@ -24,13 +24,23 @@ Dictado.init(
         },
       },
     },
-    notas_alumnos: {
-      type: DataTypes.TEXT, // Para almacenar notas numéricas o alfanuméricas
-      allowNull: true,
+    cursoId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: 'cursos', key: 'id' },
+      onDelete: 'CASCADE',
     },
-    asistencias_alumnos: {
-      type: DataTypes.TEXT, // Para almacenar presente/ausente
-      allowNull: true,
+    materiaId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: 'materias', key: 'id' },
+      onDelete: 'CASCADE',
+    },
+    docenteId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: 'personas', key: 'dni' },
+      onDelete: 'CASCADE',
     },
   },
   {
