@@ -2,7 +2,7 @@
 //Para eliminar datos existentes tenés que ejecutar el comando:
 // npx sequelize-cli db:seed:undo:all
 
-//Para que se creen los datos tenés que ejecutar el comando: 
+//Para que se creen los datos tenés que ejecutar el comando:
 // npx sequelize-cli db:seed:all
 
 //Los seed se ejecutan en una terminal aparte pero en la carpeta del backend
@@ -66,7 +66,8 @@ module.exports = {
         {
           id: 4,
           nombre: 'Física',
-          descripcion: 'Principios de la mecánica, termodinámica y electromagnetismo.',
+          descripcion:
+            'Principios de la mecánica, termodinámica y electromagnetismo.',
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -107,8 +108,8 @@ module.exports = {
         },
         {
           dni: 34567890,
-          nombre: 'Carmen Elena',
-          apellido: 'Rodríguez Silva',
+          nombre: 'Carmen',
+          apellido: 'Rodríguez',
           telefono: '341-4567890',
           direccion: 'San Martín 789, Rosario',
           email: 'carmen.rodriguez@escuela.edu.ar',
@@ -121,7 +122,7 @@ module.exports = {
         {
           dni: 45678901,
           nombre: 'Roberto Carlos',
-          apellido: 'Fernández Torres',
+          apellido: 'Fernández',
           telefono: '341-5678901',
           direccion: 'Belgrano 321, Rosario',
           email: 'roberto.fernandez@escuela.edu.ar',
@@ -135,8 +136,8 @@ module.exports = {
         // ===================== ALUMNOS =====================
         {
           dni: 44123456,
-          nombre: 'Martín Alejandro',
-          apellido: 'Pérez González',
+          nombre: 'Martín',
+          apellido: 'Pérez',
           telefono: '341-1234567',
           direccion: 'Pellegrini 1230, Rosario',
           email: 'martin.perez@estudiante.edu.ar',
@@ -148,8 +149,8 @@ module.exports = {
         },
         {
           dni: 44234567,
-          nombre: 'Sofía Valentina',
-          apellido: 'Martínez Díaz',
+          nombre: 'Sofía',
+          apellido: 'Martínez',
           telefono: '341-2345678',
           direccion: 'Zeballos 456, Rosario',
           email: 'sofia.martinez@estudiante.edu.ar',
@@ -161,8 +162,8 @@ module.exports = {
         },
         {
           dni: 45123456,
-          nombre: 'Nicolás Benjamín',
-          apellido: 'Jiménez Vargas',
+          nombre: 'Nicolás',
+          apellido: 'Jiménez',
           telefono: '341-7890123',
           direccion: 'Urquiza 890, Rosario',
           email: 'nicolas.jimenez@estudiante.edu.ar',
@@ -174,8 +175,8 @@ module.exports = {
         },
         {
           dni: 46123456,
-          nombre: 'Catalina Luz',
-          apellido: 'Morales Gómez',
+          nombre: 'Catalina',
+          apellido: 'Morales',
           telefono: '341-1357924',
           direccion: 'Tucumán 789, Rosario',
           email: 'catalina.morales@estudiante.edu.ar',
@@ -198,8 +199,7 @@ module.exports = {
           id: 1,
           anio: 2025,
           dias_cursado: 'Lunes, Miércoles, Viernes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 1,
           materia_id: 1, // Matemática
           docente_id: 12345678, // Ana García
@@ -210,8 +210,6 @@ module.exports = {
           id: 2,
           anio: 2025,
           dias_cursado: 'Martes, Jueves',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
           curso_id: 1,
           materia_id: 2, // Lengua y Literatura
           docente_id: 23456789, // Luis Gómez
@@ -222,8 +220,7 @@ module.exports = {
           id: 3,
           anio: 2025,
           dias_cursado: 'Viernes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 1,
           materia_id: 3, // Historia
           docente_id: 34567890, // Carmen Rodríguez
@@ -234,8 +231,7 @@ module.exports = {
           id: 4,
           anio: 2025,
           dias_cursado: 'Lunes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 1,
           materia_id: 4, // Física
           docente_id: 45678901, // Roberto Fernández
@@ -248,8 +244,7 @@ module.exports = {
           id: 5,
           anio: 2025,
           dias_cursado: 'Martes, Jueves',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 2,
           materia_id: 1, // Matemática
           docente_id: 12345678, // Ana García
@@ -260,8 +255,7 @@ module.exports = {
           id: 6,
           anio: 2025,
           dias_cursado: 'Lunes, Miércoles',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 2,
           materia_id: 2, // Lengua y Literatura
           docente_id: 23456789, // Luis Gómez
@@ -272,8 +266,7 @@ module.exports = {
           id: 7,
           anio: 2025,
           dias_cursado: 'Viernes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 2,
           materia_id: 3, // Historia
           docente_id: 34567890, // Carmen Rodríguez
@@ -284,8 +277,7 @@ module.exports = {
           id: 8,
           anio: 2025,
           dias_cursado: 'Miércoles',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
+
           curso_id: 2,
           materia_id: 4, // Física
           docente_id: 45678901, // Roberto Fernández
@@ -298,8 +290,6 @@ module.exports = {
           id: 9,
           anio: 2025,
           dias_cursado: 'Lunes, Viernes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
           curso_id: 3,
           materia_id: 1, // Matemática
           docente_id: 12345678, // Ana García
@@ -310,8 +300,6 @@ module.exports = {
           id: 10,
           anio: 2025,
           dias_cursado: 'Martes, Jueves',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
           curso_id: 3,
           materia_id: 2, // Lengua y Literatura
           docente_id: 23456789, // Luis Gómez
@@ -322,8 +310,6 @@ module.exports = {
           id: 11,
           anio: 2025,
           dias_cursado: 'Miércoles',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
           curso_id: 3,
           materia_id: 3, // Historia
           docente_id: 34567890, // Carmen Rodríguez
@@ -334,8 +320,6 @@ module.exports = {
           id: 12,
           anio: 2025,
           dias_cursado: 'Martes, Jueves, Viernes',
-          notas_alumnos: null,
-          asistencias_alumnos: null,
           curso_id: 3,
           materia_id: 4, // Física
           docente_id: 45678901, // Roberto Fernández
@@ -387,7 +371,7 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         },
-        
+
         // Exámenes Curso 1B
         {
           id: 5,
@@ -407,7 +391,7 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         },
-        
+
         // Exámenes Curso 2A
         {
           id: 7,
@@ -430,9 +414,54 @@ module.exports = {
       ],
       {}
     );
+
+    // Agregar notas
+    await queryInterface.bulkInsert(
+      'evaluaciones',
+      [
+        {
+          id: 1,
+          nota: 8.5,
+          observacion: null,
+          examen_id: 1, // Operaciones básicas: suma, resta, multiplicación. Curso 1A
+          alumno_id: 44123456, // Martin Pérez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 2,
+          nota: 6,
+          observacion: null,
+          examen_id: 1, // Operaciones básicas: suma, resta, multiplicación. Curso 1A
+          alumno_id: 44234567, // Sofía Martínez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 3,
+          nota: 7.5,
+          observacion: null,
+          examen_id: 2, // Comprensión lectora y análisis de texto. Curso 1A
+          alumno_id: 44123456, // Martin Pérez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          id: 4,
+          nota: 5.5,
+          observacion: null,
+          examen_id: 2, // Comprensión lectora y análisis de texto. Curso 1A
+          alumno_id: 44234567, // Sofía Martínez
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      ],
+      {}
+    );
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('evaluaciones', null, {});
     await queryInterface.bulkDelete('examenes', null, {});
     await queryInterface.bulkDelete('dictados', null, {});
     await queryInterface.bulkDelete('personas', null, {});
