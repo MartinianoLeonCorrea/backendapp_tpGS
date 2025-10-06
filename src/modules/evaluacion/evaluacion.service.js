@@ -10,6 +10,11 @@ class EvaluacionService {
     return await Evaluacion.create(evaluacionData);
   }
 
+  // Crear múltiples evaluaciones en batch
+  async createBatchEvaluaciones(evaluaciones) {
+    return await Evaluacion.bulkCreate(evaluaciones, { validate: true });
+  }
+
   // ========================== READ ============================
   // Obtener todas las evaluaciones con filtros opcionales
   async findAllEvaluaciones({ examenId, alumnoDni, dictadoId, page, limit }) {
@@ -31,7 +36,7 @@ class EvaluacionService {
     });
   }
 
-  // Contar evaluaciones con filtros opcionales
+  // Contar evaluaciones with optional filters
   async countEvaluaciones({ examenId, alumnoDni, dictadoId }) {
     const where = {};
 
@@ -56,6 +61,16 @@ class EvaluacionService {
 
     return await Evaluacion.findByPk(id, { include });
   }
+  // Obtener evaluaciones por examenId
+  async findEvaluacionesByExamen(examenId) {
+    return await Evaluacion.findAll({
+      where: { examenId },
+      include: [
+        { model: Examen, as: 'examen' },
+        { model: Persona, as: 'alumno' },
+      ],
+    });
+  }
 
   // Obtener evaluación por examen y alumno
   async findEvaluacionByExamenAndAlumno(examenId, alumnoId) {
@@ -76,6 +91,21 @@ class EvaluacionService {
     }
 
     return await this.findEvaluacionById(id);
+  }
+
+  // Actualizar múltiples evaluaciones en batch
+  async updateBatchEvaluaciones(evaluaciones) {
+    const updatedEvaluaciones = [];
+
+    for (const evaluacion of evaluaciones) {
+      const { id, ...updateData } = evaluacion;
+      const updated = await this.updateEvaluacion(id, updateData);
+      if (updated) {
+        updatedEvaluaciones.push(updated);
+      }
+    }
+
+    return updatedEvaluaciones;
   }
 
   // ========================== DELETE ==========================
