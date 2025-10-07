@@ -17,6 +17,8 @@ router.get(
   '/alumno/:alumnoId/examen/:examenId',
   evaluacionController.getEvaluacionByAlumnoAndExamen
 );
+// Obtener evaluaciones por alumnoId
+router.get('/alumno/:alumnoId', evaluacionController.getEvaluacionesByAlumno); //api
 
 // Crear una nueva evaluación
 router.post('/', evaluacionController.createEvaluacion);

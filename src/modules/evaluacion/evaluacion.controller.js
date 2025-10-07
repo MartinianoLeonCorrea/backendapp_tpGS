@@ -1,4 +1,5 @@
 const evaluacionService = require('../evaluacion/evaluacion.service'); // Asume que existe, similar a otros
+const { get } = require('./evaluacion.routes');
 
 // Obtener todas las evaluaciones (para admin; con filtros opcionales)
 const getAllEvaluaciones = async (req, res, next) => {
@@ -116,6 +117,27 @@ const getEvaluacionByAlumnoAndExamen = async (req, res, next) => {
     res.status(200).json({
       message: 'Evaluación obtenida exitosamente',
       data: evaluacion,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const getEvaluacionesByAlumno = async (req, res, next) => {
+  try {
+    const { alumnoId } = req.params;
+    const alumnoNum = parseInt(alumnoId);
+
+    if (isNaN(alumnoNum)) {
+      return res.status(400).json({ message: 'ID de alumno inválido' });
+    }
+
+    const evaluaciones = await evaluacionService.findEvaluacionesByAlumno(
+      alumnoNum
+    );
+
+    res.status(200).json({
+      message: 'Evaluaciones obtenidas exitosamente',
+      data: evaluaciones,
     });
   } catch (error) {
     next(error);
@@ -376,6 +398,7 @@ module.exports = {
   updateEvaluacion,
   deleteEvaluacion,
   getEvaluacionesByExamen,
+  getEvaluacionesByAlumno,
   getEvaluacionByAlumnoAndExamen,
   createBatchEvaluaciones,
   updateBatchEvaluaciones,

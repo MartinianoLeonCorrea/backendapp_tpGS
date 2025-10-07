@@ -2,6 +2,8 @@ const { Op } = require('sequelize');
 const Evaluacion = require('./evaluacion.model');
 const Examen = require('../examen/examen.model');
 const Persona = require('../persona/persona.model');
+const Dictado = require('../dictado/dictado.model'); // Importar el modelo Dictado
+const Materia = require('../materia/materia.model'); // Importar el modelo Materia
 
 class EvaluacionService {
   // ========================== CREATE ==========================
@@ -67,6 +69,26 @@ class EvaluacionService {
       where: { examenId },
       include: [
         { model: Examen, as: 'examen' },
+        { model: Persona, as: 'alumno' },
+      ],
+    });
+  }
+  // Obtener evaluaciones por alumnoId
+  async findEvaluacionesByAlumno(alumnoId) {
+    return await Evaluacion.findAll({
+      where: { alumnoId },
+      include: [
+        {
+          model: Examen,
+          as: 'examen',
+          include: [
+            {
+              model: Dictado,
+              as: 'dictado',
+              include: [{ model: Materia, as: 'materia' }],
+            },
+          ],
+        },
         { model: Persona, as: 'alumno' },
       ],
     });
