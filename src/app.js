@@ -1,19 +1,17 @@
 // Configuración Express, middlewares y rutas.
-
 const express = require('express');
-const app = express();
 const cors = require('cors');
 
-app.use(cors());
-// Middleware para parsear el body de las request como JSON
-app.use(express.json());
+//Importar middlewares
+const { notFound } = require('./middleware/notFound');
+const errorHandler = require('./middleware/errorHandler');
 
-// Middlewares de ejemplo (mostrar las peticiones que llegan, cuando y de qué tipo)
-app.use((req, res, next) => {
-  const now = new Date().toISOString();
-  console.log(`[${now}] ${req.method} ${req.originalUrl}`);
-  next();
-});
+// Crea instancia de Express
+const app = express();
+
+// Midlewares base
+app.use(cors());
+app.use(express.json());
 
 // Importar rutas
 const materiaRoutes = require('./modules/materia/materia.routes');
@@ -36,17 +34,7 @@ app.get('/', (req, res) => {
   res.send('API de Gestión Tu Secundaria corriendo en el backend');
 });
 
-// Middleware para manejar rutas no encontradas (Error 404)
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Ruta no encontrada' });
-});
-
-// Middleware de manejo de errores global
-app.use((err, req, res, next) => {
-  console.error(err.stack); // Loguear el error para depuración
-  res
-    .status(500)
-    .json({ message: 'Algo salió mal en el servidor', error: err.message });
-});
-
+//Midlewares finales
+app.use(notFound); //Manejo del 404
+app.use(errorHandler); //Manejo global de errores
 module.exports = app;

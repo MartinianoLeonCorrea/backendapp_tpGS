@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const PersonaController = require('./persona.controller');
-
+const { validateRequest } = require('../../middleware/validateRequest');
+const { personaSchema } = require('./persona.schema');
 // ========================= CREATE =========================
 
-router.post('/alumnos', PersonaController.createAlumno); // POST /api/personas/alumnos
-router.post('/docentes', PersonaController.createDocente); // POST /api/personas/docentes
+router.post('/alumnos', validateRequest(personaSchema), PersonaController.createAlumno); // POST /api/personas/alumnos
+router.post('/docentes', validateRequest(personaSchema), PersonaController.createDocente); // POST /api/personas/docentes
 
 // ========================= READ ===========================
 

@@ -7,20 +7,6 @@ const createAlumno = async (req, res, next) => {
   try {
     const alumnoData = { ...req.body, tipo: 'alumno' };
 
-    // Validación unificada usando el service (similar a Materia)
-    const validationResult =
-      PersonaService.validateCreateAlumnoData(alumnoData);
-    if (!validationResult.isValid) {
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse(
-            'Error de validación en el registro de alumno',
-            validationResult.errors
-          )
-        );
-    }
-
     // Verificar si el DNI ya existe (adicional al unique del modelo)
     const existingAlumno = await PersonaService.findPersonaByDni(
       alumnoData.dni
@@ -61,30 +47,7 @@ const createAlumno = async (req, res, next) => {
         )
       );
   } catch (error) {
-    console.error('Error en createAlumno:', error); // Remover en producción
 
-    // Manejo específico de errores de Sequelize para respuestas más amigables
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse('Conflicto de unicidad', [
-            'El email o DNI ya está en uso. Intente con datos únicos.',
-          ])
-        );
-    }
-    if (error.name === 'SequelizeValidationError' && error.errors) {
-      const validationErrors = error.errors.map((err) => err.message);
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse(
-            'Error de validación en el modelo',
-            validationErrors
-          )
-        );
-    }
-    // Error genérico
     next(error);
   }
 };
@@ -93,20 +56,6 @@ const createAlumno = async (req, res, next) => {
 const createDocente = async (req, res, next) => {
   try {
     const docenteData = { ...req.body, tipo: 'docente' };
-
-    // Validación unificada
-    const validationResult =
-      PersonaService.validateCreateDocenteData(docenteData);
-    if (!validationResult.isValid) {
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse(
-            'Error de validación en el registro de docente',
-            validationResult.errors
-          )
-        );
-    }
 
     // Verificar que no incluya cursoId (docentes no lo necesitan)
     if (docenteData.cursoId) {
@@ -119,23 +68,6 @@ const createDocente = async (req, res, next) => {
         );
     }
 
-    // Validar especialidad si se proporciona (opcional, pero si está, debe ser válida)
-    if (docenteData.especialidad) {
-      const especialidadValidation = PersonaService.validateEspecialidad(
-        docenteData.especialidad
-      );
-      if (!especialidadValidation.isValid) {
-        return res
-          .status(400)
-          .json(
-            PersonaService.errorResponse(
-              'Especialidad inválida',
-              especialidadValidation.errors
-            )
-          );
-      }
-    }
-
     const newDocente = await PersonaService.createPersona(docenteData); // Reusa createPersona con tipo
     res
       .status(201)
@@ -146,27 +78,6 @@ const createDocente = async (req, res, next) => {
         )
       );
   } catch (error) {
-    // Similar manejo de errores que en createAlumno
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse('Conflicto de unicidad', [
-            'El email o DNI ya está en uso. Intente con datos únicos.',
-          ])
-        );
-    }
-    if (error.name === 'SequelizeValidationError' && error.errors) {
-      const validationErrors = error.errors.map((err) => err.message);
-      return res
-        .status(400)
-        .json(
-          PersonaService.errorResponse(
-            'Error de validación en el modelo',
-            validationErrors
-          )
-        );
-    }
     next(error);
   }
 };
