@@ -33,7 +33,11 @@ router.post(
 // Crear múltiples evaluaciones en batch
 router.post(
   '/batch-create',
-  validateRequest(Joi.array().items(evaluacionSchema)),
+  validateRequest(
+    Joi.object({
+      evaluaciones: Joi.array().items(evaluacionSchema).required(),
+    })
+  ),
   evaluacionController.createBatchEvaluaciones
 );
 
@@ -47,7 +51,11 @@ router.put(
 // Actualizar múltiples evaluaciones en batch
 router.put(
   '/batch-update',
-  validateRequest(Joi.array().items(evaluacionSchema)),
+  validateRequest(
+    Joi.object({
+      evaluaciones: Joi.array().items(evaluacionSchema).required(),
+    })
+  ),
   evaluacionController.updateBatchEvaluaciones
 );
 

@@ -10,16 +10,17 @@ const evaluacionSchema = Joi.object({
   nota: Joi.number()
     .min(NOTA.min)
     .max(NOTA.max)
-    .required(NOTA.required)
+    .allow(null)
+    .optional()
     .messages({
       'number.base': 'La nota debe ser un número.',
       'number.min': `La nota debe ser al menos ${NOTA.min}.`,
       'number.max': `La nota no puede superar ${NOTA.max}.`,
-      'any.required': 'La nota es obligatoria.',
     }),
   observaciones: Joi.string()
     .min(OBSERVACIONES.min)
     .max(OBSERVACIONES.max)
+    .allow(null)
     .optional()
     .messages({
       'string.base': 'Las observaciones deben ser un texto.',
