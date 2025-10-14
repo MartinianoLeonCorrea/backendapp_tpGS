@@ -1,5 +1,6 @@
 const evaluacionService = require('../evaluacion/evaluacion.service'); // Asume que existe, similar a otros
 const { get } = require('./evaluacion.routes');
+const errorHandler = require('../../middleware/errorHandler');
 
 // Obtener todas las evaluaciones (para admin; con filtros opcionales)
 const getAllEvaluaciones = async (req, res, next) => {

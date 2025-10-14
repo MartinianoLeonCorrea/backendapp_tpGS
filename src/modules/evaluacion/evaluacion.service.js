@@ -9,12 +9,20 @@ class EvaluacionService {
   // ========================== CREATE ==========================
   // Crear una nueva evaluación
   async createEvaluacion(evaluacionData) {
-    return await Evaluacion.create(evaluacionData);
+    try {
+      return await Evaluacion.create(evaluacionData);
+    } catch (error) {
+      throw new Error('Error al crear la evaluación');
+    }
   }
 
   // Crear múltiples evaluaciones en batch
   async createBatchEvaluaciones(evaluaciones) {
-    return await Evaluacion.bulkCreate(evaluaciones, { validate: true });
+    try {
+      return await Evaluacion.bulkCreate(evaluaciones, { validate: true });
+    } catch (error) {
+      throw new Error('Error al crear evaluaciones en batch');
+    }
   }
 
   // ========================== READ ============================
@@ -104,30 +112,38 @@ class EvaluacionService {
   // ========================== UPDATE ==========================
   // Actualizar una evaluación
   async updateEvaluacion(id, updateData) {
-    const [updatedRowsCount] = await Evaluacion.update(updateData, {
-      where: { id },
-    });
+    try {
+      const [updatedRowsCount] = await Evaluacion.update(updateData, {
+        where: { id },
+      });
 
-    if (updatedRowsCount === 0) {
-      return null;
+      if (updatedRowsCount === 0) {
+        return null;
+      }
+
+      return await this.findEvaluacionById(id);
+    } catch (error) {
+      throw new Error('Error al actualizar la evaluación');
     }
-
-    return await this.findEvaluacionById(id);
   }
 
   // Actualizar múltiples evaluaciones en batch
   async updateBatchEvaluaciones(evaluaciones) {
-    const updatedEvaluaciones = [];
+    try {
+      const updatedEvaluaciones = [];
 
-    for (const evaluacion of evaluaciones) {
-      const { id, ...updateData } = evaluacion;
-      const updated = await this.updateEvaluacion(id, updateData);
-      if (updated) {
-        updatedEvaluaciones.push(updated);
+      for (const evaluacion of evaluaciones) {
+        const { id, ...updateData } = evaluacion;
+        const updated = await this.updateEvaluacion(id, updateData);
+        if (updated) {
+          updatedEvaluaciones.push(updated);
+        }
       }
-    }
 
-    return updatedEvaluaciones;
+      return updatedEvaluaciones;
+    } catch (error) {
+      throw new Error('Error al actualizar evaluaciones en batch');
+    }
   }
 
   // ========================== DELETE ==========================

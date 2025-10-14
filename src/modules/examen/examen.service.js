@@ -54,6 +54,12 @@ class ExamenService {
 
   // Función para crear un nuevo examen
   async createExamen(examenData) {
+    // Verificar que el dictadoId exista
+    const dictado = await Dictado.findByPk(examenData.dictadoId);
+    if (!dictado) {
+      throw new Error(`El dictado con ID ${examenData.dictadoId} no existe.`);
+    }
+
     const newExamen = await Examen.create(examenData);
     return this.getExamenById(newExamen.id);
   }
@@ -61,7 +67,18 @@ class ExamenService {
   // Función para actualizar un examen
   async updateExamen(id, updateData) {
     const examen = await Examen.findByPk(id);
-    if (!examen) return null;
+    if (!examen) {
+      return null;
+    }
+
+    // Verificar que el dictadoId exista si se está actualizando
+    if (updateData.dictadoId) {
+      const dictado = await Dictado.findByPk(updateData.dictadoId);
+      if (!dictado) {
+        throw new Error(`El dictado con ID ${updateData.dictadoId} no existe.`);
+      }
+    }
+
     await examen.update(updateData);
     return this.getExamenById(id);
   }

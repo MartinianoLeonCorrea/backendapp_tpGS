@@ -1,5 +1,8 @@
 const express = require('express');
 const evaluacionController = require('./evaluacion.controller');
+const { validateRequest } = require('../../middleware/validateRequest');
+const { evaluacionSchema } = require('./evaluacion.schema');
+const Joi = require('joi');
 
 const router = express.Router();
 
@@ -21,16 +24,32 @@ router.get(
 router.get('/alumno/:alumnoId', evaluacionController.getEvaluacionesByAlumno); //api
 
 // Crear una nueva evaluación
-router.post('/', evaluacionController.createEvaluacion);
+router.post(
+  '/',
+  validateRequest(evaluacionSchema),
+  evaluacionController.createEvaluacion
+);
 
 // Crear múltiples evaluaciones en batch
-router.post('/batch-create', evaluacionController.createBatchEvaluaciones);
+router.post(
+  '/batch-create',
+  validateRequest(Joi.array().items(evaluacionSchema)),
+  evaluacionController.createBatchEvaluaciones
+);
 
 // Actualizar una evaluación existente
-router.put('/:id', evaluacionController.updateEvaluacion);
+router.put(
+  '/:id',
+  validateRequest(evaluacionSchema),
+  evaluacionController.updateEvaluacion
+);
 
 // Actualizar múltiples evaluaciones en batch
-router.put('/batch-update', evaluacionController.updateBatchEvaluaciones);
+router.put(
+  '/batch-update',
+  validateRequest(Joi.array().items(evaluacionSchema)),
+  evaluacionController.updateBatchEvaluaciones
+);
 
 // Eliminar una evaluación por ID
 router.delete('/:id', evaluacionController.deleteEvaluacion);

@@ -61,7 +61,11 @@ const createExamen = async (req, res, next) => {
     }
 
     const newExamen = await examenService.createExamen(req.body);
-    res.status(201).json(newExamen);
+    res.status(201).json({
+      success: true,
+      message: 'Examen creado exitosamente.',
+      data: newExamen,
+    });
   } catch (error) {
     next(error);
   }
@@ -75,9 +79,16 @@ const updateExamen = async (req, res, next) => {
       req.body
     );
     if (!updatedExamen) {
-      return res.status(404).json({ message: 'Examen no encontrado' });
+      return res.status(404).json({
+        success: false,
+        message: 'Examen no encontrado.',
+      });
     }
-    res.status(200).json(updatedExamen);
+    res.status(200).json({
+      success: true,
+      message: 'Examen actualizado exitosamente.',
+      data: updatedExamen,
+    });
   } catch (error) {
     next(error);
   }

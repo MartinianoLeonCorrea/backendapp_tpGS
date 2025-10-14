@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const examenController = require('../examen/examen.controller');
+const { validateRequest } = require('../../middleware/validateRequest');
+const { examenSchema } = require('./examen.schema');
 
 // IMPORTANTE: Las rutas específicas deben ir ANTES de las rutas con parámetros
 // para evitar conflictos
@@ -23,14 +25,15 @@ router.get('/', (req, res, next) => {
 
 // Ruta para crear un nuevo examen
 // POST /api/examenes
-router.post('/', examenController.createExamen);
+router.post('/', validateRequest(examenSchema), examenController.createExamen);
+
+// Actualizar un examen existente
+// PUT /api/examenes/:id
+router.put('/:id', validateRequest(examenSchema), examenController.updateExamen);
 
 // Rutas de búsqueda y manipulación por ID (DEBEN IR AL FINAL)
 // GET /api/examenes/:id
 router.get('/:id', examenController.getExamenById);
-
-// PUT /api/examenes/:id
-router.put('/:id', examenController.updateExamen);
 
 // DELETE /api/examenes/:id
 router.delete('/:id', examenController.deleteExamen);
