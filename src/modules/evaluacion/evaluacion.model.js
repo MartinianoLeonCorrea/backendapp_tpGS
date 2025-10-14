@@ -13,26 +13,10 @@ Evaluacion.init(
     nota: {
       type: DataTypes.FLOAT,
       allowNull: false,
-      validate: {
-        min: {
-          args: [0],
-          msg: 'La nota no puede ser menor a 0.',
-        },
-        max: {
-          args: [10],
-          msg: 'La nota no puede ser mayor a 10.',
-        },
-      },
     },
     observacion: {
       type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        len: {
-          args: [0, 255],
-          msg: 'La observación no puede exceder los 255 caracteres.',
-        },
-      },
     },
     examenId: {
       type: DataTypes.INTEGER,
