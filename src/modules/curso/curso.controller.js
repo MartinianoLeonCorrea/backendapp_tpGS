@@ -1,23 +1,13 @@
 const CursoService = require('./curso.service');
+const { idParamSchema, getCursoQuerySchema } = require('./curso.schema');
 
 class CursoController {
   // ========================= CREATE =========================
 
   // Crear un nuevo curso
-
   static async createCurso(req, res, next) {
     try {
-      const cursoData = req.body;
-
-      // Validaciones básicas
-
-      if (!cursoData.nro_letra || !cursoData.turno) {
-        return res.status(400).json({
-          message: 'Los campos nro_letra y turno son obligatorios',
-        });
-      }
-
-      const newCurso = await CursoService.createCurso(cursoData);
+      const newCurso = await CursoService.createCurso(req.body);
       res.status(201).json({
         message: 'Curso creado exitosamente',
         data: newCurso,
@@ -30,7 +20,6 @@ class CursoController {
   // ========================= READ ===========================
 
   // Obtener todos los cursos
-
   static async getAllCursos(req, res, next) {
     try {
       const cursos = await CursoService.findAllCursos();
@@ -45,9 +34,24 @@ class CursoController {
   }
 
   // Obtener un curso por ID
-
   static async getCursoById(req, res, next) {
     try {
+      const { error: paramError } = idParamSchema.validate(req.params);
+      if (paramError) {
+        return res.status(400).json({
+          message: 'Error de validación en parámetros',
+          errors: paramError.details.map((err) => err.message),
+        });
+      }
+
+      const { error: queryError } = getCursoQuerySchema.validate(req.query);
+      if (queryError) {
+        return res.status(400).json({
+          message: 'Error de validación en query params',
+          errors: queryError.details.map((err) => err.message),
+        });
+      }
+
       const { id } = req.params;
       const { includeAlumnos, includeDictados } = req.query;
 
@@ -74,13 +78,18 @@ class CursoController {
   // ========================= UPDATE =========================
 
   // Actualizar un curso existente
-
   static async updateCurso(req, res, next) {
     try {
-      const { id } = req.params;
-      const cursoData = req.body;
+      const { error: paramError } = idParamSchema.validate(req.params);
+      if (paramError) {
+        return res.status(400).json({
+          message: 'Error de validación en parámetros',
+          errors: paramError.details.map((err) => err.message),
+        });
+      }
 
-      const updatedCurso = await CursoService.updateCurso(id, cursoData);
+      const { id } = req.params;
+      const updatedCurso = await CursoService.updateCurso(id, req.body);
 
       if (!updatedCurso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
@@ -98,9 +107,16 @@ class CursoController {
   // ========================= DELETE =========================
 
   // Eliminar un curso
-
   static async deleteCurso(req, res, next) {
     try {
+      const { error: paramError } = idParamSchema.validate(req.params);
+      if (paramError) {
+        return res.status(400).json({
+          message: 'Error de validación en parámetros',
+          errors: paramError.details.map((err) => err.message),
+        });
+      }
+
       const { id } = req.params;
       const deletedCurso = await CursoService.deleteCurso(id);
 

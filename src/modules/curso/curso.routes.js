@@ -1,22 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const CursoController = require('./curso.controller');
+const { validateRequest } = require('./../../middleware/validateRequest');
+const { 
+  createCursoSchema, 
+  updateCursoSchema 
+} = require('./curso.schema');
 
 // ========================= CREATE =========================
 
-router.post('/', CursoController.createCurso); // POST /api/cursos
+router.post('/', validateRequest(createCursoSchema), CursoController.createCurso);
 
 // ========================= READ ===========================
 
-router.get('/', CursoController.getAllCursos); // GET /api/cursos
-router.get('/:id', CursoController.getCursoById); // GET /api/cursos/:id
+router.get('/', CursoController.getAllCursos);
+router.get('/:id', CursoController.getCursoById);
 
 // ========================= UPDATE =========================
 
-router.put('/:id', CursoController.updateCurso); // PUT /api/cursos/:id
+router.put('/:id', validateRequest(updateCursoSchema), CursoController.updateCurso);
 
 // ========================= DELETE =========================
 
-router.delete('/:id', CursoController.deleteCurso); // DELETE /api/cursos/:id
+router.delete('/:id', CursoController.deleteCurso);
 
 module.exports = router;

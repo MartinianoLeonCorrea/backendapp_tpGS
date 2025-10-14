@@ -1,22 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const materiaController = require('./materia.controller');
+const { validateRequest } = require('../../middleware/validateRequest');
+const {
+  createMateriaSchema,
+  updateMateriaSchema,
+  idParamSchema,
+  queryMateriaSchema,
+} = require('./materia.schema');
 
 // ========================= CREATE =========================
 
-router.post('/', materiaController.createMateria); // POST /api/materias
+router.post(
+  '/',
+  validateRequest(createMateriaSchema, 'body'),
+  materiaController.createMateria
+);
 
 // ========================= READ ===========================
 
-router.get('/', materiaController.getAllMaterias); // GET /api/materias?page=1&limit=10&search=nombremateria&include=relations
-router.get('/:id', materiaController.getMateriaById); // GET /api/materias/:id?include=relations
+router.get(
+  '/',
+  validateRequest(queryMateriaSchema, 'query'),
+  materiaController.getAllMaterias
+);
+
+router.get(
+  '/:id',
+  validateRequest(idParamSchema, 'params'),
+  validateRequest(queryMateriaSchema, 'query'),
+  materiaController.getMateriaById
+);
 
 // ========================= UPDATE =========================
 
-router.put('/:id', materiaController.updateMateria); // PUT /api/materias/:id
+router.put(
+  '/:id',
+  validateRequest(idParamSchema, 'params'),
+  validateRequest(updateMateriaSchema, 'body'),
+  materiaController.updateMateria
+);
 
 // ========================= DELETE =========================
 
-router.delete('/:id', materiaController.deleteMateria); // DELETE /api/materias/:id
+router.delete(
+  '/:id',
+  validateRequest(idParamSchema, 'params'),
+  materiaController.deleteMateria
+);
 
 module.exports = router;
