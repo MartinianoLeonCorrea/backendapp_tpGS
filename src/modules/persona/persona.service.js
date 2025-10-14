@@ -92,8 +92,8 @@ class PersonaService {
     return { isValid, errors };
   }
 
-  // Validar DNI (para queries y updates)
-  _validateDni(dni) {
+  // Validar DNI (público)
+  validateDni(dni) {
     return !isNaN(dni) && dni >= 1000000 && dni <= 99999999;
   }
 
@@ -683,6 +683,34 @@ class PersonaService {
     if (search && typeof search !== 'string') {
       errors.push('El parámetro "search" debe ser una cadena de texto.');
       isValid = false;
+    }
+
+    return { isValid, errors };
+  }
+
+  // Validar datos para actualización
+  async _validateUpdatePersonaData(personaData, dni) {
+    const errors = [];
+    let isValid = true;
+
+    // Validar email único
+    if (personaData.email) {
+      const existingPersona = await Persona.findOne({
+        where: { email: personaData.email, dni: { [Op.ne]: dni } },
+      });
+      if (existingPersona) {
+        errors.push('El email ya está registrado.');
+        isValid = false;
+      }
+    }
+
+    // Validar cursoId si es alumno
+    if (personaData.tipo === 'alumno' && personaData.cursoId) {
+      const cursoExists = await this.validateCursoExists(personaData.cursoId);
+      if (!cursoExists) {
+        errors.push(`El curso con ID ${personaData.cursoId} no existe.`);
+        isValid = false;
+      }
     }
 
     return { isValid, errors };

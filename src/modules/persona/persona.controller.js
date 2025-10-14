@@ -47,7 +47,6 @@ const createAlumno = async (req, res, next) => {
         )
       );
   } catch (error) {
-
     next(error);
   }
 };
@@ -166,7 +165,7 @@ const getPersonaByDni = async (req, res, next) => {
     const { includeCurso, includeDictados } = req.query;
 
     // Validación del DNI
-    if (!PersonaService._validateDni(dni)) {
+    if (!PersonaService.validateDni(dni)) {
       return res
         .status(400)
         .json(
@@ -290,7 +289,30 @@ const getMateriasByAlumnoDni = async (req, res, next) => {
 
 // Actualizar una persona
 const updatePersona = async (req, res, next) => {
-  // ... (ya implementado)
+  try {
+    const { dni } = req.params;
+    const personaData = req.body;
+
+    console.log('Actualizando persona con DNI:', dni, 'Datos:', personaData);
+
+    const updatedPersona = await PersonaService.updatePersona(dni, personaData);
+
+    if (!updatedPersona) {
+      return res.status(404).json({
+        success: false,
+        message: `No se encontró una persona con el DNI ${dni}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Persona actualizada exitosamente',
+      data: updatedPersona,
+    });
+  } catch (error) {
+    console.error('Error al actualizar persona:', error);
+    next(error); // Pasar el error al middleware de manejo de errores
+  }
 };
 
 // ========================= DELETE =========================
