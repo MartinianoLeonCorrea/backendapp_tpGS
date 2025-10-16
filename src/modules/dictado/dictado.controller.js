@@ -1,10 +1,12 @@
-// src/controllers/dictado.controller.js
+// src/modules/dictado/dictado.controller.js
 const dictadoService = require('../dictado/dictado.service');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 // ========== CREATE ==========
 const createDictado = async (req, res, next) => {
   try {
-    const dictado = await dictadoService.createDictado(req.body);
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const dictado = await dictadoService.createDictado(sanitizedData);
     res.status(201).json(dictado);
   } catch (error) {
     next(error);
@@ -87,6 +89,7 @@ const getDictadosByMateria = async (req, res, next) => {
     next(error);
   }
 };
+
 const getDictadosByCursoAndMateria = async (req, res, next) => {
   try {
     const { cursoId, materiaId } = req.query;
@@ -110,9 +113,11 @@ const getDictadosByCursoAndMateria = async (req, res, next) => {
 const updateDictado = async (req, res, next) => {
   try {
     const { docentesIds, materiasIds, ...updateData } = req.body;
+    const sanitizedData = sanitizeObjectStrings(updateData);
+    
     const updatedDictado = await dictadoService.updateDictado(
       req.params.id,
-      updateData,
+      sanitizedData,
       docentesIds,
       materiasIds
     );

@@ -167,7 +167,7 @@ const getPersonaByDni = async (req, res, next) => {
     const { includeCurso, includeDictados } = req.query;
 
     // Validación del DNI
-    if (!PersonaService._validateDni(dni)) {
+    if (!PersonaService.validateDni(dni)) {
       return res
         .status(400)
         .json(

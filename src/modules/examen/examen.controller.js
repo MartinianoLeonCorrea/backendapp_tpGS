@@ -1,5 +1,6 @@
-// src/controllers/examen.controller.js
+// src/modules/examen/examen.controller.js
 const examenService = require('../examen/examen.service');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 // Obtener todos los exámenes
 const getAllExamenes = async (req, res, next) => {
@@ -44,7 +45,8 @@ const getExamenById = async (req, res, next) => {
 // Crear un nuevo examen
 const createExamen = async (req, res, next) => {
   try {
-    const { fecha_examen, temas, copias, dictadoId } = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const { fecha_examen, temas, copias, dictadoId } = sanitizedData;
 
     // Validar datos requeridos
     if (!fecha_examen || !temas || !dictadoId) {
@@ -60,7 +62,7 @@ const createExamen = async (req, res, next) => {
       });
     }
 
-    const newExamen = await examenService.createExamen(req.body);
+    const newExamen = await examenService.createExamen(sanitizedData);
     res.status(201).json({
       success: true,
       message: 'Examen creado exitosamente.',
@@ -74,9 +76,10 @@ const createExamen = async (req, res, next) => {
 // Actualizar un examen
 const updateExamen = async (req, res, next) => {
   try {
+    const sanitizedData = sanitizeObjectStrings(req.body);
     const updatedExamen = await examenService.updateExamen(
       req.params.id,
-      req.body
+      sanitizedData
     );
     if (!updatedExamen) {
       return res.status(404).json({
@@ -118,6 +121,7 @@ const getExamenesByMateria = async (req, res, next) => {
     next(error);
   }
 };
+
 const getExamenesByDictadoId = async (req, res, next) => {
   try {
     const { dictadoId } = req.query;

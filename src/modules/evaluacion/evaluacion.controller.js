@@ -1,6 +1,5 @@
-const evaluacionService = require('../evaluacion/evaluacion.service'); // Asume que existe, similar a otros
-const { get } = require('./evaluacion.routes');
-const errorHandler = require('../../middleware/errorHandler');
+const evaluacionService = require('../evaluacion/evaluacion.service');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 // Obtener todas las evaluaciones (para admin; con filtros opcionales)
 const getAllEvaluaciones = async (req, res, next) => {
@@ -27,7 +26,7 @@ const getAllEvaluaciones = async (req, res, next) => {
     };
 
     const evaluaciones = await evaluacionService.findAllEvaluaciones(options);
-    const total = await evaluacionService.countEvaluaciones(options); // Asume método en service
+    const total = await evaluacionService.countEvaluaciones(options);
 
     res.status(200).json({
       message: 'Evaluaciones obtenidas exitosamente',
@@ -123,6 +122,7 @@ const getEvaluacionByAlumnoAndExamen = async (req, res, next) => {
     next(error);
   }
 };
+
 const getEvaluacionesByAlumno = async (req, res, next) => {
   try {
     const { alumnoId } = req.params;
@@ -148,7 +148,8 @@ const getEvaluacionesByAlumno = async (req, res, next) => {
 // Crear una evaluación (subir nota para un alumno en un examen)
 const createEvaluacion = async (req, res, next) => {
   try {
-    const { nota, observacion, examenId, alumnoDni } = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const { nota, observacion, examenId, alumnoDni } = sanitizedData;
 
     console.log('Datos recibidos en createEvaluacion:', {
       nota,
@@ -198,14 +199,14 @@ const createEvaluacion = async (req, res, next) => {
     }
 
     // Verificar que alumno esté en el curso del examen (via dictado → curso)
-    const examen = await evaluacionService.getExamenById(examenNum); // Asume helper en service
+    const examen = await evaluacionService.getExamenById(examenNum);
     if (!examen || !examen.dictado || !examen.dictado.curso) {
       console.error('Error: Examen o dictado no encontrado');
       return res
         .status(404)
         .json({ message: 'Examen o dictado no encontrado' });
     }
-    const alumno = await evaluacionService.getPersonaByDni(dniNum); // Asume helper
+    const alumno = await evaluacionService.getPersonaByDni(dniNum);
     if (!alumno || alumno.cursoId !== examen.dictado.cursoId) {
       console.error('Error: El alumno no pertenece al curso del examen');
       return res
@@ -224,7 +225,7 @@ const createEvaluacion = async (req, res, next) => {
       nota,
       observacion,
       examenId: examenNum,
-      alumnoId: dniNum, // Asumiendo FK alumnoId es DNI
+      alumnoId: dniNum,
     });
 
     console.log('Evaluación creada exitosamente:', newEvaluacion);
@@ -245,7 +246,7 @@ const createEvaluacion = async (req, res, next) => {
 const createBatchEvaluaciones = async (req, res, next) => {
   try {
     const { evaluaciones } = req.body;
-    console.log('Datos recibidos en batch-create:', { evaluaciones }); // Log para debug
+    console.log('Datos recibidos en batch-create:', { evaluaciones });
 
     if (!Array.isArray(evaluaciones) || evaluaciones.length === 0) {
       return res
@@ -257,7 +258,9 @@ const createBatchEvaluaciones = async (req, res, next) => {
     const errors = [];
 
     for (const evalData of evaluaciones) {
-      const { nota, observacion, examenId, alumnoId } = evalData; // Usa alumnoId (no alumnoDni)
+      // Sanitizar cada objeto individual
+      const sanitizedEval = sanitizeObjectStrings(evalData);
+      const { nota, observacion, examenId, alumnoId } = sanitizedEval;
 
       // Validación nota
       if (nota !== undefined && (nota < 0 || nota > 10 || isNaN(nota))) {
@@ -324,8 +327,13 @@ const updateBatchEvaluaciones = async (req, res, next) => {
         .json({ message: 'Debe proporcionar un array de evaluaciones' });
     }
 
+    // Sanitizar cada evaluación en el array
+    const sanitizedEvaluaciones = evaluaciones.map(evalData => 
+      sanitizeObjectStrings(evalData)
+    );
+
     const updatedEvaluaciones = await evaluacionService.updateBatchEvaluaciones(
-      evaluaciones
+      sanitizedEvaluaciones
     );
 
     res.status(200).json({
@@ -341,7 +349,9 @@ const updateBatchEvaluaciones = async (req, res, next) => {
 const updateEvaluacion = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { nota, observacion } = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const { nota, observacion } = sanitizedData;
+    
     const idNum = parseInt(id);
     if (isNaN(idNum)) {
       return res.status(400).json({ message: 'ID inválido' });

@@ -1,11 +1,13 @@
 const MateriaService = require('./materia.service');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 // ========================= CREATE =========================
 
 // Crear una nueva materia
 const createMateria = async (req, res, next) => {
   try {
-    const { nombre, descripcion } = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const { nombre, descripcion } = sanitizedData;
 
     const newMateria = await MateriaService.createMateria({
       nombre,
@@ -105,7 +107,8 @@ const getMateriaById = async (req, res, next) => {
 const updateMateria = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion } = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
+    const { nombre, descripcion } = sanitizedData;
 
     const updatedMateria = await MateriaService.updateMateria(id, {
       nombre,

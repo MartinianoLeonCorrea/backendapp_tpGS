@@ -1,5 +1,7 @@
+// src/modules/curso/curso.controller.js
 const CursoService = require('./curso.service');
 const { idParamSchema, getCursoQuerySchema } = require('./curso.schema');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 class CursoController {
   // ========================= CREATE =========================
@@ -7,7 +9,8 @@ class CursoController {
   // Crear un nuevo curso
   static async createCurso(req, res, next) {
     try {
-      const newCurso = await CursoService.createCurso(req.body);
+      const sanitizedData = sanitizeObjectStrings(req.body);
+      const newCurso = await CursoService.createCurso(sanitizedData);
       res.status(201).json({
         message: 'Curso creado exitosamente',
         data: newCurso,
@@ -89,7 +92,8 @@ class CursoController {
       }
 
       const { id } = req.params;
-      const updatedCurso = await CursoService.updateCurso(id, req.body);
+      const sanitizedData = sanitizeObjectStrings(req.body);
+      const updatedCurso = await CursoService.updateCurso(id, sanitizedData);
 
       if (!updatedCurso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
