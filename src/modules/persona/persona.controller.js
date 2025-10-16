@@ -1,11 +1,12 @@
 const PersonaService = require('./persona.service');
+const { sanitizeObjectStrings } = require('../../utils/sanitize');
 
 // ========================= CREATE =========================
 
 // Crear un alumno (mejorado con validaciones unificadas y respuestas estandarizadas)
 const createAlumno = async (req, res, next) => {
   try {
-    const alumnoData = { ...req.body, tipo: 'alumno' };
+    const alumnoData = sanitizeObjectStrings({ ...req.body, tipo: 'alumno' });
 
     // Verificar si el DNI ya existe (adicional al unique del modelo)
     const existingAlumno = await PersonaService.findPersonaByDni(
@@ -47,6 +48,7 @@ const createAlumno = async (req, res, next) => {
         )
       );
   } catch (error) {
+
     next(error);
   }
 };
@@ -54,7 +56,7 @@ const createAlumno = async (req, res, next) => {
 // Crear un docente (mejorado similar a createAlumno)
 const createDocente = async (req, res, next) => {
   try {
-    const docenteData = { ...req.body, tipo: 'docente' };
+    const docenteData = sanitizeObjectStrings({ ...req.body, tipo: 'docente' });
 
     // Verificar que no incluya cursoId (docentes no lo necesitan)
     if (docenteData.cursoId) {
@@ -165,7 +167,7 @@ const getPersonaByDni = async (req, res, next) => {
     const { includeCurso, includeDictados } = req.query;
 
     // Validación del DNI
-    if (!PersonaService.validateDni(dni)) {
+    if (!PersonaService._validateDni(dni)) {
       return res
         .status(400)
         .json(
@@ -287,31 +289,24 @@ const getMateriasByAlumnoDni = async (req, res, next) => {
 
 // ========================= UPDATE =========================
 
-// Actualizar una persona
 const updatePersona = async (req, res, next) => {
   try {
     const { dni } = req.params;
-    const personaData = req.body;
+    const updateData = sanitizeObjectStrings(req.body);
 
-    console.log('Actualizando persona con DNI:', dni, 'Datos:', personaData);
-
-    const updatedPersona = await PersonaService.updatePersona(dni, personaData);
+    const updatedPersona = await PersonaService.updatePersona(dni, updateData);
 
     if (!updatedPersona) {
-      return res.status(404).json({
-        success: false,
-        message: `No se encontró una persona con el DNI ${dni}`,
-      });
+      return res
+        .status(404)
+        .json(PersonaService.errorResponse('Persona no encontrada', []));
     }
 
-    res.status(200).json({
-      success: true,
-      message: 'Persona actualizada exitosamente',
-      data: updatedPersona,
-    });
+    return res
+      .status(200)
+      .json(PersonaService.successResponse('Persona actualizada', updatedPersona));
   } catch (error) {
-    console.error('Error al actualizar persona:', error);
-    next(error); // Pasar el error al middleware de manejo de errores
+    next(error); // El errorHandler se encarga de Sequelize u otros errores
   }
 };
 
