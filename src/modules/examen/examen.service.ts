@@ -1,8 +1,15 @@
-// src/services/examen.service.js
-const Persona = require('../persona/persona.model');
-const Examen = require('../examen/examen.model');
-const Materia = require('../materia/materia.model');
-const Dictado = require('../dictado/dictado.model');
+import Persona from '../persona/persona.model';
+import Examen from './examen.model';
+import Materia from '../materia/materia.model';
+import Dictado from '../dictado/dictado.model';
+
+interface IExamenInput {
+  fecha_examen?: Date | string;
+  temas?: string;
+  dictadoId?: number;
+  copias?: number;
+  [key: string]: any; // Para flexibilidad si hay más campos
+}
 
 class ExamenService {
   // Función para obtener todos los exámenes con sus relaciones
@@ -27,7 +34,7 @@ class ExamenService {
   }
 
   // Función para obtener un examen por ID
-  async getExamenById(id) {
+  async getExamenById(id: number) {
     try {
       const examen = await Examen.findByPk(id, {
         include: [
@@ -53,25 +60,41 @@ class ExamenService {
   }
 
   // Función para crear un nuevo examen
-  async createExamen(examenData) {
-    // Verificar que el dictadoId exista
+  async createExamen(examenData: IExamenInput) {
+    if (
+      !examenData.fecha_examen ||
+      !examenData.temas ||
+      !examenData.dictadoId
+    ) {
+      throw new Error('Faltan datos obligatorios para crear el examen.');
+    }
+
+    // 2. Verificar que el dictadoId exista
     const dictado = await Dictado.findByPk(examenData.dictadoId);
     if (!dictado) {
       throw new Error(`El dictado con ID ${examenData.dictadoId} no existe.`);
     }
 
-    const newExamen = await Examen.create(examenData);
+    const payload = {
+      fecha_examen: new Date(examenData.fecha_examen),
+      temas: examenData.temas,
+      dictadoId: examenData.dictadoId,
+      copias: examenData.copias || 0,
+    };
+
+    const newExamen = await Examen.create(payload);
+
     return this.getExamenById(newExamen.id);
   }
 
   // Función para actualizar un examen
-  async updateExamen(id, updateData) {
+  async updateExamen(id: number, updateData: IExamenInput) {
     const examen = await Examen.findByPk(id);
     if (!examen) {
       return null;
     }
 
-    // Verificar que el dictadoId exista si se está actualizando
+    // Verificar dictado si viene en la data
     if (updateData.dictadoId) {
       const dictado = await Dictado.findByPk(updateData.dictadoId);
       if (!dictado) {
@@ -79,12 +102,18 @@ class ExamenService {
       }
     }
 
-    await examen.update(updateData);
+    const payload: any = { ...updateData };
+
+    if (updateData.fecha_examen) {
+      payload.fecha_examen = new Date(updateData.fecha_examen);
+    }
+
+    await examen.update(payload);
     return this.getExamenById(id);
   }
 
   // Función para eliminar un examen
-  async deleteExamen(id) {
+  async deleteExamen(id: number) {
     const examen = await Examen.findByPk(id);
     if (!examen) return null;
     await examen.destroy();
@@ -92,18 +121,21 @@ class ExamenService {
   }
 
   // Funciones para búsquedas por relaciones
-  async getExamenesByMateria(materiaId) {
+  async getExamenesByMateria(materiaId: number) {
     // Buscar dictados de la materia
     const dictados = await Dictado.findAll({
       where: { materiaId },
       attributes: ['id'],
     });
-    const dictadoIds = dictados.map((d) => d.id);
+
+    // Tipamos explícitamente el map para evitar errores
+    const dictadoIds: number[] = dictados.map((d: any) => d.id);
 
     console.log('Dictado IDs:', dictadoIds);
     if (!dictadoIds.length) {
       return [];
     }
+
     const examenes = await Examen.findAll({
       where: { dictadoId: dictadoIds },
       include: [
@@ -125,7 +157,8 @@ class ExamenService {
     console.log('Examenes encontrados:', examenes);
     return examenes;
   }
-  async getExamenesByDictadoId(dictadoId) {
+
+  async getExamenesByDictadoId(dictadoId: number) {
     try {
       return await Examen.findAll({
         where: { dictadoId },
@@ -154,7 +187,7 @@ class ExamenService {
   // ========================= HELPER FUNCTIONS ===========================
 
   // Función para construir una respuesta de éxito estandarizada
-  _successResponse(message, data) {
+  _successResponse(message: string, data: any) {
     return {
       success: true,
       message,
@@ -163,7 +196,7 @@ class ExamenService {
   }
 
   // Función para construir una respuesta de error estandarizada
-  _errorResponse(message, errors = []) {
+  _errorResponse(message: string, errors: string[] = []) {
     return {
       success: false,
       message,
@@ -172,4 +205,4 @@ class ExamenService {
   }
 }
 
-module.exports = new ExamenService();
+export default new ExamenService();

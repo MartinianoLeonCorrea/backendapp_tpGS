@@ -1,9 +1,10 @@
-// src/modules/examen/examen.routes.js
-const express = require('express');
-const router = express.Router();
-const examenController = require('../examen/examen.controller');
-const { validateRequest } = require('../../middleware/validateRequest');
-const { examenSchema } = require('./examen.schema');
+import { Router } from 'express';
+// Importamos todas las exportaciones nombradas del controlador como un objeto
+import * as examenController from './examen.controller';
+import { validateRequest } from '../../middleware/validateRequest';
+import { examenSchema } from './examen.schema';
+
+const router = Router();
 
 // IMPORTANTE: Las rutas específicas deben ir ANTES de las rutas con parámetros
 // para evitar conflictos
@@ -12,9 +13,8 @@ const { examenSchema } = require('./examen.schema');
 // GET /api/examenes/materia/:materiaId
 router.get('/materia/:materiaId', examenController.getExamenesByMateria);
 
-// Ruta para obtener exámenes por dictadoId (query parameter)
+// Ruta para obtener exámenes por dictadoId (query parameter) u obtener todos
 // GET /api/examenes?dictadoId=123
-// O para obtener todos los exámenes si no hay query
 // GET /api/examenes
 router.get('/', (req, res, next) => {
   if (req.query.dictadoId) {
@@ -29,7 +29,11 @@ router.post('/', validateRequest(examenSchema), examenController.createExamen);
 
 // Actualizar un examen existente
 // PUT /api/examenes/:id
-router.put('/:id', validateRequest(examenSchema), examenController.updateExamen);
+router.put(
+  '/:id',
+  validateRequest(examenSchema),
+  examenController.updateExamen
+);
 
 // Rutas de búsqueda y manipulación por ID (DEBEN IR AL FINAL)
 // GET /api/examenes/:id
@@ -38,4 +42,4 @@ router.get('/:id', examenController.getExamenById);
 // DELETE /api/examenes/:id
 router.delete('/:id', examenController.deleteExamen);
 
-module.exports = router;
+export default router;
