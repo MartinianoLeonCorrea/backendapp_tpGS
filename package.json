@@ -1,24 +1,36 @@
 {
   "name": "backendapp_tpgs",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/MartinianoLeonCorrea/backendapp_tpGS.git",
-  "author": "MartinianoLeonCorrea <correamartinianoleon@gmail.com>",
+  "author": "MartinianoLeonCorea <correamartinianoleon@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js",
-    "seed": "npx sequelize-cli db:seed:all"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:prod": "npm run build && npm start",
+    "seed": "npx sequelize-cli db:seed:all",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@mikro-orm/cli": "^6.6.5",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/joi": "^17.2.2",
     "@types/node": "^25.0.10",
+    "@types/sanitize-html": "^2.16.0",
     "dotenv": "^17.2.0",
     "nodemon": "^3.1.10",
-    "sequelize-cli": "^6.6.3"
+    "sequelize-cli": "^6.6.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@mikro-orm/core": "^6.6.5",
+    "@mikro-orm/mysql": "^6.6.5",
+    "@mikro-orm/reflection": "^6.6.5",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "joi": "^18.0.1",

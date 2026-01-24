@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    
+    // Para Node.js
+    "types": ["node"],
+    "moduleResolution": "node",
+    
+    // Para MikroORM (CRÍTICO)
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    
+    // Opciones de salida
+    "sourceMap": true,
+    "declaration": true,
+    
+    // Compatibilidad
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    
+    // Migración gradual
+    "allowJs": true,
+    "checkJs": false,
+    
+    // Strictness
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
