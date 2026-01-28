@@ -1,8 +1,7 @@
-// persona.schema.js
-const Joi = require('joi');
-const { DNI, NOMBRE, APELLIDO, DIRECCION, TELEFONO, EMAIL, TIPOS } = require('./persona.definitions');
+import Joi from 'joi';
+import { DNI, NOMBRE, APELLIDO, DIRECCION, TELEFONO, EMAIL, TIPOS } from './persona.definitions';
 
-const personaSchema = Joi.object({
+export const personaSchema = Joi.object({
   dni: Joi.number()
     .integer()
     .min(DNI.min)
@@ -36,15 +35,15 @@ const personaSchema = Joi.object({
     }),
 
   telefono: Joi.string()
-    .pattern(TELEFONO.regex)
     .min(TELEFONO.min)
     .max(TELEFONO.max)
+    .pattern(TELEFONO.regex)
     .required()
     .messages({
-      'string.pattern.base': 'El teléfono contiene caracteres no válidos.',
       'string.empty': 'El teléfono no puede estar vacío.',
       'string.min': `El teléfono debe tener al menos ${TELEFONO.min} caracteres.`,
-      'string.max': `El teléfono no puede superar los ${TELEFONO.max} caracteres.`
+      'string.max': `El teléfono no puede superar los ${TELEFONO.max} caracteres.`,
+      'string.pattern.base': 'El formato del teléfono es inválido.'
     }),
 
   direccion: Joi.string()
@@ -75,16 +74,12 @@ const personaSchema = Joi.object({
       'any.required': 'El tipo es obligatorio.'
     }),
 
-  // Validaciones condicionales según el tipo
   cursoId: Joi.when('tipo', {
     is: 'alumno',
-    then: Joi.number()
-      .integer()
-      .required()
-      .messages({
-        'number.base': 'El cursoId debe ser numérico.',
-        'any.required': 'El cursoId es obligatorio para alumnos.'
-      }),
+    then: Joi.number().integer().required().messages({
+      'number.base': 'El cursoId debe ser numérico.',
+      'any.required': 'El cursoId es obligatorio para alumnos.'
+    }),
     otherwise: Joi.forbidden().messages({
       'any.unknown': 'Los docentes no pueden tener cursoId.'
     })
@@ -92,19 +87,10 @@ const personaSchema = Joi.object({
 
   especialidad: Joi.when('tipo', {
     is: 'docente',
-    then: Joi.string()
-      .min(2)
-      .max(50)
-      .optional()
-      .allow(null, '')
-      .messages({
-        'string.min': 'La especialidad debe tener al menos 2 caracteres.',
-        'string.max': 'La especialidad no puede superar los 50 caracteres.'
-      }),
-    otherwise: Joi.forbidden().messages({
-      'any.unknown': 'Los alumnos no pueden tener especialidad.'
-    })
+    then: Joi.string().min(2).max(50).required().messages({
+      'string.empty': 'La especialidad es obligatoria para docentes.',
+      'string.min': 'La especialidad debe tener al menos 2 caracteres.'
+    }),
+    otherwise: Joi.forbidden()
   })
 });
-
-module.exports = { personaSchema };

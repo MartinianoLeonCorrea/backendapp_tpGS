@@ -12,10 +12,17 @@ export class Materia {
   @Property({ type: 'text', nullable: true })
   descripcion?: string;
 
-  @Property({ fieldName: 'created_at' })
+  @Property({ 
+    fieldName: 'created_at', 
+    onCreate: () => new Date() // Esto asegura el valor en el INSERT
+  })
   createdAt: Date = new Date();
 
-  @Property({ fieldName: 'updated_at', onUpdate: () => new Date() })
+  @Property({ 
+    fieldName: 'updated_at', 
+    onCreate: () => new Date(), // Valor inicial
+    onUpdate: () => new Date()  // Valor en cada UPDATE
+  })
   updatedAt: Date = new Date();
 
   // Relaciones

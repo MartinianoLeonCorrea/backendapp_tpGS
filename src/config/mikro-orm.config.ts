@@ -1,4 +1,4 @@
-import { Options } from '@mikro-orm/core';
+import { MikroORM, Options } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import dotenv from 'dotenv';
 
@@ -11,29 +11,27 @@ const config: Options = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   dbName: process.env.DB_NAME,
-  
-  // Directorio de entidades (busca en modules)
   entities: ['./dist/modules/**/*.entity.js'],
   entitiesTs: ['./src/modules/**/*.entity.ts'],
-  
-  // Migraciones
   migrations: {
     path: './dist/migrations',
     pathTs: './src/migrations',
   },
-  
-  // Configuración general
-  debug: process.env.NODE_ENV === 'development',
-  allowGlobalContext: true, // Para Request Context
-  
-  // Naming strategy (snake_case como en Sequelize)
-  namingStrategy: undefined, // Usa el default que maneja snake_case
-  
-  // Pool de conexiones
-  pool: {
-    min: 0,
-    max: 5,
+  seeder: {
+    path: './dist/seeders',
+    pathTs: './src/seeders',
+    defaultSeeder: 'DemoSeeder',
+    glob: '!(*.d).{js,ts}',
   },
+  debug: process.env.NODE_ENV === 'development',
+  allowGlobalContext: true,
+  pool: { min: 0, max: 5 },
 };
 
+// Exportamos la configuración por defecto para la CLI
 export default config;
+
+// Exportamos una función para inicializar el ORM en app.ts
+export const initORM = async () => {
+  return await MikroORM.init(config);
+};

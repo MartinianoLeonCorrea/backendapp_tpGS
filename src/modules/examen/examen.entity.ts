@@ -10,20 +10,19 @@ export class Examen {
   @Property({ fieldName: 'fecha_examen' })
   fechaExamen!: Date;
 
-  @Property({ type: 'string' })
+  @Property({ type: 'text' })
   temas!: string;
 
   @Property({ default: 0 })
   copias: number = 0;
 
-  @Property({ fieldName: 'created_at' })
+  @Property({ fieldName: 'created_at', onCreate: () => new Date() })
   createdAt: Date = new Date();
 
-  @Property({ fieldName: 'updated_at', onUpdate: () => new Date() })
+  @Property({ fieldName: 'updated_at', onCreate: () => new Date(), onUpdate: () => new Date() })
   updatedAt: Date = new Date();
 
-  // Relaciones (MikroORM crea automáticamente dictadoId)
-  @ManyToOne(() => Dictado)
+  @ManyToOne(() => Dictado, { fieldName: 'dictado_id' })
   dictado!: Dictado;
 
   @OneToMany(() => Evaluacion, (evaluacion) => evaluacion.examen)

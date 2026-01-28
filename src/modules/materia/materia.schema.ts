@@ -1,13 +1,13 @@
-const Joi = require('joi');
-const {
+import Joi from 'joi';
+import {
   MATERIA_NOMBRE,
   MATERIA_DESCRIPCION,
   MATERIA_ID,
   PAGINATION,
   INCLUDE_OPTIONS,
-} = require('./materia.definitions');
+} from './materia.definitions';
 
-const createMateriaSchema = Joi.object({
+export const createMateriaSchema = Joi.object({
   nombre: Joi.string()
     .min(MATERIA_NOMBRE.MIN)
     .max(MATERIA_NOMBRE.MAX)
@@ -30,7 +30,7 @@ const createMateriaSchema = Joi.object({
     }),
 });
 
-const updateMateriaSchema = Joi.object({
+export const updateMateriaSchema = Joi.object({
   nombre: Joi.string()
     .min(MATERIA_NOMBRE.MIN)
     .max(MATERIA_NOMBRE.MAX)
@@ -55,7 +55,7 @@ const updateMateriaSchema = Joi.object({
     'object.min': 'Debe proporcionar al menos un campo para actualizar',
   });
 
-const idParamSchema = Joi.object({
+export const idParamSchema = Joi.object({
   id: Joi.number().integer().min(MATERIA_ID.MIN).required().messages({
     'number.base': 'El ID debe ser un número',
     'number.integer': 'El ID debe ser un número entero',
@@ -64,7 +64,7 @@ const idParamSchema = Joi.object({
   }),
 });
 
-const queryMateriaSchema = Joi.object({
+export const queryMateriaSchema = Joi.object({
   page: Joi.number()
     .integer()
     .min(PAGINATION.PAGE_MIN)
@@ -94,10 +94,3 @@ const queryMateriaSchema = Joi.object({
       'any.only': `El parámetro include solo puede ser: ${INCLUDE_OPTIONS.join(', ')}`,
     }),
 });
-
-module.exports = {
-  createMateriaSchema,
-  updateMateriaSchema,
-  idParamSchema,
-  queryMateriaSchema,
-};

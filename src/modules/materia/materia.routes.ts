@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const materiaController = require('./materia.controller');
-const { validateRequest } = require('../../middleware/validateRequest');
-const {
+import { Router } from 'express';
+import * as materiaController from './materia.controller';
+import { validateRequest } from '../../middleware/validateRequest';
+import {
   createMateriaSchema,
   updateMateriaSchema,
   idParamSchema,
   queryMateriaSchema,
-} = require('./materia.schema');
+} from './materia.schema';
+
+const router = Router();
 
 // ========================= CREATE =========================
 
@@ -49,4 +50,4 @@ router.delete(
   materiaController.deleteMateria
 );
 
-module.exports = router;
+export default router;

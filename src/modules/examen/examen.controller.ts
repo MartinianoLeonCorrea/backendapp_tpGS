@@ -1,71 +1,52 @@
 import { Request, Response, NextFunction } from 'express';
+import { EntityManager } from '@mikro-orm/mysql'; // <--- Agregado
 import examenService from './examen.service';
 import { sanitizeObjectStrings } from '../../utils/sanitize';
 
+// Definimos un tipo local para que TypeScript no se queje de req.em
+interface RequestWithEm extends Request {
+  em: EntityManager;
+}
+
 // Obtener todos los exámenes
-export const getAllExamenes = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getAllExamenes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const examenes = await examenService.getAllExamenes();
-    res
-      .status(200)
-      .json(
-        examenService._successResponse(
-          'Exámenes obtenidos exitosamente',
-          examenes
-        )
-      );
+    // Castamos req como RequestWithEm
+    const examenes = await examenService.getAllExamenes((req as RequestWithEm).em);
+    res.status(200).json(
+      examenService._successResponse('Exámenes obtenidos exitosamente', examenes)
+    );
   } catch (error) {
     next(error);
   }
 };
 
 // Obtener un examen por ID
-export const getExamenById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getExamenById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Convertimos el param a número para el servicio
     const id = Number(req.params.id);
-
-    const examen = await examenService.getExamenById(id);
+    const examen = await examenService.getExamenById((req as RequestWithEm).em, id);
 
     if (!examen) {
-      return res
-        .status(404)
-        .json(
-          examenService._errorResponse('Examen no encontrado', [
-            `No existe un examen con ID ${id}`,
-          ])
-        );
+      return res.status(404).json(
+        examenService._errorResponse('Examen no encontrado', [`No existe un examen con ID ${id}`])
+      );
     }
 
-    res
-      .status(200)
-      .json(
-        examenService._successResponse('Examen encontrado exitosamente', examen)
-      );
+    res.status(200).json(
+      examenService._successResponse('Examen encontrado exitosamente', examen)
+    );
   } catch (error) {
     next(error);
   }
 };
 
 // Crear un nuevo examen
-export const createExamen = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sanitizedData = sanitizeObjectStrings(req.body) as any;
     const { fecha_examen, temas, dictadoId } = sanitizedData;
 
-    // Validar datos requeridos
     if (!fecha_examen || !temas || !dictadoId) {
       return res.status(400).json({
         success: false,
@@ -74,16 +55,7 @@ export const createExamen = async (
       });
     }
 
-    // Validar que dictadoId sea un número válido
-    if (isNaN(Number(dictadoId))) {
-      return res.status(400).json({
-        success: false,
-        message: 'El dictadoId debe ser un número válido',
-        errors: ['dictadoId debe ser un número'],
-      });
-    }
-
-    const newExamen = await examenService.createExamen(sanitizedData);
+    const newExamen = await examenService.createExamen((req as RequestWithEm).em, sanitizedData);
 
     res.status(201).json({
       success: true,
@@ -96,16 +68,12 @@ export const createExamen = async (
 };
 
 // Actualizar un examen
-export const updateExamen = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const updateExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
     const sanitizedData = sanitizeObjectStrings(req.body);
 
-    const updatedExamen = await examenService.updateExamen(id, sanitizedData);
+    const updatedExamen = await examenService.updateExamen((req as RequestWithEm).em, id, sanitizedData);
 
     if (!updatedExamen) {
       return res.status(404).json({
@@ -126,14 +94,10 @@ export const updateExamen = async (
 };
 
 // Eliminar un examen
-export const deleteExamen = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const deleteExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const deletedExamen = await examenService.deleteExamen(id);
+    const deletedExamen = await examenService.deleteExamen((req as RequestWithEm).em, id);
 
     if (!deletedExamen) {
       return res.status(404).json({
@@ -153,16 +117,10 @@ export const deleteExamen = async (
 };
 
 // Obtener exámenes por materia
-export const getExamenesByMateria = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getExamenesByMateria = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Asumiendo que materiaId es numérico en la base de datos
     const materiaId = Number(req.params.materiaId);
-
-    const examenes = await examenService.getExamenesByMateria(materiaId);
+    const examenes = await examenService.getExamenesByMateria((req as RequestWithEm).em, materiaId);
 
     res.status(200).json({
       success: true,
@@ -175,14 +133,8 @@ export const getExamenesByMateria = async (
 };
 
 // Obtener exámenes por dictadoId (Query Param)
-export const getExamenesByDictadoId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getExamenesByDictadoId = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // En Express, query params pueden ser strings, arrays o undefined.
-    // Forzamos el cast a string para evitar errores de tipo en TypeScript.
     const dictadoId = req.query.dictadoId as string;
 
     if (!dictadoId) {
@@ -193,17 +145,7 @@ export const getExamenesByDictadoId = async (
       });
     }
 
-    if (isNaN(Number(dictadoId))) {
-      return res.status(400).json({
-        success: false,
-        message: 'El dictadoId debe ser un número válido',
-        errors: ['dictadoId debe ser numérico'],
-      });
-    }
-
-    const examenes = await examenService.getExamenesByDictadoId(
-      Number(dictadoId)
-    );
+    const examenes = await examenService.getExamenesByDictadoId((req as RequestWithEm).em, Number(dictadoId));
 
     res.status(200).json({
       success: true,

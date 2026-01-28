@@ -1,24 +1,20 @@
+import { EntityManager, wrap } from '@mikro-orm/core';
 import { orm } from '../../config/mikro-orm';
 import { Materia } from './materia.entity';
 
 class MateriaService {
   // Helper para obtener el EntityManager
-  private get em() {
+  private get em(): EntityManager {
     return orm.em.fork();
   }
 
   // ========================= CREATE =========================
-  async createMateria(materiaData: { nombre: string; descripcion?: string }) {
+  async createMateria(data: { nombre: string; descripcion?: string }) {
     try {
-      if (!materiaData.nombre || materiaData.nombre.trim() === '') {
-        throw new Error('El nombre de la materia es requerido.');
-      }
-
       const em = this.em;
-      
       const newMateria = em.create(Materia, {
-        nombre: materiaData.nombre.trim(),
-        descripcion: materiaData.descripcion?.trim() || undefined,
+        nombre: data.nombre.trim(),
+        descripcion: data.descripcion?.trim(),
         createdAt: '',
         updatedAt: ''
       });
@@ -39,80 +35,49 @@ class MateriaService {
     limit?: number;
     search?: string;
     includeRelations?: boolean;
-  } = {}) {
+  }) {
     try {
-      const { page, limit, search, includeRelations = false } = options;
+      const { page, limit, search, includeRelations } = options;
       const em = this.em;
-
-      const queryOptions: any = {
-        orderBy: { nombre: 'ASC' },
-      };
-
-      // Paginación
-      if (page && limit) {
-        queryOptions.limit = limit;
-        queryOptions.offset = (page - 1) * limit;
-      }
-
-      // Búsqueda
       const where: any = {};
+
       if (search) {
-        where.nombre = { $like: `%${search}%` };
+        where.nombre = { $ilike: `%${search}%` };
       }
 
-      // Incluir relaciones
-      if (includeRelations) {
-        queryOptions.populate = ['dictados'];
-      }
-
-      const materias = await em.find(Materia, where, queryOptions);
-      return materias;
+      return await em.find(Materia, where, {
+        orderBy: { nombre: 'ASC' },
+        limit: limit,
+        offset: page && limit ? (page - 1) * limit : undefined,
+        populate: includeRelations ? (['dictados'] as any) : [],
+      });
     } catch (error: any) {
       throw new Error('Error al obtener todas las materias: ' + error.message);
     }
   }
 
-  async findMateriaById(id: number, includeRelations = false) {
+  async findMateriaById(id: number, includeRelations: boolean = false) {
     try {
-      if (!this._validateId(id)) {
-        throw new Error('ID inválido');
-      }
-
-      const em = this.em;
-      const queryOptions: any = {};
-
-      if (includeRelations) {
-        queryOptions.populate = ['dictados'];
-      }
-
-      const materia = await em.findOne(Materia, { id }, queryOptions);
-      return materia;
+      return await this.em.findOne(Materia, { id }, {
+        populate: includeRelations ? (['dictados'] as any) : []
+      });
     } catch (error: any) {
       throw new Error('Error al obtener materia por ID: ' + error.message);
     }
   }
 
   // ========================= UPDATE =========================
-  async updateMateria(id: number, materiaData: { nombre?: string; descripcion?: string }) {
+  async updateMateria(id: number, data: { nombre?: string; descripcion?: string }) {
     try {
-      if (!this._validateId(id)) {
-        throw new Error('ID inválido');
-      }
-
-      if (!materiaData.nombre || materiaData.nombre.trim() === '') {
-        throw new Error('El nombre de la materia es requerido.');
-      }
-
       const em = this.em;
       const materia = await em.findOne(Materia, { id });
 
-      if (!materia) {
-        return null;
-      }
+      if (!materia) return null;
 
-      // Actualizar campos
-      materia.nombre = materiaData.nombre.trim();
-      materia.descripcion = materiaData.descripcion?.trim() || undefined;
+      wrap(materia).assign({
+        nombre: data.nombre?.trim(),
+        descripcion: data.descripcion?.trim(),
+      });
 
       await em.flush();
       return materia;
@@ -127,16 +92,10 @@ class MateriaService {
   // ========================= DELETE =========================
   async deleteMateria(id: number) {
     try {
-      if (!this._validateId(id)) {
-        throw new Error('ID inválido');
-      }
-
       const em = this.em;
       const materia = await em.findOne(Materia, { id });
-
-      if (!materia) {
-        return false;
-      }
+      
+      if (!materia) return false;
 
       await em.removeAndFlush(materia);
       return true;
@@ -148,14 +107,8 @@ class MateriaService {
   // ========================= COUNT =========================
   async countMaterias(search?: string) {
     try {
-      const em = this.em;
-      const where: any = {};
-
-      if (search) {
-        where.nombre = { $like: `%${search}%` };
-      }
-
-      return await em.count(Materia, where);
+      const where = search ? { nombre: { $ilike: `%${search}%` } } : {};
+      return await this.em.count(Materia, where);
     } catch (error: any) {
       throw new Error('Error al contar materias: ' + error.message);
     }
@@ -163,34 +116,20 @@ class MateriaService {
 
   // ========================= HELPER FUNCTIONS ===========================
   _successResponse(message: string, data: any) {
-    return {
-      success: true,
-      message,
-      data,
-    };
+    return { success: true, message, data };
   }
 
   _errorResponse(message: string, errors: string[] = []) {
-    return {
-      success: false,
-      message,
-      errors,
-    };
+    return { success: false, message, errors };
   }
 
   _buildPaginationMeta(page: number, limit: number, totalCount: number) {
-    const totalPages = Math.ceil(totalCount / limit);
     return {
       totalItems: totalCount,
-      totalPages: totalPages,
+      totalPages: Math.ceil(totalCount / limit),
       currentPage: page,
       itemsPerPage: limit,
     };
-  }
-
-  _validateId(id: any): boolean {
-    const num = Number(id);
-    return Number.isInteger(num) && num > 0;
   }
 }
 
