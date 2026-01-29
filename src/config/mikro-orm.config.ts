@@ -1,4 +1,4 @@
-import { MikroORM, Options } from '@mikro-orm/core';
+import { Options } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import dotenv from 'dotenv';
 
@@ -31,7 +31,3 @@ const config: Options = {
 // Exportamos la configuración por defecto para la CLI
 export default config;
 
-// Exportamos una función para inicializar el ORM en app.ts
-export const initORM = async () => {
-  return await MikroORM.init(config);
-};

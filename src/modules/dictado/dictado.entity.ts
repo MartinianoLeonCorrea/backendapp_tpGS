@@ -1,4 +1,11 @@
-import { Entity, PrimaryKey, Property, ManyToOne, OneToMany, Collection } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  OneToMany,
+  Collection,
+} from '@mikro-orm/core';
 import { Curso } from '../curso/curso.entity';
 import { Materia } from '../materia/materia.entity';
 import { Persona } from '../persona/persona.entity';
@@ -12,16 +19,28 @@ export class Dictado {
   @Property()
   anio!: number;
 
-  @Property({ length: 100, fieldName: 'dias_cursado' })
+  @Property({ fieldName: 'dias_cursado', length: 100 })
   diasCursado!: string;
 
-  @Property({ fieldName: 'created_at' })
+  @Property({ fieldName: 'fecha_desde', nullable: true })
+  fechaDesde?: Date;
+
+  @Property({ fieldName: 'fecha_hasta', nullable: true })
+  fechaHasta?: Date;
+
+  @Property({
+    fieldName: 'created_at',
+    onCreate: () => new Date(),
+  })
   createdAt: Date = new Date();
 
-  @Property({ fieldName: 'updated_at', onUpdate: () => new Date() })
+  @Property({
+    fieldName: 'updated_at',
+    onCreate: () => new Date(),
+    onUpdate: () => new Date(),
+  })
   updatedAt: Date = new Date();
 
-  // Relaciones (MikroORM crea automáticamente cursoId, materiaId, docenteId)
   @ManyToOne(() => Curso)
   curso!: Curso;
 

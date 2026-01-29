@@ -30,6 +30,9 @@ export async function closeORM(): Promise<void> {
  */
 export function requestContextMiddleware() {
   return (req: any, res: any, next: any) => {
-    RequestContext.create(orm.em, next);
+    RequestContext.create(orm.em, () => {
+      req.em = orm.em.fork();
+      next();
+    });
   };
 }

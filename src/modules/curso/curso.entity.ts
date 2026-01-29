@@ -1,32 +1,44 @@
-import { Entity, PrimaryKey, Property, OneToMany, Collection } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  OneToMany,
+  Collection,
+  Enum,
+} from '@mikro-orm/core';
 import { Persona } from '../persona/persona.entity';
 import { Dictado } from '../dictado/dictado.entity';
+
+export enum Turno {
+  MANANA = 'MAÑANA',
+  TARDE = 'TARDE',
+  NOCHE = 'NOCHE',
+}
 
 @Entity({ tableName: 'cursos' })
 export class Curso {
   @PrimaryKey()
   id!: number;
 
-  @Property({ length: 3, fieldName: 'nro_letra' })
+  @Property({ fieldName: 'nro_letra', length: 3 })
   nroLetra!: string;
 
-  @Property({ length: 10 })
-  turno!: 'MAÑANA' | 'TARDE' | 'NOCHE';
+  @Enum(() => Turno)
+  turno!: Turno;
 
-  @Property({ 
-    fieldName: 'created_at', 
-    onCreate: () => new Date() // Esto asegura el valor en el INSERT
+  @Property({
+    fieldName: 'created_at',
+    onCreate: () => new Date(),
   })
-  createdAt: Date = new Date();
+  createdAt?: Date;
 
-  @Property({ 
-    fieldName: 'updated_at', 
-    onCreate: () => new Date(), // Valor inicial
-    onUpdate: () => new Date()  // Valor en cada UPDATE
+  @Property({
+    fieldName: 'updated_at',
+    onCreate: () => new Date(),
+    onUpdate: () => new Date(),
   })
-  updatedAt: Date = new Date();
+  updatedAt?: Date;
 
-  // Relaciones
   @OneToMany(() => Persona, (persona) => persona.curso)
   alumnos = new Collection<Persona>(this);
 
