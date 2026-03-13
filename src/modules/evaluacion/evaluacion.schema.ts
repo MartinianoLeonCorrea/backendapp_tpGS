@@ -1,15 +1,15 @@
-const Joi = require('joi');
-const {
+import Joi from 'joi';
+import {
   NOTA,
-  OBSERVACIONES,
+  OBSERVACION,
   ALUMNO_ID,
   EXAMEN_ID,
-} = require('./evaluacion.definitions');
+} from './evaluacion.definitions';
 
-const evaluacionSchema = Joi.object({
+export const evaluacionSchema = Joi.object({
   nota: Joi.number()
-    .min(NOTA.min)
-    .max(NOTA.max)
+    .min(NOTA.min!)
+    .max(NOTA.max!)
     .allow(null)
     .optional()
     .messages({
@@ -17,24 +17,30 @@ const evaluacionSchema = Joi.object({
       'number.min': `La nota debe ser al menos ${NOTA.min}.`,
       'number.max': `La nota no puede superar ${NOTA.max}.`,
     }),
-  observaciones: Joi.string()
-    .min(OBSERVACIONES.min)
-    .max(OBSERVACIONES.max)
+  observacion: Joi.string()
+    .min(OBSERVACION.min!)
+    .max(OBSERVACION.max!)
     .allow(null)
     .optional()
     .messages({
       'string.base': 'Las observaciones deben ser un texto.',
-      'string.min': `Las observaciones deben tener al menos ${OBSERVACIONES.min} caracteres.`,
-      'string.max': `Las observaciones no pueden superar los ${OBSERVACIONES.max} caracteres.`,
+      'string.min': `Las observaciones deben tener al menos ${OBSERVACION.min} caracteres.`,
+      'string.max': `Las observaciones no pueden superar los ${OBSERVACION.max} caracteres.`,
     }),
-  alumnoId: Joi.number().integer().required(ALUMNO_ID.required).messages({
+  alumnoId: Joi.number()
+  .integer()
+  .required()
+  .messages({
     'number.base': 'El ID del alumno debe ser un número entero.',
     'any.required': 'El ID del alumno es obligatorio.',
   }),
-  examenId: Joi.number().integer().required(EXAMEN_ID.required).messages({
+  examenId: Joi.number()
+  .integer()
+  .required()
+  .messages({
     'number.base': 'El ID del examen debe ser un número entero.',
     'any.required': 'El ID del examen es obligatorio.',
   }),
 });
 
-module.exports = { evaluacionSchema };
+;

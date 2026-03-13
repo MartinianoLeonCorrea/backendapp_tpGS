@@ -1,28 +1,49 @@
-const evaluacionService = require('../evaluacion/evaluacion.service');
-const { sanitizeObjectStrings } = require('../../utils/sanitize');
+import evaluacionService from './evaluacion.service';
+import { sanitizeObjectStrings } from '../../utils/sanitize';
+import { Request, Response, NextFunction } from 'express';
+
+const getFirstString = (value: unknown): string | undefined => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
+};
+
+const parseOptionalInt = (value: unknown): number | undefined => {
+  const text = getFirstString(value);
+  if (text === undefined) return undefined;
+  const parsed = parseInt(text, 10);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+const parseIntOrNaN = (value: unknown): number => {
+  const parsed = parseOptionalInt(value);
+  return parsed === undefined ? NaN : parsed;
+};
 
 // Obtener todas las evaluaciones (para admin; con filtros opcionales)
-const getAllEvaluaciones = async (req, res, next) => {
+export const getAllEvaluaciones = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { examenId, alumnoDni, dictadoId, page = 1, limit = 10 } = req.query;
-    const idNum = parseInt(examenId);
-    const dniNum = parseInt(alumnoDni);
-    const dictadoNum = parseInt(dictadoId);
+    const query = req.query as Record<string, unknown>;
+    const idNum = parseOptionalInt(query.examenId);
+    const dniNum = parseOptionalInt(query.alumnoDni);
+    const dictadoNum = parseOptionalInt(query.dictadoId);
+    const pageNum = parseOptionalInt(query.page) ?? 1;
+    const limitNum = parseOptionalInt(query.limit) ?? 10;
 
     if (
-      (examenId && isNaN(idNum)) ||
-      (alumnoDni && isNaN(dniNum)) ||
-      (dictadoId && isNaN(dictadoNum))
+      (query.examenId !== undefined && idNum === undefined) ||
+      (query.alumnoDni !== undefined && dniNum === undefined) ||
+      (query.dictadoId !== undefined && dictadoNum === undefined)
     ) {
       return res.status(400).json({ message: 'IDs o DNI inválidos' });
     }
 
     const options = {
-      examenId: idNum || undefined,
-      alumnoDni: dniNum || undefined,
-      dictadoId: dictadoNum || undefined,
-      page: parseInt(page),
-      limit: parseInt(limit),
+      examenId: idNum,
+      alumnoDni: dniNum,
+      dictadoId: dictadoNum,
+      page: pageNum,
+      limit: limitNum,
     };
 
     const evaluaciones = await evaluacionService.findAllEvaluaciones(options);
@@ -44,10 +65,9 @@ const getAllEvaluaciones = async (req, res, next) => {
 };
 
 // Obtener una evaluación por ID
-const getEvaluacionById = async (req, res, next) => {
+export const getEvaluacionById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    const idNum = parseInt(id);
+    const idNum = parseIntOrNaN(req.params.id);
     if (isNaN(idNum)) {
       return res.status(400).json({ message: 'ID inválido' });
     }
@@ -70,10 +90,9 @@ const getEvaluacionById = async (req, res, next) => {
 };
 
 // Obtener evaluaciones por examenId
-const getEvaluacionesByExamen = async (req, res, next) => {
+export const getEvaluacionesByExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { examenId } = req.params;
-    const idNum = parseInt(examenId);
+    const idNum = parseIntOrNaN(req.params.examenId);
 
     if (isNaN(idNum)) {
       return res.status(400).json({ message: 'ID de examen inválido' });
@@ -93,11 +112,10 @@ const getEvaluacionesByExamen = async (req, res, next) => {
 };
 
 // Obtener evaluación por alumnoId y examenId
-const getEvaluacionByAlumnoAndExamen = async (req, res, next) => {
+export const getEvaluacionByAlumnoAndExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { alumnoId, examenId } = req.params;
-    const alumnoNum = parseInt(alumnoId);
-    const examenNum = parseInt(examenId);
+    const alumnoNum = parseIntOrNaN(req.params.alumnoId);
+    const examenNum = parseIntOrNaN(req.params.examenId);
 
     if (isNaN(alumnoNum) || isNaN(examenNum)) {
       return res
@@ -123,10 +141,9 @@ const getEvaluacionByAlumnoAndExamen = async (req, res, next) => {
   }
 };
 
-const getEvaluacionesByAlumno = async (req, res, next) => {
+export const getEvaluacionesByAlumno = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { alumnoId } = req.params;
-    const alumnoNum = parseInt(alumnoId);
+    const alumnoNum = parseIntOrNaN(req.params.alumnoId);
 
     if (isNaN(alumnoNum)) {
       return res.status(400).json({ message: 'ID de alumno inválido' });
@@ -146,9 +163,9 @@ const getEvaluacionesByAlumno = async (req, res, next) => {
 };
 
 // Crear una evaluación (subir nota para un alumno en un examen)
-const createEvaluacion = async (req, res, next) => {
+export const createEvaluacion = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const sanitizedData = sanitizeObjectStrings(req.body);
+    const sanitizedData = sanitizeObjectStrings(req.body) as any;
     const { nota, observacion, examenId, alumnoDni } = sanitizedData;
 
     console.log('Datos recibidos en createEvaluacion:', {
@@ -207,7 +224,7 @@ const createEvaluacion = async (req, res, next) => {
         .json({ message: 'Examen o dictado no encontrado' });
     }
     const alumno = await evaluacionService.getPersonaByDni(dniNum);
-    if (!alumno || alumno.cursoId !== examen.dictado.cursoId) {
+    if (!alumno || alumno.curso?.id !== examen.dictado.curso?.id) {
       console.error('Error: El alumno no pertenece al curso del examen');
       return res
         .status(400)
@@ -243,7 +260,7 @@ const createEvaluacion = async (req, res, next) => {
 // ========================= BATCH OPERATIONS =========================
 
 // Crear múltiples evaluaciones en batch
-const createBatchEvaluaciones = async (req, res, next) => {
+export const createBatchEvaluaciones = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { evaluaciones } = req.body;
     console.log('Datos recibidos en batch-create:', { evaluaciones });
@@ -259,7 +276,7 @@ const createBatchEvaluaciones = async (req, res, next) => {
 
     for (const evalData of evaluaciones) {
       // Sanitizar cada objeto individual
-      const sanitizedEval = sanitizeObjectStrings(evalData);
+      const sanitizedEval = sanitizeObjectStrings(evalData) as any;
       const { nota, observacion, examenId, alumnoId } = sanitizedEval;
 
       // Validación nota
@@ -317,7 +334,7 @@ const createBatchEvaluaciones = async (req, res, next) => {
 };
 
 // Actualizar múltiples evaluaciones en batch
-const updateBatchEvaluaciones = async (req, res, next) => {
+export const updateBatchEvaluaciones = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { evaluaciones } = req.body;
 
@@ -327,10 +344,25 @@ const updateBatchEvaluaciones = async (req, res, next) => {
         .json({ message: 'Debe proporcionar un array de evaluaciones' });
     }
 
-    // Sanitizar cada evaluación en el array
-    const sanitizedEvaluaciones = evaluaciones.map(evalData => 
-      sanitizeObjectStrings(evalData)
-    );
+    // Sanitizar y validar cada evaluación para garantizar id numérico
+    const sanitizedEvaluaciones: Array<{ id: number; nota?: number; observacion?: string; examenId?: number; alumnoId?: number }> = [];
+
+    for (const evalData of evaluaciones) {
+      const sanitizedEval = sanitizeObjectStrings(evalData) as any;
+      const idNum = Number(sanitizedEval.id);
+
+      if (!Number.isInteger(idNum)) {
+        return res.status(400).json({ message: 'Cada evaluación debe incluir un id numérico válido' });
+      }
+
+      sanitizedEvaluaciones.push({
+        id: idNum,
+        nota: sanitizedEval.nota,
+        observacion: sanitizedEval.observacion,
+        examenId: sanitizedEval.examenId,
+        alumnoId: sanitizedEval.alumnoId,
+      });
+    }
 
     const updatedEvaluaciones = await evaluacionService.updateBatchEvaluaciones(
       sanitizedEvaluaciones
@@ -346,13 +378,12 @@ const updateBatchEvaluaciones = async (req, res, next) => {
 };
 
 // Actualizar una evaluación (editar nota/observación)
-const updateEvaluacion = async (req, res, next) => {
+export const updateEvaluacion = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    const sanitizedData = sanitizeObjectStrings(req.body);
+    const sanitizedData = sanitizeObjectStrings(req.body) as any;
     const { nota, observacion } = sanitizedData;
     
-    const idNum = parseInt(id);
+    const idNum = parseIntOrNaN(req.params.id);
     if (isNaN(idNum)) {
       return res.status(400).json({ message: 'ID inválido' });
     }
@@ -381,10 +412,9 @@ const updateEvaluacion = async (req, res, next) => {
 };
 
 // Eliminar una evaluación
-const deleteEvaluacion = async (req, res, next) => {
+export const deleteEvaluacion = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    const idNum = parseInt(id);
+    const idNum = parseIntOrNaN(req.params.id);
     if (isNaN(idNum)) {
       return res.status(400).json({ message: 'ID inválido' });
     }
@@ -402,15 +432,4 @@ const deleteEvaluacion = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  getAllEvaluaciones,
-  getEvaluacionById,
-  createEvaluacion,
-  updateEvaluacion,
-  deleteEvaluacion,
-  getEvaluacionesByExamen,
-  getEvaluacionesByAlumno,
-  getEvaluacionByAlumnoAndExamen,
-  createBatchEvaluaciones,
-  updateBatchEvaluaciones,
-};
+

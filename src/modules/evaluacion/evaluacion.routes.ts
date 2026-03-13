@@ -1,16 +1,13 @@
-const express = require('express');
-const evaluacionController = require('./evaluacion.controller');
-const { validateRequest } = require('../../middleware/validateRequest');
-const { evaluacionSchema } = require('./evaluacion.schema');
-const Joi = require('joi');
+import {Router} from 'express';
+import * as evaluacionController from './evaluacion.controller';
+import { validateRequest } from '../../middleware/validateRequest';
+import { evaluacionSchema } from './evaluacion.schema';
+import Joi from 'joi';
 
-const router = express.Router();
+const router = Router();
 
 // Obtener todas las evaluaciones con filtros opcionales
 router.get('/', evaluacionController.getAllEvaluaciones);
-
-// Obtener una evaluación por ID
-router.get('/:id', evaluacionController.getEvaluacionById);
 
 // Obtener evaluaciones por examenId
 router.get('/examen/:examenId', evaluacionController.getEvaluacionesByExamen);
@@ -22,6 +19,9 @@ router.get(
 );
 // Obtener evaluaciones por alumnoId
 router.get('/alumno/:alumnoId', evaluacionController.getEvaluacionesByAlumno); //api
+
+// Obtener una evaluación por ID
+router.get('/:id', evaluacionController.getEvaluacionById);
 
 // Crear una nueva evaluación
 router.post(
@@ -62,4 +62,4 @@ router.put(
 // Eliminar una evaluación por ID
 router.delete('/:id', evaluacionController.deleteEvaluacion);
 
-module.exports = router;
+export default router;
