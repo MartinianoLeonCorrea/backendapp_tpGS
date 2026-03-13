@@ -77,6 +77,7 @@ export class DemoSeeder extends Seeder {
     // Docente
     em.create(Persona, {
       dni: 20123456,
+      id: 1,
       nombre: 'Juan',
       apellido: 'González',
       telefono: '1122334455',
@@ -91,6 +92,7 @@ export class DemoSeeder extends Seeder {
     // Alumnos
     em.create(Persona, {
       dni: 44123456,
+      id: 2,
       nombre: 'Martin',
       apellido: 'Pérez',
       telefono: '1133445566',
@@ -104,6 +106,7 @@ export class DemoSeeder extends Seeder {
 
     em.create(Persona, {
       dni: 44234567,
+      id: 3,
       nombre: 'Sofía',
       apellido: 'Martínez',
       telefono: '1144556677',
