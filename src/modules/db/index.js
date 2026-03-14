@@ -1,5 +1,8 @@
 // src/modules/db/index.js
-const { sequelize } = require('../../config/database');
+
+//eliminar archivo cuando no se use más
+
+/*const { sequelize } = require('../../config/database');
 
 const Persona = require('../persona/persona.model');
 const Curso = require('../curso/curso.model');
@@ -23,3 +26,4 @@ module.exports = {
   Examen,
   Evaluacion,
 };
+*/

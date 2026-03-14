@@ -1,7 +1,7 @@
-const sanitizeHtml = require('sanitize-html');
+import sanitizeHtml from 'sanitize-html';
 
-function sanitizeObjectStrings(data) {
-  const sanitized = {};
+export function sanitizeObjectStrings<T extends Record<string, any>>(data: T): T {
+  const sanitized: Record<string, any> = {};
   for (const key in data) {
     if (typeof data[key] === 'string') {
       sanitized[key] = sanitizeHtml(data[key], {
@@ -12,7 +12,6 @@ function sanitizeObjectStrings(data) {
       sanitized[key] = data[key];
     }
   }
-  return sanitized;
+  return sanitized as T;
 }
 
-module.exports = { sanitizeObjectStrings };
