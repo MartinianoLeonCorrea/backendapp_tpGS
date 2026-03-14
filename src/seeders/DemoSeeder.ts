@@ -3,6 +3,8 @@ import { EntityManager } from '@mikro-orm/core';
 import { Persona, TipoPersona } from '../modules/persona/persona.entity';
 import { Materia } from '../modules/materia/materia.entity';
 import { Curso } from '../modules/curso/curso.entity';
+import { Dictado } from '../modules/dictado/dictado.entity';
+import { Examen } from '../modules/examen/examen.entity';
 
 /**
  * COMANDOS DE EJECUCIÓN (Desde la raíz del backend):
@@ -75,7 +77,7 @@ export class DemoSeeder extends Seeder {
     // ==========================================================
     
     // Docente
-    em.create(Persona, {
+    const docenteJuan = em.create(Persona, {
       dni: 20123456,
       id: 1,
       nombre: 'Juan',
@@ -85,6 +87,20 @@ export class DemoSeeder extends Seeder {
       email: 'juan.gonzalez@escuela.edu.ar',
       tipo: TipoPersona.DOCENTE,
       especialidad: 'Matemática y Física',
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+
+    const docenteMaria = em.create(Persona, {
+      dni: 20123457,
+      id: 4,
+      nombre: 'María',
+      apellido: 'López',
+      telefono: '1122334466',
+      direccion: 'Calle Real 456',
+      email: 'maria.lopez@escuela.edu.ar',
+      tipo: TipoPersona.DOCENTE,
+      especialidad: 'Lengua y Literatura',
       createdAt: ahora,
       updatedAt: ahora,
     });
@@ -117,6 +133,58 @@ export class DemoSeeder extends Seeder {
       createdAt: ahora,
       updatedAt: ahora,
     });
+
+    // ==========================================================
+    // 3. PERSONAS (ALUMNOS Y DOCENTES)
+    // ==========================================================
+
+    // Dictados
+  const dictadoMatematica1A = em.create(Dictado, {
+    id: 1,
+    anio: 2026,
+    diasCursado: 'Lunes, Miércoles',
+    fechaDesde: new Date('2026-03-01'),
+    fechaHasta: new Date('2026-12-01'),
+    curso: curso1A,
+    materia: matMatematica,
+    docente: docenteJuan,
+    createdAt: ahora,
+    updatedAt: ahora,
+  });
+
+  const dictadoLengua1B = em.create(Dictado, {
+    id: 2,
+    anio: 2026,
+    diasCursado: 'Martes, Jueves',
+    fechaDesde: new Date('2026-03-01'),
+    fechaHasta: new Date('2026-12-01'),
+    curso: curso1B,
+    materia: matLengua,
+    docente: docenteMaria,
+    createdAt: ahora,
+    updatedAt: ahora,
+  });
+
+  // Exámenes
+  em.create(Examen, {
+    id: 1,
+    fechaExamen: new Date('2026-06-15'),
+    temas: 'Álgebra y geometría',
+    copias: 30,
+    dictado: dictadoMatematica1A,
+    createdAt: ahora,
+    updatedAt: ahora,
+  });
+
+  em.create(Examen, {
+    id: 2,
+    fechaExamen: new Date('2026-07-20'),
+    temas: 'Gramática y ortografía',
+    copias: 25,
+    dictado: dictadoLengua1B,
+    createdAt: ahora,
+    updatedAt: ahora,
+  });
 
     // Guardar todo
     await em.flush();
