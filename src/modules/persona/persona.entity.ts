@@ -13,10 +13,6 @@ export class Persona {
   @PrimaryKey()
   dni!: number;
 
-  @PrimaryKey()
-  id!: number;
-
-
   @Property({ length: 100 })
   nombre!: string;
 
@@ -38,20 +34,13 @@ export class Persona {
   @Property({ length: 100, nullable: true })
   especialidad?: string;
 
-  @Property({
-    fieldName: 'created_at',
-    onCreate: () => new Date() // Esto asegura el valor en el INSERT
-  })
+  @Property({ fieldName: 'created_at', onCreate: () => new Date() })
   createdAt: Date = new Date();
 
-  @Property({
-    fieldName: 'updated_at',
-    onCreate: () => new Date(), // Valor inicial
-    onUpdate: () => new Date()  // Valor en cada UPDATE
-  })
+  @Property({ fieldName: 'updated_at', onCreate: () => new Date(), onUpdate: () => new Date() })
   updatedAt: Date = new Date();
 
-  // Relaciones (MikroORM crea automáticamente cursoId)
+  // Relaciones
   @ManyToOne(() => Curso, { nullable: true })
   curso?: Curso;
 

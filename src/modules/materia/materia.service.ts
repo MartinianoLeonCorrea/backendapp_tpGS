@@ -1,20 +1,45 @@
-import { EntityManager, wrap } from '@mikro-orm/core';
 import { orm } from '../../config/mikro-orm';
 import { Materia } from './materia.entity';
 
+// Tipos de respuesta
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: any;
+  pagination?: PaginationMeta;
+}
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  errors: string[];
+}
+
+interface PaginationMeta {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  itemsPerPage: number;
+}
+
 class MateriaService {
   // Helper para obtener el EntityManager
-  private get em(): EntityManager {
+  private get em() {
     return orm.em.fork();
   }
 
   // ========================= CREATE =========================
-  async createMateria(data: { nombre: string; descripcion?: string }) {
+  async createMateria(materiaData: { nombre: string; descripcion?: string | null }) {
     try {
+      if (!materiaData.nombre || materiaData.nombre.trim() === '') {
+        throw new Error('El nombre de la materia es requerido.');
+      }
+
       const em = this.em;
+      
       const newMateria = em.create(Materia, {
-        nombre: data.nombre.trim(),
-        descripcion: data.descripcion?.trim(),
+        nombre: materiaData.nombre.trim(),
+        descripcion: materiaData.descripcion?.trim() || undefined,
         createdAt: '',
         updatedAt: ''
       });
@@ -35,49 +60,80 @@ class MateriaService {
     limit?: number;
     search?: string;
     includeRelations?: boolean;
-  }) {
+  } = {}) {
     try {
-      const { page, limit, search, includeRelations } = options;
+      const { page, limit, search, includeRelations = false } = options;
       const em = this.em;
-      const where: any = {};
 
-      if (search) {
-        where.nombre = { $ilike: `%${search}%` };
+      const queryOptions: any = {
+        orderBy: { nombre: 'ASC' },
+      };
+
+      // Paginación
+      if (page && limit) {
+        queryOptions.limit = limit;
+        queryOptions.offset = (page - 1) * limit;
       }
 
-      return await em.find(Materia, where, {
-        orderBy: { nombre: 'ASC' },
-        limit: limit,
-        offset: page && limit ? (page - 1) * limit : undefined,
-        populate: includeRelations ? (['dictados'] as any) : [],
-      });
+      // Búsqueda
+      const where: any = {};
+      if (search) {
+        where.nombre = { $like: `%${search}%` };
+      }
+
+      // Incluir relaciones
+      if (includeRelations) {
+        queryOptions.populate = ['dictados'];
+      }
+
+      const materias = await em.find(Materia, where, queryOptions);
+      return materias;
     } catch (error: any) {
       throw new Error('Error al obtener todas las materias: ' + error.message);
     }
   }
 
-  async findMateriaById(id: number, includeRelations: boolean = false) {
+  async findMateriaById(id: number, includeRelations = false) {
     try {
-      return await this.em.findOne(Materia, { id }, {
-        populate: includeRelations ? (['dictados'] as any) : []
-      });
+      if (!this._validateId(id)) {
+        throw new Error('ID inválido');
+      }
+
+      const em = this.em;
+      const queryOptions: any = {};
+
+      if (includeRelations) {
+        queryOptions.populate = ['dictados'];
+      }
+
+      const materia = await em.findOne(Materia, { id }, queryOptions);
+      return materia;
     } catch (error: any) {
       throw new Error('Error al obtener materia por ID: ' + error.message);
     }
   }
 
   // ========================= UPDATE =========================
-  async updateMateria(id: number, data: { nombre?: string; descripcion?: string }) {
+  async updateMateria(id: number, materiaData: { nombre?: string; descripcion?: string | null }) {
     try {
+      if (!this._validateId(id)) {
+        throw new Error('ID inválido');
+      }
+
+      if (!materiaData.nombre || materiaData.nombre.trim() === '') {
+        throw new Error('El nombre de la materia es requerido.');
+      }
+
       const em = this.em;
       const materia = await em.findOne(Materia, { id });
 
-      if (!materia) return null;
+      if (!materia) {
+        return null;
+      }
 
-      wrap(materia).assign({
-        nombre: data.nombre?.trim(),
-        descripcion: data.descripcion?.trim(),
-      });
+      // Actualizar campos
+      materia.nombre = materiaData.nombre.trim();
+      materia.descripcion = materiaData.descripcion?.trim() || undefined;
 
       await em.flush();
       return materia;
@@ -92,10 +148,16 @@ class MateriaService {
   // ========================= DELETE =========================
   async deleteMateria(id: number) {
     try {
+      if (!this._validateId(id)) {
+        throw new Error('ID inválido');
+      }
+
       const em = this.em;
       const materia = await em.findOne(Materia, { id });
-      
-      if (!materia) return false;
+
+      if (!materia) {
+        return false;
+      }
 
       await em.removeAndFlush(materia);
       return true;
@@ -107,29 +169,49 @@ class MateriaService {
   // ========================= COUNT =========================
   async countMaterias(search?: string) {
     try {
-      const where = search ? { nombre: { $ilike: `%${search}%` } } : {};
-      return await this.em.count(Materia, where);
+      const em = this.em;
+      const where: any = {};
+
+      if (search) {
+        where.nombre = { $like: `%${search}%` };
+      }
+
+      return await em.count(Materia, where);
     } catch (error: any) {
       throw new Error('Error al contar materias: ' + error.message);
     }
   }
 
   // ========================= HELPER FUNCTIONS ===========================
-  _successResponse(message: string, data: any) {
-    return { success: true, message, data };
+  _successResponse(message: string, data: any): ApiResponse {
+    return {
+      success: true,
+      message,
+      data,
+    };
   }
 
-  _errorResponse(message: string, errors: string[] = []) {
-    return { success: false, message, errors };
+  _errorResponse(message: string, errors: string[] = []): ApiErrorResponse {
+    return {
+      success: false,
+      message,
+      errors,
+    };
   }
 
-  _buildPaginationMeta(page: number, limit: number, totalCount: number) {
+  _buildPaginationMeta(page: number, limit: number, totalCount: number): PaginationMeta {
+    const totalPages = Math.ceil(totalCount / limit);
     return {
       totalItems: totalCount,
-      totalPages: Math.ceil(totalCount / limit),
+      totalPages: totalPages,
       currentPage: page,
       itemsPerPage: limit,
     };
+  }
+
+  _validateId(id: any): boolean {
+    const num = Number(id);
+    return Number.isInteger(num) && num > 0;
   }
 }
 

@@ -1,20 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { EntityManager } from '@mikro-orm/mysql';
 import dictadoService from './dictado.service';
 import { sanitizeObjectStrings } from '../../utils/sanitize';
-
-interface RequestWithEm extends Request {
-  em: EntityManager;
-}
 
 // ========== CREATE ==========
 export const createDictado = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sanitizedData = sanitizeObjectStrings(req.body);
-    const dictado = await dictadoService.createDictado(
-      (req as RequestWithEm).em,
-      sanitizedData
-    );
+    const dictado = await dictadoService.createDictado(sanitizedData);
 
     res.status(201).json({
       success: true,
@@ -29,9 +21,7 @@ export const createDictado = async (req: Request, res: Response, next: NextFunct
 // ========== READ ==========
 export const getAllDictados = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const dictados = await dictadoService.getAllDictados(
-      (req as RequestWithEm).em
-    );
+    const dictados = await dictadoService.getAllDictados();
 
     res.status(200).json({
       success: true,
@@ -46,10 +36,7 @@ export const getAllDictados = async (req: Request, res: Response, next: NextFunc
 export const getDictadoById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const dictado = await dictadoService.getDictadoById(
-      (req as RequestWithEm).em,
-      id
-    );
+    const dictado = await dictadoService.getDictadoById(id);
 
     if (!dictado) {
       return res.status(404).json({
@@ -71,10 +58,7 @@ export const getDictadoById = async (req: Request, res: Response, next: NextFunc
 export const getDictadosByCurso = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cursoId = Number(req.params.cursoId);
-    const dictados = await dictadoService.getDictadosByCurso(
-      (req as RequestWithEm).em,
-      cursoId
-    );
+    const dictados = await dictadoService.getDictadosByCurso(cursoId);
 
     res.status(200).json({
       success: true,
@@ -88,19 +72,8 @@ export const getDictadosByCurso = async (req: Request, res: Response, next: Next
 
 export const getDictadosByPersona = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const personaId = Number(req.params.personaId);
-
-    if (!personaId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Falta personaId en la ruta',
-      });
-    }
-
-    const dictados = await dictadoService.getDictadosByPersona(
-      (req as RequestWithEm).em,
-      personaId
-    );
+    const docenteId = Number(req.params.personaId);
+    const dictados = await dictadoService.getDictadosByPersona(docenteId);
 
     res.status(200).json({
       success: true,
@@ -112,29 +85,9 @@ export const getDictadosByPersona = async (req: Request, res: Response, next: Ne
   }
 };
 
-export const getDictadosActivosByPersona = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const personaId = Number(req.params.personaId);
-    const dictados = await dictadoService.getDictadosActivosByPersona(
-      (req as RequestWithEm).em,
-      personaId
-    );
-
-    res.status(200).json({
-      success: true,
-      message: 'Dictados activos obtenidos por persona',
-      data: dictados,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getDictadosActivos = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const dictados = await dictadoService.getDictadosActivos(
-      (req as RequestWithEm).em
-    );
+    const dictados = await dictadoService.getDictadosActivos();
 
     res.status(200).json({
       success: true,
@@ -146,13 +99,25 @@ export const getDictadosActivos = async (req: Request, res: Response, next: Next
   }
 };
 
+export const getDictadosActivosByPersona = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const docenteId = Number(req.params.personaId);
+    const dictados = await dictadoService.getDictadosActivosByPersona(docenteId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Dictados activos obtenidos por persona',
+      data: dictados,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getDictadosByMateria = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const materiaId = Number(req.params.materiaId);
-    const dictados = await dictadoService.getDictadosByMateria(
-      (req as RequestWithEm).em,
-      materiaId
-    );
+    const dictados = await dictadoService.getDictadosByMateria(materiaId);
 
     res.status(200).json({
       success: true,
@@ -176,11 +141,7 @@ export const getDictadosByCursoAndMateria = async (req: Request, res: Response, 
       });
     }
 
-    const dictados = await dictadoService.getDictadosByCursoAndMateria(
-      (req as RequestWithEm).em,
-      cursoId,
-      materiaId
-    );
+    const dictados = await dictadoService.getDictadosByCursoAndMateria(cursoId, materiaId);
 
     res.status(200).json({
       success: true,
@@ -196,16 +157,9 @@ export const getDictadosByCursoAndMateria = async (req: Request, res: Response, 
 export const updateDictado = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const updateData = req.body;
+    const sanitizedData = sanitizeObjectStrings(req.body);
 
-
-    const sanitizedData = sanitizeObjectStrings(updateData);
-
-    const updatedDictado = await dictadoService.updateDictado(
-      (req as RequestWithEm).em,
-      id,
-      sanitizedData
-    );
+    const updatedDictado = await dictadoService.updateDictado(id, sanitizedData);
 
     if (!updatedDictado) {
       return res.status(404).json({
@@ -228,10 +182,7 @@ export const updateDictado = async (req: Request, res: Response, next: NextFunct
 export const deleteDictado = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const deletedDictado = await dictadoService.deleteDictado(
-      (req as RequestWithEm).em,
-      id
-    );
+    const deletedDictado = await dictadoService.deleteDictado(id);
 
     if (!deletedDictado) {
       return res.status(404).json({

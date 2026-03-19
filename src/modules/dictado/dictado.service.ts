@@ -1,45 +1,38 @@
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
+import { orm } from '../../config/mikro-orm';
 import { Dictado } from './dictado.entity';
 import { Curso } from '../curso/curso.entity';
 import { Materia } from '../materia/materia.entity';
 import { Persona } from '../persona/persona.entity';
 import { Examen } from '../examen/examen.entity';
 
-interface IDictadoInput {
-  anio?: number;
-  dias_cursado?: string;
-  cursoId?: number;
-  materiaId?: number;
-  docenteId?: number;
-  [key: string]: any;
-}
-
 class DictadoService {
+  private get em() {
+    return orm.em.fork();
+  }
+
   // ========================== CREATE ==========================
+  async createDictado(data: any) {
+    const em = this.em;
+    const { anio, diasCursado, cursoId, materiaId, docenteId } = data;
 
-  async createDictado(em: EntityManager, data: IDictadoInput) {
-    const { anio, dias_cursado, cursoId, materiaId, docenteId } = data;
-
-    if (!anio || !dias_cursado || !cursoId || !materiaId || !docenteId) {
-      throw new Error('Faltan datos obligatorios para crear el dictado.');
-    }
-
-    const curso = await em.findOne(Curso, cursoId);
-    const materia = await em.findOne(Materia, materiaId);
-    const docente = await em.findOne(Persona, docenteId);
+    // Buscar las entidades relacionadas
+    const curso = await em.findOne(Curso, { id: cursoId });
+    const materia = await em.findOne(Materia, { id: materiaId });
+    const docente = await em.findOne(Persona, { dni: docenteId });
 
     if (!curso || !materia || !docente) {
-      throw new Error('Curso, materia o docente inexistente.');
+      throw new Error('Curso, materia o docente no encontrado');
     }
 
     const dictado = em.create(Dictado, {
       anio,
-      diasCursado: dias_cursado,
+      diasCursado,
       curso,
       materia,
       docente,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: '',
+      updatedAt: ''
     });
 
     await em.persistAndFlush(dictado);
@@ -47,153 +40,111 @@ class DictadoService {
   }
 
   // ========================== READ ============================
-
-  async getAllDictados(em: EntityManager) {
-    return em.find(Dictado, {}, {
-      populate: ['curso', 'materia', 'docente', 'examenes'] as any,
+  async getAllDictados() {
+    return await this.em.find(Dictado, {}, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
     });
   }
 
-  async getDictadosActivos(em: EntityManager) {
-    const now = new Date();
-
-    return em.find(
-      Dictado,
-      {
-        fechaDesde: { $lte: now },
-        fechaHasta: { $gte: now },
-      },
-      {
-        populate: ['curso', 'materia', 'docente', 'examenes'] as any,
-      }
-    );
-  }
-
-  async getDictadoById(em: EntityManager, id: number) {
-    return em.findOne(Dictado, id, {
-      populate: [
-        'curso',
-        'curso.alumnos',
-        'materia',
-        'docente',
-        'examenes',
-      ] as any,
+  async getDictadoById(id: number) {
+    return await this.em.findOne(Dictado, { id }, {
+      populate: ['curso', 'curso.alumnos', 'materia', 'docente', 'examenes'],
     });
   }
 
-  async getDictadosByCurso(em: EntityManager, cursoId: number) {
-    return em.find(
-      Dictado,
-      { curso: cursoId },
-      { populate: ['curso', 'materia', 'docente'] as any }
-    );
+  async getDictadosByCurso(cursoId: number) {
+    return await this.em.find(Dictado, { curso: cursoId }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
   }
 
-  async getDictadosByPersona(em: EntityManager, docenteId: number) {
-    return em.find(
-      Dictado,
-      { docente: docenteId },
-      { populate: ['curso', 'materia', 'docente'] as any }
-    );
+  async getDictadosByPersona(docenteId: number) {
+    return await this.em.find(Dictado, { docente: { dni: docenteId } }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
   }
 
-  async getDictadosByMateria(em: EntityManager, materiaId: number) {
-    return em.find(
-      Dictado,
-      { materia: materiaId },
-      { populate: ['curso', 'materia', 'docente'] as any }
-    );
+  async getDictadosByMateria(materiaId: number) {
+    return await this.em.find(Dictado, { materia: materiaId }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
   }
 
-  async getDictadosActivosByPersona(em: EntityManager, docenteId: number) {
+  async getDictadosActivos() {
     const now = new Date();
-
-    return em.find(
-      Dictado,
-      {
-        docente: docenteId,
-        fechaDesde: { $lte: now },
-        fechaHasta: { $gte: now },
-      },
-      {
-        populate: ['curso', 'materia', 'docente', 'examenes'] as any,
-      }
-    );
+    return await this.em.find(Dictado, {
+      fechaDesde: { $lte: now },
+      fechaHasta: { $gte: now },
+    }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
   }
 
-  async getDictadosByCursoAndMateria(
-    em: EntityManager,
-    cursoId: number,
-    materiaId: number
-  ) {
-    return em.find(
-      Dictado,
-      {
-        curso: cursoId,
-        materia: materiaId,
-      },
-      {
-        populate: ['curso', 'materia', 'docente', 'examenes'] as any,
-      }
-    );
+  async getDictadosActivosByPersona(docenteId: number) {
+    const now = new Date();
+    return await this.em.find(Dictado, {
+      docente: { dni: docenteId },
+      fechaDesde: { $lte: now },
+      fechaHasta: { $gte: now },
+    }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
+  }
+
+  async getDictadosByCursoAndMateria(cursoId: number, materiaId: number) {
+    return await this.em.find(Dictado, {
+      curso: cursoId,
+      materia: materiaId,
+    }, {
+      populate: ['curso', 'materia', 'docente', 'examenes'],
+    });
   }
 
   // ========================== UPDATE ==========================
+  async updateDictado(id: number, data: any) {
+    const em = this.em;
+    const dictado = await em.findOne(Dictado, { id });
 
-  async updateDictado(
-    em: EntityManager,
-    id: number,
-    data: IDictadoInput
-  ) {
-    const dictado = await em.findOne(Dictado, id);
     if (!dictado) return null;
 
+    // Actualizar relaciones si vienen en data
     if (data.cursoId) {
-      const curso = await em.findOne(Curso, data.cursoId);
-      if (!curso) throw new Error('Curso inexistente.');
+      const curso = await em.findOne(Curso, { id: data.cursoId });
+      if (!curso) throw new Error('Curso no encontrado');
       dictado.curso = curso;
     }
 
     if (data.materiaId) {
-      const materia = await em.findOne(Materia, data.materiaId);
-      if (!materia) throw new Error('Materia inexistente.');
+      const materia = await em.findOne(Materia, { id: data.materiaId });
+      if (!materia) throw new Error('Materia no encontrada');
       dictado.materia = materia;
     }
 
     if (data.docenteId) {
-      const docente = await em.findOne(Persona, data.docenteId);
-      if (!docente) throw new Error('Docente inexistente.');
+      const docente = await em.findOne(Persona, { dni: data.docenteId });
+      if (!docente) throw new Error('Docente no encontrado');
       dictado.docente = docente;
     }
 
-    if (data.anio !== undefined) {
-      dictado.anio = data.anio;
-    }
-
-    if (data.dias_cursado !== undefined) {
-      dictado.diasCursado = data.dias_cursado;
-    }
-
-    dictado.updatedAt = new Date();
+    // Actualizar campos simples
+    if (data.anio !== undefined) dictado.anio = data.anio;
+    if (data.diasCursado !== undefined) dictado.diasCursado = data.diasCursado;
 
     await em.flush();
     return dictado;
   }
 
   // ========================= DELETE =========================
+  async deleteDictado(id: number) {
+    const em = this.em;
+    const dictado = await em.findOne(Dictado, { id });
 
-  async deleteDictado(em: EntityManager, id: number) {
-    const dictado = await em.findOne(Dictado, id);
     if (!dictado) return null;
 
-    const examenesCount = await em.count(Examen, {
-      dictado: id,
-    });
-
+    // Verificar si tiene exámenes asociados
+    const examenesCount = await em.count(Examen, { dictado: id });
     if (examenesCount > 0) {
-      throw new Error(
-        'No se puede eliminar el dictado porque tiene exámenes asociados.'
-      );
+      throw new Error('No se puede eliminar el dictado porque tiene exámenes asociados');
     }
 
     await em.removeAndFlush(dictado);
