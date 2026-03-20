@@ -19,3 +19,8 @@ export const updateDictadoSchema = Joi.object({
 export const idParamSchema = Joi.object({
   id: Joi.number().integer().positive().required(),
 });
+
+export const queryCursoMateriaSchema = Joi.object({
+  cursoId: Joi.number().integer().positive().required(),
+  materiaId: Joi.number().integer().positive().required(),
+});
