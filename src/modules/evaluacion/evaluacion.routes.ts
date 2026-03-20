@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import * as evaluacionController from './evaluacion.controller';
 import { validateRequest } from '../../middleware/validateRequest';
-import { evaluacionSchema } from './evaluacion.schema';
+import { createEvaluacionSchema, updateEvaluacionSchema } from './evaluacion.schema';
 import Joi from 'joi';
 
 const router = Router();
@@ -26,7 +26,7 @@ router.get('/:id', evaluacionController.getEvaluacionById);
 // Crear una nueva evaluación
 router.post(
   '/',
-  validateRequest(evaluacionSchema),
+  validateRequest(createEvaluacionSchema),
   evaluacionController.createEvaluacion
 );
 
@@ -35,7 +35,7 @@ router.post(
   '/batch-create',
   validateRequest(
     Joi.object({
-      evaluaciones: Joi.array().items(evaluacionSchema).required(),
+      evaluaciones: Joi.array().items(createEvaluacionSchema).required(),
     })
   ),
   evaluacionController.createBatchEvaluaciones
@@ -44,7 +44,7 @@ router.post(
 // Actualizar una evaluación existente
 router.put(
   '/:id',
-  validateRequest(evaluacionSchema),
+  validateRequest(updateEvaluacionSchema),
   evaluacionController.updateEvaluacion
 );
 
@@ -53,7 +53,7 @@ router.put(
   '/batch-update',
   validateRequest(
     Joi.object({
-      evaluaciones: Joi.array().items(evaluacionSchema).required(),
+      evaluaciones: Joi.array().items(updateEvaluacionSchema).required(),
     })
   ),
   evaluacionController.updateBatchEvaluaciones

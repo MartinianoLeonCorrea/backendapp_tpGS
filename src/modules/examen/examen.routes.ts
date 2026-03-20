@@ -2,7 +2,7 @@ import { Router } from 'express';
 // Importamos todas las exportaciones nombradas del controlador como un objeto
 import * as examenController from './examen.controller';
 import { validateRequest } from '../../middleware/validateRequest';
-import { examenSchema } from './examen.schema';
+import { createExamenSchema, updateExamenSchema } from './examen.schema';
 
 const router = Router();
 
@@ -25,13 +25,13 @@ router.get('/', (req, res, next) => {
 
 // Ruta para crear un nuevo examen
 // POST /api/examenes
-router.post('/', validateRequest(examenSchema), examenController.createExamen);
+router.post('/', validateRequest(createExamenSchema), examenController.createExamen);
 
 // Actualizar un examen existente
 // PUT /api/examenes/:id
 router.put(
   '/:id',
-  validateRequest(examenSchema),
+  validateRequest(updateExamenSchema),
   examenController.updateExamen
 );
 
