@@ -79,7 +79,6 @@ export class DemoSeeder extends Seeder {
     // Docente
     const docenteJuan = em.create(Persona, {
       dni: 20123456,
-      id: 1,
       nombre: 'Juan',
       apellido: 'González',
       telefono: '1122334455',
@@ -93,7 +92,6 @@ export class DemoSeeder extends Seeder {
 
     const docenteMaria = em.create(Persona, {
       dni: 20123457,
-      id: 4,
       nombre: 'María',
       apellido: 'López',
       telefono: '1122334466',
@@ -108,7 +106,6 @@ export class DemoSeeder extends Seeder {
     // Alumnos
     em.create(Persona, {
       dni: 44123456,
-      id: 2,
       nombre: 'Martin',
       apellido: 'Pérez',
       telefono: '1133445566',
@@ -122,7 +119,6 @@ export class DemoSeeder extends Seeder {
 
     em.create(Persona, {
       dni: 44234567,
-      id: 3,
       nombre: 'Sofía',
       apellido: 'Martínez',
       telefono: '1144556677',
@@ -168,7 +164,7 @@ export class DemoSeeder extends Seeder {
   // Exámenes
   em.create(Examen, {
     id: 1,
-    fechaExamen: new Date('2026-06-15'),
+    fechaExamen: new Date('2026-06-15T09:00:00.000Z'),
     temas: 'Álgebra y geometría',
     copias: 30,
     dictado: dictadoMatematica1A,
@@ -178,7 +174,7 @@ export class DemoSeeder extends Seeder {
 
   em.create(Examen, {
     id: 2,
-    fechaExamen: new Date('2026-07-20'),
+    fechaExamen: new Date('2026-07-20T15:00:00.000Z'),
     temas: 'Gramática y ortografía',
     copias: 25,
     dictado: dictadoLengua1B,
