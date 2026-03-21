@@ -1,5 +1,6 @@
 import { orm } from '../../config/mikro-orm';
 import { Persona, TipoPersona } from './persona.entity';
+import { Curso } from '../curso/curso.entity';
 
 class PersonaService {
   private get em() {
@@ -9,7 +10,18 @@ class PersonaService {
   // ========================= CREATE =========================
   async createPersona(data: any) {
     const em = this.em;
-    const persona = em.create(Persona, data);
+    const { cursoId, ...personaData } = data;
+    const persona = em.create(Persona, personaData);
+
+    if (personaData.tipo === TipoPersona.ALUMNO && cursoId) {
+      const curso = await em.findOne(Curso, { id: Number(cursoId) });
+      if (!curso) {
+        throw new Error('El curso seleccionado no existe');
+      }
+
+      persona.curso = curso;
+    }
+
     await em.persistAndFlush(persona);
     return persona;
   }
@@ -54,7 +66,21 @@ class PersonaService {
     
     if (!persona) return null;
 
-    Object.assign(persona, data);
+    const { cursoId, ...restData } = data;
+    Object.assign(persona, restData);
+
+    if (cursoId !== undefined) {
+      if (cursoId === null || cursoId === '') {
+        persona.curso = undefined;
+      } else {
+        const curso = await em.findOne(Curso, { id: Number(cursoId) });
+        if (!curso) {
+          throw new Error('El curso seleccionado no existe');
+        }
+        persona.curso = curso;
+      }
+    }
+
     await em.flush();
     return persona;
   }

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as PersonaController from './persona.controller';
 import { validateRequest } from '../../middleware/validateRequest';
-import { personaSchema } from './persona.schema';
+import { personaSchema, updatePersonaSchema } from './persona.schema';
 
 const router = Router();
 
@@ -32,8 +32,7 @@ router.get('/curso/:cursoId/alumnos', PersonaController.getAlumnosByCurso);
 // GET /api/personas/:dni
 router.get('/:dni', PersonaController.getPersonaByDni); 
 
-// Nota: getMateriasByAlumnoDni se omite temporalmente si no se migró la lógica 
-// específica en el controlador, pero puedes descomentarlo si lo necesitas:
+// Nota: getMateriasByAlumnoDni se omite temporalmente si no se migró la lógica específica en el controlador:
 // router.get('/:dni/materias', PersonaController.getMateriasByAlumnoDni); 
 
 // ========================= UPDATE =========================
@@ -41,7 +40,7 @@ router.get('/:dni', PersonaController.getPersonaByDni);
 // PUT /api/personas/:dni
 router.put(
   '/:dni', 
-  validateRequest(personaSchema), 
+  validateRequest(updatePersonaSchema), 
   PersonaController.updatePersona
 ); 
 

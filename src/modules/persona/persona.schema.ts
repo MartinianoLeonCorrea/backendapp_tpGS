@@ -11,7 +11,7 @@ export const personaSchema = Joi.object({
   
   cursoId: Joi.when('tipo', {
     is: 'alumno',
-    then: Joi.number().integer().positive().required(),
+    then: Joi.number().integer().positive().optional(),
     otherwise: Joi.forbidden(),
   }),
   
@@ -21,3 +21,14 @@ export const personaSchema = Joi.object({
     otherwise: Joi.forbidden(),
   }),
 });
+
+export const updatePersonaSchema = Joi.object({
+  nombre: Joi.string().min(2).max(100).trim(),
+  apellido: Joi.string().min(2).max(100).trim(),
+  telefono: Joi.string().min(7).max(20).pattern(/^[\d\s\-+()]*$/).trim(),
+  direccion: Joi.string().min(5).max(255).trim(),
+  email: Joi.string().email().max(100).trim(),
+  tipo: Joi.string().valid('alumno', 'docente'),
+  cursoId: Joi.number().integer().positive(),
+  especialidad: Joi.string().min(2).max(100).trim().allow('', null),
+}).min(1);
