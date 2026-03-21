@@ -36,8 +36,10 @@ class ExamenService {
 
   // Función para crear un nuevo examen
   async createExamen(em: EntityManager, examenData: IExamenInput) {
+    const fechaInput = examenData.fecha_examen ?? examenData.fechaExamen;
+
     if (
-      !examenData.fecha_examen ||
+      !fechaInput ||
       !examenData.temas ||
       !examenData.dictadoId
     ) {
@@ -52,7 +54,7 @@ class ExamenService {
 
     // Creamos la instancia de la entidad
     const newExamen = em.create(Examen, {
-      fechaExamen: new Date(examenData.fecha_examen),
+      fechaExamen: new Date(fechaInput),
       temas: examenData.temas,
       dictado: dictado,
       copias: examenData.copias || 0,
@@ -83,8 +85,9 @@ class ExamenService {
     }
 
     // Actualizamos campos manualmente o con assign
-    if (updateData.fecha_examen) {
-      examen.fechaExamen = new Date(updateData.fecha_examen);
+    const fechaInput = updateData.fecha_examen ?? updateData.fechaExamen;
+    if (fechaInput) {
+      examen.fechaExamen = new Date(fechaInput);
     }
     
     em.assign(examen, {

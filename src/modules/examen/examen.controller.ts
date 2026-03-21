@@ -45,6 +45,9 @@ export const getExamenById = async (req: Request, res: Response, next: NextFunct
 export const createExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sanitizedData = sanitizeObjectStrings(req.body) as any;
+    if (!sanitizedData.fecha_examen && sanitizedData.fechaExamen) {
+      sanitizedData.fecha_examen = sanitizedData.fechaExamen;
+    }
     const { fecha_examen, temas, dictadoId } = sanitizedData;
 
     if (!fecha_examen || !temas || !dictadoId) {
@@ -71,7 +74,10 @@ export const createExamen = async (req: Request, res: Response, next: NextFuncti
 export const updateExamen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const sanitizedData = sanitizeObjectStrings(req.body);
+    const sanitizedData = sanitizeObjectStrings(req.body) as any;
+    if (!sanitizedData.fecha_examen && sanitizedData.fechaExamen) {
+      sanitizedData.fecha_examen = sanitizedData.fechaExamen;
+    }
 
     const updatedExamen = await examenService.updateExamen((req as RequestWithEm).em, id, sanitizedData);
 
