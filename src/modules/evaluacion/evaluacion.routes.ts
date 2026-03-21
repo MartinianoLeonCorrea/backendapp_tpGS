@@ -1,7 +1,11 @@
 import {Router} from 'express';
 import * as evaluacionController from './evaluacion.controller';
 import { validateRequest } from '../../middleware/validateRequest';
-import { createEvaluacionSchema, updateEvaluacionSchema } from './evaluacion.schema';
+import {
+  createEvaluacionSchema,
+  updateEvaluacionSchema,
+  updateBatchEvaluacionItemSchema,
+} from './evaluacion.schema';
 import Joi from 'joi';
 
 const router = Router();
@@ -41,22 +45,22 @@ router.post(
   evaluacionController.createBatchEvaluaciones
 );
 
-// Actualizar una evaluación existente
-router.put(
-  '/:id',
-  validateRequest(updateEvaluacionSchema),
-  evaluacionController.updateEvaluacion
-);
-
 // Actualizar múltiples evaluaciones en batch
 router.put(
   '/batch-update',
   validateRequest(
     Joi.object({
-      evaluaciones: Joi.array().items(updateEvaluacionSchema).required(),
+      evaluaciones: Joi.array().items(updateBatchEvaluacionItemSchema).required(),
     })
   ),
   evaluacionController.updateBatchEvaluaciones
+);
+
+// Actualizar una evaluación existente
+router.put(
+  '/:id',
+  validateRequest(updateEvaluacionSchema),
+  evaluacionController.updateEvaluacion
 );
 
 // Eliminar una evaluación por ID
