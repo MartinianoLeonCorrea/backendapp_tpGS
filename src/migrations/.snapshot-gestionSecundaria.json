@@ -1,0 +1,867 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nro_letra": {
+          "name": "nro_letra",
+          "type": "varchar(3)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 3,
+          "mappedType": "string"
+        },
+        "turno": {
+          "name": "turno",
+          "type": "enum('MAÑANA','TARDE','NOCHE')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "MAÑANA",
+            "TARDE",
+            "NOCHE"
+          ],
+          "mappedType": "enum"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "cursos",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "materias",
+      "indexes": [
+        {
+          "columnNames": [
+            "nombre"
+          ],
+          "composite": false,
+          "keyName": "materias_nombre_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "dni": {
+          "name": "dni",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "apellido": {
+          "name": "apellido",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(15)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 15,
+          "mappedType": "string"
+        },
+        "direccion": {
+          "name": "direccion",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "enum('alumno','docente')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "alumno",
+            "docente"
+          ],
+          "mappedType": "enum"
+        },
+        "especialidad": {
+          "name": "especialidad",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "curso_id": {
+          "name": "curso_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "personas",
+      "indexes": [
+        {
+          "columnNames": [
+            "curso_id"
+          ],
+          "composite": false,
+          "keyName": "personas_curso_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "dni"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "personas_curso_id_foreign": {
+          "constraintName": "personas_curso_id_foreign",
+          "columnNames": [
+            "curso_id"
+          ],
+          "localTableName": "personas",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "cursos",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "anio": {
+          "name": "anio",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "dias_cursado": {
+          "name": "dias_cursado",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "fecha_desde": {
+          "name": "fecha_desde",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "fecha_hasta": {
+          "name": "fecha_hasta",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "curso_id": {
+          "name": "curso_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "materia_id": {
+          "name": "materia_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "docente_dni": {
+          "name": "docente_dni",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "dictados",
+      "indexes": [
+        {
+          "columnNames": [
+            "curso_id"
+          ],
+          "composite": false,
+          "keyName": "dictados_curso_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "materia_id"
+          ],
+          "composite": false,
+          "keyName": "dictados_materia_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "docente_dni"
+          ],
+          "composite": false,
+          "keyName": "dictados_docente_dni_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "dictados_curso_id_foreign": {
+          "constraintName": "dictados_curso_id_foreign",
+          "columnNames": [
+            "curso_id"
+          ],
+          "localTableName": "dictados",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "cursos",
+          "updateRule": "cascade"
+        },
+        "dictados_materia_id_foreign": {
+          "constraintName": "dictados_materia_id_foreign",
+          "columnNames": [
+            "materia_id"
+          ],
+          "localTableName": "dictados",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "materias",
+          "updateRule": "cascade"
+        },
+        "dictados_docente_dni_foreign": {
+          "constraintName": "dictados_docente_dni_foreign",
+          "columnNames": [
+            "docente_dni"
+          ],
+          "localTableName": "dictados",
+          "referencedColumnNames": [
+            "dni"
+          ],
+          "referencedTableName": "personas",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_examen": {
+          "name": "fecha_examen",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "temas": {
+          "name": "temas",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "copias": {
+          "name": "copias",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "0",
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "dictado_id": {
+          "name": "dictado_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "examenes",
+      "indexes": [
+        {
+          "columnNames": [
+            "dictado_id"
+          ],
+          "composite": false,
+          "keyName": "examenes_dictado_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "examenes_dictado_id_foreign": {
+          "constraintName": "examenes_dictado_id_foreign",
+          "columnNames": [
+            "dictado_id"
+          ],
+          "localTableName": "examenes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "dictados",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nota": {
+          "name": "nota",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "float"
+        },
+        "observacion": {
+          "name": "observacion",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "examen_id": {
+          "name": "examen_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "alumno_dni": {
+          "name": "alumno_dni",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "evaluaciones",
+      "indexes": [
+        {
+          "columnNames": [
+            "examen_id"
+          ],
+          "composite": false,
+          "keyName": "evaluaciones_examen_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "alumno_dni"
+          ],
+          "composite": false,
+          "keyName": "evaluaciones_alumno_dni_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "evaluaciones_examen_id_foreign": {
+          "constraintName": "evaluaciones_examen_id_foreign",
+          "columnNames": [
+            "examen_id"
+          ],
+          "localTableName": "evaluaciones",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "examenes",
+          "updateRule": "cascade"
+        },
+        "evaluaciones_alumno_dni_foreign": {
+          "constraintName": "evaluaciones_alumno_dni_foreign",
+          "columnNames": [
+            "alumno_dni"
+          ],
+          "localTableName": "evaluaciones",
+          "referencedColumnNames": [
+            "dni"
+          ],
+          "referencedTableName": "personas",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "active": {
+          "name": "active",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "true",
+          "mappedType": "boolean"
+        },
+        "persona_dni": {
+          "name": "persona_dni",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "user",
+      "indexes": [
+        {
+          "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "keyName": "user_email_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "persona_dni"
+          ],
+          "composite": false,
+          "keyName": "user_persona_dni_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "user_persona_dni_foreign": {
+          "constraintName": "user_persona_dni_foreign",
+          "columnNames": [
+            "persona_dni"
+          ],
+          "localTableName": "user",
+          "referencedColumnNames": [
+            "dni"
+          ],
+          "referencedTableName": "personas",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    }
+  ],
+  "nativeEnums": {}
+}
