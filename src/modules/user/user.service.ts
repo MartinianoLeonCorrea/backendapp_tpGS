@@ -3,7 +3,7 @@ import { RequestContext } from '@mikro-orm/core';
 import { User } from './user.entity';
 import { RequiredEntityData } from '@mikro-orm/core';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { generateToken } from '../../utils/jwt';
 
 
 export class UserService {
@@ -16,6 +16,11 @@ export class UserService {
     return this.em.findOne(User, { email });
   }
 
+  private toPublicUser(user: User) {
+    const { password, ...publicUser } = user as User & { password?: string };
+    return publicUser;
+  }
+
   async login(email: string, password: string) {
     const user = await this.findByEmail(email);
 
@@ -24,20 +29,26 @@ export class UserService {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new Error('Password incorrecta');
 
-    const token = jwt.sign(
-      { userId: user.id },
-      'SECRET_KEY',
-      { expiresIn: '1h' }
-    );
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      dni: user.dni,
+    });
 
-    return { user, token };
+    return { user: this.toPublicUser(user), token };
   }
 
   async findAll() {
-    return await this.em.find(User, {});
+    const users = await this.em.find(User, {});
+    return users.map((user) => this.toPublicUser(user));
   }
 
   async createUser(data: RequiredEntityData<User>) {
+    const existingUser = await this.findByEmail(data.email);
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = this.em.create(User, {
@@ -46,6 +57,6 @@ export class UserService {
     });
 
     await this.em.persistAndFlush(user);
-    return user;
+    return this.toPublicUser(user);
   }
 }
