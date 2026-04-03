@@ -13,6 +13,7 @@ import cursoRoutes from './modules/curso/curso.routes';
 import personaRoutes from './modules/persona/persona.routes';
 import dictadoRoutes from './modules/dictado/dictado.routes';
 import evaluacionRoutes from './modules/evaluacion/evaluacion.routes';
+import authRoutes from './modules/auth/auth.routes';
 import userRoutes from './modules/user/user.routes';
 
 const app: Application = express();
@@ -32,7 +33,7 @@ app.use('/api/personas', personaRoutes);
 app.use('/api/dictados', dictadoRoutes);
 app.use('/api/evaluaciones', evaluacionRoutes);
 app.use('/users', userRoutes);
-app.use('/api/auth', userRoutes);
+app.use('/api/auth', authRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
