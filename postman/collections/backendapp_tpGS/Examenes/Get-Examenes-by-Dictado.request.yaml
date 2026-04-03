@@ -1,0 +1,19 @@
+$kind: http-request
+name: Get Examenes by Dictado
+method: GET
+url: '{{baseUrl}}/api/examenes/dictado/:dictadoId'
+order: 4000
+pathVariables:
+  - key: dictadoId
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response is an array", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an('array');
+      });

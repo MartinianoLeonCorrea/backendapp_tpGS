@@ -1,0 +1,30 @@
+$kind: http-request
+name: Get Evaluacion by Alumno y Examen
+method: GET
+url: '{{baseUrl}}/api/evaluaciones/alumno/:dni/examen/:examenId'
+order: 5000
+pathVariables:
+  - key: dni
+    value: '12345678'
+  - key: examenId
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });
+      pm.test("Response has nota", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nota');
+      });
+      pm.test("Response has alumno and examen", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('alumno');
+        pm.expect(json).to.have.property('examen');
+      });

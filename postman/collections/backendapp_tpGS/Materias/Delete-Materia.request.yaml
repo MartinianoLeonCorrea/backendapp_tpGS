@@ -1,0 +1,12 @@
+$kind: http-request
+name: Delete Materia
+method: DELETE
+url: '{{baseUrl}}/api/materias/1'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 404", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204, 404]);
+      });

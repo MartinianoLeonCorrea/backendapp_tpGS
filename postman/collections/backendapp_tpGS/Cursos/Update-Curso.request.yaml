@@ -1,0 +1,21 @@
+$kind: http-request
+name: Update Curso
+method: PUT
+url: '{{baseUrl}}/api/cursos/1'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "turno": "TARDE"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 404", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });

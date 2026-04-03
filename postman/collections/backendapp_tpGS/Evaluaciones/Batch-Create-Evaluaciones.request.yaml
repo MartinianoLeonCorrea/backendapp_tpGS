@@ -1,0 +1,46 @@
+$kind: http-request
+name: Batch Create Evaluaciones
+method: POST
+url: '{{baseUrl}}/api/evaluaciones/batch'
+order: 7000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    [
+      {
+        "alumnoDni": "12345678",
+        "examenId": 1,
+        "nota": 8
+      },
+      {
+        "alumnoDni": "23456789",
+        "examenId": 1,
+        "nota": 7
+      },
+      {
+        "alumnoDni": "34567890",
+        "examenId": 1,
+        "nota": 9
+      }
+    ]
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 201", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response is an array", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an('array');
+      });
+      pm.test("Each evaluacion has id and nota", function () {
+        const json = pm.response.json();
+        json.forEach(function (ev) {
+          pm.expect(ev).to.have.property('id');
+          pm.expect(ev).to.have.property('nota');
+        });
+      });

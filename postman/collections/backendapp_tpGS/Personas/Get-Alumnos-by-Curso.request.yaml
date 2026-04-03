@@ -1,0 +1,26 @@
+$kind: http-request
+name: Get Alumnos by Curso
+method: GET
+url: '{{baseUrl}}/api/personas/alumnos/curso/:cursoId'
+order: 3000
+pathVariables:
+  - key: cursoId
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response is an array", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an('array');
+      });
+      pm.test("Each item has dni and tipo ALUMNO", function () {
+        const json = pm.response.json();
+        json.forEach(function (persona) {
+          pm.expect(persona).to.have.property('dni');
+          pm.expect(persona.tipo).to.equal('ALUMNO');
+        });
+      });

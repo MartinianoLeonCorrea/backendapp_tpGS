@@ -1,0 +1,15 @@
+$kind: http-request
+name: Delete Examen
+method: DELETE
+url: '{{baseUrl}}/api/examenes/:id'
+order: 7000
+pathVariables:
+  - key: id
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 204", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Update Dictado
+method: PUT
+url: '{{baseUrl}}/api/dictados/:id'
+order: 7000
+pathVariables:
+  - key: id
+    value: '1'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "docenteDni": "87654321",
+      "anio": 2025,
+      "activo": false
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });

@@ -1,0 +1,27 @@
+$kind: http-request
+name: Get Examen by ID
+method: GET
+url: '{{baseUrl}}/api/examenes/:id'
+order: 2000
+pathVariables:
+  - key: id
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });
+      pm.test("Response has fecha", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('fecha');
+      });
+      pm.test("Response has materia", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('materia');
+      });

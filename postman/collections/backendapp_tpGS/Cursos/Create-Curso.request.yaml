@@ -1,0 +1,31 @@
+$kind: http-request
+name: Create Curso
+method: POST
+url: '{{baseUrl}}/api/cursos'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nroLetra": "1A",
+      "turno": "MAÑANA"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 201", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response has nroLetra and turno", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nroLetra');
+        pm.expect(json).to.have.property('turno');
+      });
+      pm.test("Turno is valid value", function () {
+        const json = pm.response.json();
+        pm.expect(['MAÑANA', 'TARDE', 'NOCHE']).to.include(json.turno);
+      });

@@ -1,0 +1,28 @@
+$kind: http-request
+name: Update Materia
+method: PUT
+url: '{{baseUrl}}/api/materias/1'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Matemáticas Avanzadas",
+      "descripcion": "Cálculo diferencial e integral"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 404", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+      pm.test("If updated, response has nombre", function () {
+        if (pm.response.code === 200) {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property('nombre');
+        }
+      });

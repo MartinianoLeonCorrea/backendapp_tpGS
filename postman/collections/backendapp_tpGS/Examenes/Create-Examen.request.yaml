@@ -1,0 +1,35 @@
+$kind: http-request
+name: Create Examen
+method: POST
+url: '{{baseUrl}}/api/examenes'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "dictadoId": 1,
+      "fecha": "2025-07-15",
+      "descripcion": "Primer parcial"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 201", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });
+      pm.test("Response has fecha", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('fecha');
+      });
+      pm.test("Response has dictado", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('dictado');
+      });

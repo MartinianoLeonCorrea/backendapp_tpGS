@@ -1,0 +1,38 @@
+$kind: http-request
+name: Create Docente
+method: POST
+url: '{{baseUrl}}/api/personas/docentes'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "dni": "87654321",
+      "nombre": "María",
+      "apellido": "González",
+      "email": "maria.gonzalez@example.com",
+      "legajo": "D001"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 201", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response has dni", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('dni');
+      });
+      pm.test("Response has tipo DOCENTE", function () {
+        const json = pm.response.json();
+        pm.expect(json.tipo).to.equal('DOCENTE');
+      });
+      pm.test("Response has nombre and apellido", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nombre');
+        pm.expect(json).to.have.property('apellido');
+      });

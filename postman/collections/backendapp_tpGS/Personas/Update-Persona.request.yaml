@@ -1,0 +1,34 @@
+$kind: http-request
+name: Update Persona
+method: PUT
+url: '{{baseUrl}}/api/personas/:dni'
+order: 6000
+pathVariables:
+  - key: dni
+    value: '12345678'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Juan Carlos",
+      "apellido": "Pérez",
+      "email": "juancarlos.perez@example.com"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has dni", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('dni');
+      });
+      pm.test("Response has updated nombre", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nombre');
+      });

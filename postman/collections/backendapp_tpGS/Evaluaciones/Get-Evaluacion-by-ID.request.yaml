@@ -1,0 +1,28 @@
+$kind: http-request
+name: Get Evaluacion by ID
+method: GET
+url: '{{baseUrl}}/api/evaluaciones/:id'
+order: 2000
+pathVariables:
+  - key: id
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });
+      pm.test("Response has nota", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nota');
+      });
+      pm.test("Response has alumno and examen", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('alumno');
+        pm.expect(json).to.have.property('examen');
+      });

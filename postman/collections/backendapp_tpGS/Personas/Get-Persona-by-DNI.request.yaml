@@ -1,0 +1,27 @@
+$kind: http-request
+name: Get Persona by DNI
+method: GET
+url: '{{baseUrl}}/api/personas/:dni'
+order: 2000
+pathVariables:
+  - key: dni
+    value: '12345678'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response has dni", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('dni');
+      });
+      pm.test("Response has nombre", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nombre');
+      });
+      pm.test("Response has apellido", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('apellido');
+      });

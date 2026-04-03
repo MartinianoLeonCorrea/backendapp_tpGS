@@ -1,0 +1,19 @@
+$kind: http-request
+name: Get Curso by ID
+method: GET
+url: '{{baseUrl}}/api/cursos/1'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 404", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+      pm.test("If found, response has nroLetra and turno", function () {
+        if (pm.response.code === 200) {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property('nroLetra');
+          pm.expect(json).to.have.property('turno');
+        }
+      });

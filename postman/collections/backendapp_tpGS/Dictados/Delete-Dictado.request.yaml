@@ -1,0 +1,15 @@
+$kind: http-request
+name: Delete Dictado
+method: DELETE
+url: '{{baseUrl}}/api/dictados/:id'
+order: 8000
+pathVariables:
+  - key: id
+    value: '1'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 204", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });

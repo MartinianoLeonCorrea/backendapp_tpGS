@@ -1,0 +1,26 @@
+$kind: http-request
+name: Create Materia
+method: POST
+url: '{{baseUrl}}/api/materias'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Matemáticas",
+      "descripcion": "Álgebra y geometría"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 201 or 200", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response has nombre", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nombre');
+      });

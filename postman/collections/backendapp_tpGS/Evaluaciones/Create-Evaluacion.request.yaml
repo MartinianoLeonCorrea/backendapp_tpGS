@@ -1,0 +1,37 @@
+$kind: http-request
+name: Create Evaluacion
+method: POST
+url: '{{baseUrl}}/api/evaluaciones'
+order: 6000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "alumnoDni": "12345678",
+      "examenId": 1,
+      "nota": 8
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 or 201", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test("Response has id", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+      });
+      pm.test("Response has nota", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('nota');
+      });
+      pm.test("Nota is a number between 0 and 10", function () {
+        const json = pm.response.json();
+        pm.expect(json.nota).to.be.a('number');
+        pm.expect(json.nota).to.be.at.least(0);
+        pm.expect(json.nota).to.be.at.most(10);
+      });

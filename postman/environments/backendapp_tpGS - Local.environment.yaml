@@ -1,0 +1,9 @@
+name: backendapp_tpGS - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:4000'
+    enabled: true
+  - key: authToken
+    value: ''
+    enabled: true
+color: 120
