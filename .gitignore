@@ -1,2 +1,9 @@
+# Postman local config
+.postman/
+
+# Personal environment (opcional, si tiene tokens)
+postman/*.postman_environment.json
+
+# Database & Secrets
 /node_modules 
 .env
