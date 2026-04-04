@@ -1,6 +1,8 @@
 import { orm } from '../../config/mikro-orm';
 import { Persona, TipoPersona } from './persona.entity';
 import { Curso } from '../curso/curso.entity';
+import { User } from '../user/user.entity';
+import bcrypt from 'bcrypt'; // nuevos imports     
 
 class PersonaService {
   private get em() {
@@ -22,7 +24,31 @@ class PersonaService {
       persona.curso = curso;
     }
 
-    await em.persistAndFlush(persona);
+    if (personaData.tipo === TipoPersona.ALUMNO) {
+      const existingUser = await em.findOne(User, { email: personaData.email });
+      if (existingUser) {
+        throw new Error('Ya existe un usuario registrado con ese email');
+      }
+
+      const rawPassword = String(personaData.dni).slice(-4); // últimos 4 dígitos
+      const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+      await em.persistAndFlush(persona); // primero la persona
+
+      const user = em.create(User, {
+        email: personaData.email,
+        dni: String(personaData.dni),
+        password: hashedPassword,
+        active: true,
+        persona: persona,
+        createdAt: new Date(),
+      });
+
+      await em.persistAndFlush(user);
+    } else {
+      await em.persistAndFlush(persona);
+    }
+
     return persona;
   }
 
