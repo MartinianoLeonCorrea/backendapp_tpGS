@@ -15,6 +15,7 @@ import dictadoRoutes from './modules/dictado/dictado.routes';
 import evaluacionRoutes from './modules/evaluacion/evaluacion.routes';
 import authRoutes from './modules/auth/auth.routes';
 import userRoutes from './modules/user/user.routes';
+import materialRoutes from './modules/material/material.routes';
 
 const app: Application = express();
 
@@ -34,6 +35,7 @@ app.use('/api/dictados', dictadoRoutes);
 app.use('/api/evaluaciones', evaluacionRoutes);
 app.use('/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/materiales', materialRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

@@ -10,6 +10,7 @@ import { Curso } from '../curso/curso.entity';
 import { Materia } from '../materia/materia.entity';
 import { Persona } from '../persona/persona.entity';
 import { Examen } from '../examen/examen.entity';
+import { Material } from '../material/material.entity';
 
 @Entity({ tableName: 'dictados' })
 export class Dictado {
@@ -52,4 +53,7 @@ export class Dictado {
 
   @OneToMany(() => Examen, (examen) => examen.dictado)
   examenes = new Collection<Examen>(this);
+
+  @OneToMany(() => Material, (material) => material.dictado)
+  materiales = new Collection<Material>(this);
 }
