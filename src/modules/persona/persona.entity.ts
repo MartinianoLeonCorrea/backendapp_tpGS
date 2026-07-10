@@ -1,7 +1,17 @@
-import { Entity, PrimaryKey, Property, ManyToOne, OneToMany, Collection, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  Collection,
+  Enum,
+} from '@mikro-orm/core';
 import { Curso } from '../curso/curso.entity';
 import { Dictado } from '../dictado/dictado.entity';
 import { Evaluacion } from '../evaluacion/evaluacion.entity';
+import { User } from '../user/user.entity';
 
 export enum TipoPersona {
   ALUMNO = 'alumno',
@@ -25,7 +35,7 @@ export class Persona {
   @Property({ length: 255 })
   direccion!: string;
 
-  @Property({ length: 100 })
+  @Property({ length: 100, unique: true })
   email!: string;
 
   @Enum(() => TipoPersona)
@@ -37,7 +47,11 @@ export class Persona {
   @Property({ fieldName: 'created_at', onCreate: () => new Date() })
   createdAt: Date = new Date();
 
-  @Property({ fieldName: 'updated_at', onCreate: () => new Date(), onUpdate: () => new Date() })
+  @Property({
+    fieldName: 'updated_at',
+    onCreate: () => new Date(),
+    onUpdate: () => new Date(),
+  })
   updatedAt: Date = new Date();
 
   // Relaciones
@@ -49,4 +63,7 @@ export class Persona {
 
   @OneToMany(() => Evaluacion, (evaluacion) => evaluacion.alumno)
   evaluaciones = new Collection<Evaluacion>(this);
+
+  @OneToOne(() => User, (user) => user.persona, { nullable: true })
+  user?: User;
 }

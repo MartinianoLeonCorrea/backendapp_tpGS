@@ -1,24 +1,15 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  OneToOne,
-} from "@mikro-orm/core";
-import { Persona } from "../persona/persona.entity";
+import { Entity, PrimaryKey, Property, OneToOne } from '@mikro-orm/core';
+import { Persona } from '../persona/persona.entity';
 
-@Entity()
+@Entity({ tableName: 'users' })
 export class User {
-
   //hay que mover los roles desde persona a user
-
-  @PrimaryKey()
+  //el id va a ser el legajo
+  @PrimaryKey({ autoincrement: true })
   id!: number;
 
-  @Property({ unique: true })
-  email!: string;
-
-  @Property()
-  dni!: string;
+  @Property({ unique: true, nullable: true })
+  legajo?: string;
 
   @Property()
   password!: string;
@@ -26,10 +17,9 @@ export class User {
   @Property({ default: true })
   active!: boolean;
 
-  @OneToOne(() => Persona, { owner: true, nullable: true })
-  persona?: Persona;
+  @OneToOne(() => Persona, { owner: true, deleteRule: 'cascade' })
+  persona!: Persona;
 
-  @Property({ onCreate: () => new Date() })
-  createdAt!: Date;
+  @Property({ onCreate: () => new Date(), fieldName: 'created_at' })
+  createdAt: Date = new Date();
 }
-

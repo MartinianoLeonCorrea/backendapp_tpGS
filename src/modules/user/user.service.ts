@@ -1,62 +1,93 @@
-import { EntityManager } from '@mikro-orm/core';
-import { RequestContext } from '@mikro-orm/core';
+import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { User } from './user.entity';
+import { TipoPersona } from '../persona/persona.entity';
 import { RequiredEntityData } from '@mikro-orm/core';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../utils/jwt';
 
-
 export class UserService {
-
   private get em(): EntityManager {
     return RequestContext.getEntityManager() as EntityManager;
   }
 
-  async findByEmail(email: string) {
-    return this.em.findOne(User, { email });
-  }
-
   private toPublicUser(user: User) {
-    const { password, ...publicUser } = user as User & { password?: string };
+    const { password, ...publicUser } = user as any;
     return publicUser;
   }
+  // GENERADOR DE LEGAJOS
+  async generarLegajoAutoincremental(tipo: TipoPersona): Promise<string> {
+    const year = new Date().getFullYear();
+    const prefijoAnio = year.toString().slice(-2);
 
-  async login(email: string, password: string) {
-    const user = await this.findByEmail(email);
+    const ultimoUsuario = await this.em.findOne(
+      User,
+      {
+        persona: { tipo: tipo },
+        legajo: { $like: `${prefijoAnio}%` }, // Busca los de este año
+      },
+      { orderBy: { legajo: 'DESC' } },
+    );
 
-    if (!user) throw new Error('Usuario no existe');
+    let siguienteNumero = 1;
+    if (ultimoUsuario && ultimoUsuario.legajo) {
+      const numeroSecuenciaStr = ultimoUsuario.legajo.substring(2);
+      siguienteNumero = parseInt(numeroSecuenciaStr, 10) + 1;
+    }
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new Error('Password incorrecta');
+    // AANNN para alumnos (5 dígitos), AANN para docentes (4 dígitos)
+    if (tipo === TipoPersona.ALUMNO) {
+      return `${prefijoAnio}${siguienteNumero.toString().padStart(3, '0')}`;
+    } else {
+      return `${prefijoAnio}${siguienteNumero.toString().padStart(2, '0')}`;
+    }
+  }
 
+  // LOGIN ACTUALIZADO
+  async login(usuarioIdentificador: string, contrasenaPlana: string) {
+    let user: User | null = null;
+
+    if (usuarioIdentificador.includes('@')) {
+      // Búsqueda por email
+      user = await this.em.findOne(
+        User,
+        { persona: { email: usuarioIdentificador } },
+        { populate: ['persona'] },
+      );
+    } else {
+      // Búsqueda por legajo (ahora es un string)
+      user = await this.em.findOne(
+        User,
+        { legajo: usuarioIdentificador },
+        { populate: ['persona'] },
+      );
+    }
+
+    if (!user) throw new Error('Credenciales inválidas');
+
+    const valid = await bcrypt.compare(contrasenaPlana, user.password);
+    if (!valid) throw new Error('Credenciales inválidas');
+
+    // Firmamos el token con la info que necesita tu frontend
     const token = generateToken({
       userId: user.id,
-      email: user.email,
-      dni: user.dni,
+      legajo: user.legajo,
+      email: user.persona.email,
     });
 
     return { user: this.toPublicUser(user), token };
   }
-
-  async findAll() {
-    const users = await this.em.find(User, {});
-    return users.map((user) => this.toPublicUser(user));
-  }
-
-  async createUser(data: RequiredEntityData<User>) {
-    const existingUser = await this.findByEmail(data.email);
-    if (existingUser) {
-      throw new Error('El email ya está registrado');
-    }
-
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
+  createUser = async (userData: RequiredEntityData<User>) => {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = this.em.create(User, {
-      ...data,
+      ...userData,
       password: hashedPassword,
     });
-
     await this.em.persistAndFlush(user);
     return this.toPublicUser(user);
+  };
+
+  async findAll() {
+    const users = await this.em.find(User, {}, { populate: ['persona'] });
+    return users.map((user) => this.toPublicUser(user));
   }
 }

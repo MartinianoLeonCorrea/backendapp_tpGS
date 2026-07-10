@@ -2,14 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from './user.service';
 
 export class UserController {
-
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = req.body;
+      const { usuario, password } = req.body;
 
-      const result = await this.userService.login(email, password);
+      const result = await this.userService.login(usuario, password);
 
       res.json(result);
     } catch (error) {
