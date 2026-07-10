@@ -5,6 +5,8 @@ import { Materia } from '../modules/materia/materia.entity';
 import { Curso } from '../modules/curso/curso.entity';
 import { Dictado } from '../modules/dictado/dictado.entity';
 import { Examen } from '../modules/examen/examen.entity';
+import { User } from '../modules/user/user.entity';
+import bcrypt from 'bcrypt';
 
 /**
  * COMANDOS DE EJECUCIÓN (Desde la raíz del backend):
@@ -75,7 +77,7 @@ export class DemoSeeder extends Seeder {
     // ==========================================================
     // 3. PERSONAS (ALUMNOS Y DOCENTES)
     // ==========================================================
-    
+
     // Docente
     const docenteJuan = em.create(Persona, {
       dni: 20123456,
@@ -104,7 +106,7 @@ export class DemoSeeder extends Seeder {
     });
 
     // Alumnos
-    em.create(Persona, {
+    const alumnoMartin = em.create(Persona, {
       dni: 44123456,
       nombre: 'Martin',
       apellido: 'Pérez',
@@ -117,7 +119,7 @@ export class DemoSeeder extends Seeder {
       updatedAt: ahora,
     });
 
-    em.create(Persona, {
+    const alumnoSofia = em.create(Persona, {
       dni: 44234567,
       nombre: 'Sofía',
       apellido: 'Martínez',
@@ -131,60 +133,98 @@ export class DemoSeeder extends Seeder {
     });
 
     // ==========================================================
-    // 3. PERSONAS (ALUMNOS Y DOCENTES)
+    // 4. USUARIOS (USER)
     // ==========================================================
+    const hashedPasswordDocente = await bcrypt.hash('docente123', 10);
+    const hashedPasswordAlumno = await bcrypt.hash('alumno123', 10);
 
-    // Dictados
-  const dictadoMatematica1A = em.create(Dictado, {
-    id: 1,
-    anio: 2026,
-    diasCursado: 'Lunes, Miércoles',
-    fechaDesde: new Date('2026-03-01'),
-    fechaHasta: new Date('2026-12-01'),
-    curso: curso1A,
-    materia: matMatematica,
-    docente: docenteJuan,
-    createdAt: ahora,
-    updatedAt: ahora,
-  });
+    em.create(User, {
+      legajo: '2601',
+      password: hashedPasswordDocente,
+      active: true,
+      persona: docenteJuan,
+      createdAt: ahora,
+    });
 
-  const dictadoLengua1B = em.create(Dictado, {
-    id: 2,
-    anio: 2026,
-    diasCursado: 'Martes, Jueves',
-    fechaDesde: new Date('2026-03-01'),
-    fechaHasta: new Date('2026-12-01'),
-    curso: curso1B,
-    materia: matLengua,
-    docente: docenteMaria,
-    createdAt: ahora,
-    updatedAt: ahora,
-  });
+    em.create(User, {
+      legajo: '2602',
+      password: hashedPasswordDocente,
+      active: true,
+      persona: docenteMaria,
+      createdAt: ahora,
+    });
 
-  // Exámenes
-  em.create(Examen, {
-    id: 1,
-    fechaExamen: new Date('2026-06-15T09:00:00.000Z'),
-    temas: 'Álgebra y geometría',
-    copias: 30,
-    dictado: dictadoMatematica1A,
-    createdAt: ahora,
-    updatedAt: ahora,
-  });
+    em.create(User, {
+      legajo: '26001',
+      password: hashedPasswordAlumno,
+      active: true,
+      persona: alumnoMartin,
+      createdAt: ahora,
+    });
 
-  em.create(Examen, {
-    id: 2,
-    fechaExamen: new Date('2026-07-20T15:00:00.000Z'),
-    temas: 'Gramática y ortografía',
-    copias: 25,
-    dictado: dictadoLengua1B,
-    createdAt: ahora,
-    updatedAt: ahora,
-  });
+    em.create(User, {
+      legajo: '26002',
+      password: hashedPasswordAlumno,
+      active: true,
+      persona: alumnoSofia,
+      createdAt: ahora,
+    });
+
+    // ==========================================================
+    // 5. DICTADOS
+    // ==========================================================
+    const dictadoMatematica1A = em.create(Dictado, {
+      id: 1,
+      anio: 2026,
+      diasCursado: 'Lunes, Miércoles',
+      fechaDesde: new Date('2026-03-01'),
+      fechaHasta: new Date('2026-12-01'),
+      curso: curso1A,
+      materia: matMatematica,
+      docente: docenteJuan,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+
+    const dictadoLengua1B = em.create(Dictado, {
+      id: 2,
+      anio: 2026,
+      diasCursado: 'Martes, Jueves',
+      fechaDesde: new Date('2026-03-01'),
+      fechaHasta: new Date('2026-12-01'),
+      curso: curso1B,
+      materia: matLengua,
+      docente: docenteMaria,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+
+    // ==========================================================
+    // 6. EXÁMENES
+    // ==========================================================
+    em.create(Examen, {
+      id: 1,
+      fechaExamen: new Date('2026-06-15T09:00:00.000Z'),
+      temas: 'Álgebra y geometría',
+      copias: 30,
+      dictado: dictadoMatematica1A,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+
+    em.create(Examen, {
+      id: 2,
+      fechaExamen: new Date('2026-07-20T15:00:00.000Z'),
+      temas: 'Gramática y ortografía',
+      copias: 25,
+      dictado: dictadoLengua1B,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
 
     // Guardar todo
     await em.flush();
-    
+
     console.log('✅ Seed finalizado exitosamente: Datos de prueba creados.');
   }
 }
