@@ -48,7 +48,7 @@ export class Dictado {
   @ManyToOne(() => Materia)
   materia!: Materia;
 
-  @ManyToOne(() => Persona)
+  @ManyToOne(() => Persona, { fieldName: 'docente_dni' })
   docente!: Persona;
 
   @OneToMany(() => Examen, (examen) => examen.dictado)

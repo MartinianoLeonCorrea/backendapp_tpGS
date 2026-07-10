@@ -16,19 +16,33 @@ class ExamenService {
   // Función para obtener todos los exámenes con sus relaciones
   async getAllExamenes(em: EntityManager) {
     // Usamos populate para traer las relaciones anidadas
-    return await em.find(Examen, {}, {
-      populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any
-    });
+    return await em.find(
+      Examen,
+      {},
+      {
+        populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any,
+      },
+    );
   }
 
   // Función para obtener un examen por ID
   async getExamenById(em: EntityManager, id: number) {
     try {
-      // MikroORM usa findOne para buscar por ID o criterios
-      const examen = await em.findOne(Examen, { id }, {
-        populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any
-      });
-      return examen;
+      const examen = await em.findOne(Examen, { id });
+
+      if (!examen) {
+        return null;
+      }
+
+      return {
+        id: examen.id,
+        fechaExamen: examen.fechaExamen,
+        temas: examen.temas,
+        copias: examen.copias,
+        createdAt: examen.createdAt,
+        updatedAt: examen.updatedAt,
+        dictadoId: examen.dictado?.id,
+      };
     } catch (error) {
       throw error;
     }
@@ -38,11 +52,7 @@ class ExamenService {
   async createExamen(em: EntityManager, examenData: IExamenInput) {
     const fechaInput = examenData.fecha_examen ?? examenData.fechaExamen;
 
-    if (
-      !fechaInput ||
-      !examenData.temas ||
-      !examenData.dictadoId
-    ) {
+    if (!fechaInput || !examenData.temas || !examenData.dictadoId) {
       throw new Error('Faltan datos obligatorios para crear el examen.');
     }
 
@@ -59,7 +69,7 @@ class ExamenService {
       dictado: dictado,
       copias: examenData.copias || 0,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
 
     // Persistimos en la base de datos
@@ -89,11 +99,12 @@ class ExamenService {
     if (fechaInput) {
       examen.fechaExamen = new Date(fechaInput);
     }
-    
+
     em.assign(examen, {
       temas: updateData.temas || examen.temas,
-      copias: updateData.copias !== undefined ? updateData.copias : examen.copias,
-      updatedAt: new Date()
+      copias:
+        updateData.copias !== undefined ? updateData.copias : examen.copias,
+      updatedAt: new Date(),
     });
 
     await em.flush();
@@ -104,7 +115,7 @@ class ExamenService {
   async deleteExamen(em: EntityManager, id: number) {
     const examen = await em.findOne(Examen, { id });
     if (!examen) return null;
-    
+
     // Eliminamos y sincronizamos
     await em.removeAndFlush(examen);
     return examen;
@@ -113,20 +124,28 @@ class ExamenService {
   // Funciones para búsquedas por relaciones
   async getExamenesByMateria(em: EntityManager, materiaId: number) {
     // MikroORM permite filtrar por propiedades de relaciones
-    const examenes = await em.find(Examen, {
-      dictado: { materia: { id: materiaId } }
-    }, {
-      populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any
-    });
-    
+    const examenes = await em.find(
+      Examen,
+      {
+        dictado: { materia: { id: materiaId } },
+      },
+      {
+        populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any,
+      },
+    );
+
     return examenes;
   }
 
   async getExamenesByDictadoId(em: EntityManager, dictadoId: number) {
     try {
-      return await em.find(Examen, { dictado: { id: dictadoId } }, {
-        populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any
-      });
+      return await em.find(
+        Examen,
+        { dictado: dictadoId },
+        {
+          populate: ['dictado', 'dictado.materia', 'dictado.docente'] as any,
+        },
+      );
     } catch (error) {
       console.error('Error en getExamenesByDictadoId:', error);
       return [];
