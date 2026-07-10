@@ -25,6 +25,51 @@ class EvaluacionService {
     return orm.em.fork();
   }
 
+  private async getAlumnoForeignKeyColumn(em: EntityManager) {
+    const fkRows = await em.getConnection().execute(
+      `SELECT kcu.COLUMN_NAME AS column_name
+       FROM information_schema.KEY_COLUMN_USAGE kcu
+       WHERE kcu.TABLE_SCHEMA = DATABASE()
+         AND kcu.TABLE_NAME = 'evaluaciones'
+         AND kcu.REFERENCED_TABLE_NAME = 'personas'
+         AND kcu.REFERENCED_COLUMN_NAME = 'dni'`,
+    );
+
+    const getColumnName = (row: any) =>
+      row?.column_name ?? row?.COLUMN_NAME ?? row?.columnName ?? null;
+
+    if (Array.isArray(fkRows) && fkRows.length > 0) {
+      const detectedFk = getColumnName(fkRows[0]);
+      if (typeof detectedFk === 'string' && detectedFk.trim() !== '') {
+        return detectedFk;
+      }
+    }
+
+    // Fallback por compatibilidad con esquemas que no tengan FK declarada.
+    const columnRows = await em.getConnection().execute(
+      `SELECT COLUMN_NAME AS column_name
+       FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'evaluaciones'`,
+    );
+
+    const columnNames = Array.isArray(columnRows)
+      ? columnRows
+          .map((row: any) => getColumnName(row))
+          .filter((value: any) => typeof value === 'string')
+      : [];
+
+    const normalized = new Map(
+      columnNames.map((name: string) => [name.toLowerCase(), name]),
+    );
+
+    return (
+      normalized.get('alumnoid') ||
+      normalized.get('alumno_dni') ||
+      normalized.get('alumno_id') ||
+      null
+    );
+  }
   // ========================== HELPERS ==========================
 
   _successResponse(message: string, data: any) {
@@ -65,8 +110,20 @@ class EvaluacionService {
 
   async createBatchEvaluaciones(evaluaciones: IEvaluacionInput[]) {
     const em = this.em;
-    const created: Evaluacion[] = [];
- 
+    const created: Array<{
+      id: number;
+      nota: number | null;
+      observacion?: string | null;
+      examenId?: number;
+      alumnoId?: number;
+    }> = [];
+    const alumnoFkColumn = await this.getAlumnoForeignKeyColumn(em);
+
+    if (!alumnoFkColumn) {
+      throw new Error(
+        'No se pudo detectar la columna FK del alumno en evaluaciones.',
+      );
+    }
     // Usamos una transacción para que el batch sea atómico:
     // si falla una, no se guarda ninguna
     await em.transactional(async (tem) => {
@@ -81,17 +138,32 @@ class EvaluacionService {
           throw new Error(`El alumno con DNI ${data.alumnoId} no existe.`);
         }
 
-        const evaluacion = tem.create(Evaluacion, {
-          nota: data.nota!,
-          observacion: data.observacion,
-          examen,
-          alumno,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
+        const insertResult = await tem.getConnection().execute(
+          `INSERT INTO evaluaciones (nota, observacion, created_at, updated_at, examen_id, ${alumnoFkColumn})
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            data.nota ?? null,
+            data.observacion ?? null,
+            new Date(),
+            new Date(),
+            examen.id,
+            alumno.dni,
+          ],
+        );
 
-        tem.persist(evaluacion);
-        created.push(evaluacion);
+        const insertedId = Array.isArray(insertResult)
+          ? (insertResult as any)[0]?.insertId
+          : (insertResult as any)?.insertId;
+
+        if (insertedId) {
+          created.push({
+            id: Number(insertedId),
+            nota: data.nota ?? null,
+            observacion: data.observacion ?? null,
+            examenId: examen.id,
+            alumnoId: alumno.dni,
+          });
+        }
       }
     });
 
@@ -107,8 +179,9 @@ class EvaluacionService {
     const where: any = {};
     if (examenId) where.examen = { id: examenId };
     if (alumnoDni) where.alumno = { dni: alumnoDni };
-    if (dictadoId) where.examen = { ...where.examen, dictado: { id: dictadoId } };
- 
+    if (dictadoId)
+      where.examen = { ...where.examen, dictado: { id: dictadoId } };
+
     return await this.em.find(Evaluacion, where, {
       populate: ['examen', 'alumno'] as any,
       offset,
@@ -116,35 +189,60 @@ class EvaluacionService {
     });
   }
 
-  async countEvaluaciones(options: { examenId?: number; alumnoDni?: number; dictadoId?: number }) {
+  async countEvaluaciones(options: {
+    examenId?: number;
+    alumnoDni?: number;
+    dictadoId?: number;
+  }) {
     const { examenId, alumnoDni, dictadoId } = options;
 
     const where: any = {};
-    if (examenId)  where.examen = { id: examenId };
+    if (examenId) where.examen = { id: examenId };
     if (alumnoDni) where.alumno = { dni: alumnoDni };
-    if (dictadoId) where.examen = { ...where.examen, dictado: { id: dictadoId } };
+    if (dictadoId)
+      where.examen = { ...where.examen, dictado: { id: dictadoId } };
 
     return await this.em.count(Evaluacion, where);
   }
 
-  async findEvaluacionById(id: number, { includeExamen = false, includeAlumno = false } = {}) {
+  async findEvaluacionById(
+    id: number,
+    { includeExamen = false, includeAlumno = false } = {},
+  ) {
     const populate: string[] = [];
     if (includeExamen) populate.push('examen');
     if (includeAlumno) populate.push('alumno');
 
-    return await this.em.findOne(Evaluacion, { id }, { populate: populate as any });
+    return await this.em.findOne(
+      Evaluacion,
+      { id },
+      { populate: populate as any },
+    );
   }
 
   async findEvaluacionesByExamen(examenId: number) {
-    return await this.em.find(Evaluacion, { examen: { id: examenId } }, {
-      populate: ['examen', 'alumno'] as any,
-    });
+    return await this.em.find(
+      Evaluacion,
+      { examen: { id: examenId } },
+      {
+        populate: ['examen', 'alumno'] as any,
+      },
+    );
   }
 
   async findEvaluacionesByAlumno(alumnoId: number) {
-    return await this.em.find(Evaluacion, { alumno: { dni: alumnoId } }, {
-      populate: ['examen', 'examen.dictado', 'examen.dictado.materia', 'alumno'] as any,
-    });
+    return await this.em.find(
+      Evaluacion,
+      { alumno: { dni: alumnoId } },
+      {
+        populate: [
+          'examen',
+          'examen.dictado',
+          'examen.dictado.materia',
+          'alumno',
+        ] as any,
+      },
+    );
   }
 
   async findEvaluacionByExamenAndAlumno(examenId: number, alumnoId: number) {
@@ -156,15 +254,23 @@ class EvaluacionService {
 
   // Usados por el controlador para validaciones antes de crear una evaluación
   async getExamenById(id: number) {
-    return await this.em.findOne(Examen, { id }, {
-      populate: ['dictado', 'dictado.curso'] as any,
-    });
+    return await this.em.findOne(
+      Examen,
+      { id },
+      {
+        populate: ['dictado', 'dictado.curso'] as any,
+      },
+    );
   }
 
   async getPersonaByDni(dni: number) {
-    return await this.em.findOne(Persona, { dni }, {
-      populate: ['curso'] as any,
-    });
+    return await this.em.findOne(
+      Persona,
+      { dni },
+      {
+        populate: ['curso'] as any,
+      },
+    );
   }
 
   // ========================== UPDATE ==========================
@@ -183,7 +289,9 @@ class EvaluacionService {
     return evaluacion;
   }
 
-  async updateBatchEvaluaciones(evaluaciones: Array<{ id: number } & Partial<IEvaluacionInput>>) {
+  async updateBatchEvaluaciones(
+    evaluaciones: Array<{ id: number } & Partial<IEvaluacionInput>>,
+  ) {
     const em = this.em;
     const updated: Evaluacion[] = [];
 
