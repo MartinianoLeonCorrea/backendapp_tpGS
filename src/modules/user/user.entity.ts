@@ -15,7 +15,10 @@ export class User {
   password!: string;
 
   @Property({ default: true })
-  active!: boolean;
+  active: boolean = true;
+
+  @Property({ nullable: true })
+  blockedUntil?: Date;
 
   @OneToOne(() => Persona, { owner: true, deleteRule: 'cascade' })
   persona!: Persona;

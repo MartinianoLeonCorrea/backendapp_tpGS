@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from './user.service';
 
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -25,10 +25,23 @@ export class UserController {
     }
   };
 
-  register = async (req: Request, res: Response, next: NextFunction) => {
+  create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await this.userService.createUser(req.body);
       res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+  findPersonasWithoutUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const personas = await this.userService.findPersonasWithoutUser();
+
+      res.status(200).json(personas);
     } catch (error) {
       next(error);
     }

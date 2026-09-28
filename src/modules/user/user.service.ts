@@ -1,9 +1,10 @@
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { User } from './user.entity';
 import { TipoPersona } from '../persona/persona.entity';
-import { RequiredEntityData } from '@mikro-orm/core';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../utils/jwt';
+import { Persona } from '../persona/persona.entity';
+import { CreateUserDto } from './dto/create.user.dto';
 
 export class UserService {
   private get em(): EntityManager {
@@ -76,18 +77,76 @@ export class UserService {
 
     return { user: this.toPublicUser(user), token };
   }
-  createUser = async (userData: RequiredEntityData<User>) => {
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+  async createUser(data: CreateUserDto) {
+    const { personaDni, password } = data;
+
+    // Buscar la persona
+    const persona = await this.em.findOne(
+      Persona,
+      { dni: personaDni },
+      { populate: ['user'] },
+    );
+
+    if (!persona) {
+      throw new Error('La persona no existe.');
+    }
+
+    // Verificar que no tenga usuario
+    if (persona.user) {
+      throw new Error('La persona ya posee un usuario.');
+    }
+
+    // Generar legajo
+    const legajo = await this.generarLegajoAutoincremental(persona.tipo);
+
+    // Contraseña inicial:
+    // si el administrador no especifica una, usamos los últimos 4 dígitos del DNI
+    const initialPassword = password ?? String(persona.dni).slice(-4);
+
+    // Hashear contraseña
+    const hashedPassword = await bcrypt.hash(initialPassword, 10);
+
+    // Crear usuario
     const user = this.em.create(User, {
-      ...userData,
+      persona,
+      legajo,
       password: hashedPassword,
+      active: true,
+      createdAt: new Date(),
     });
+
     await this.em.persistAndFlush(user);
+
     return this.toPublicUser(user);
-  };
+  }
 
   async findAll() {
-    const users = await this.em.find(User, {}, { populate: ['persona'] });
+    const users = await this.em.find(
+      User,
+      {},
+      {
+        populate: ['persona'],
+        orderBy: {
+          legajo: 'ASC',
+        },
+      },
+    );
+
     return users.map((user) => this.toPublicUser(user));
+  }
+
+  async findPersonasWithoutUser() {
+    return await this.em.find(
+      Persona,
+      {
+        user: null,
+      },
+      {
+        orderBy: {
+          apellido: 'ASC',
+          nombre: 'ASC',
+        },
+      },
+    );
   }
 }

@@ -1,9 +1,7 @@
 import { orm } from '../../config/mikro-orm';
 import { Persona, TipoPersona } from './persona.entity';
 import { Curso } from '../curso/curso.entity';
-import { User } from '../user/user.entity';
-import bcrypt from 'bcrypt'; // nuevos imports
-import { UserService } from '../user/user.service';
+
 
 class PersonaService {
   private get em() {
@@ -15,46 +13,32 @@ class PersonaService {
     const em = this.em;
     const { cursoId, ...personaData } = data;
 
-    // Primero se valida que no exista una persona con el mismo email
+    // Validar email único
     const existingPersona = await em.findOne(Persona, {
       email: personaData.email,
     });
+
     if (existingPersona) {
       throw new Error('Ya existe una persona registrada con ese email');
     }
 
     const persona = em.create(Persona, personaData);
 
-    // Si es alumno, le asignamos curso
+    // Si es alumno, asignar curso
     if (personaData.tipo === TipoPersona.ALUMNO && cursoId) {
       const curso = await em.findOne(Curso, { id: Number(cursoId) });
+
       if (!curso) {
         throw new Error('El curso seleccionado no existe');
       }
+
       persona.curso = curso;
     }
 
-    const userService = new UserService();
-    const nuevoLegajo = await userService.generarLegajoAutoincremental(
-      personaData.tipo,
-    );
+    await em.persistAndFlush(persona);
 
-    const rawPassword = String(personaData.dni).slice(-4); // últimos 4 dígitos
-    const hashedPassword = await bcrypt.hash(rawPassword, 10);
-
-    const user = em.create(User, {
-      legajo: nuevoLegajo,
-      password: hashedPassword,
-      active: true,
-      persona: persona,
-      createdAt: new Date(),
-    });
-
-    await em.persistAndFlush([persona, user]);
-
-    return { persona, legajoAsignado: nuevoLegajo };
+    return persona;
   }
-
   // ========================= READ ===========================
   async findPersonaByDni(dni: number) {
     return await this.em.findOne(Persona, { dni }, { populate: ['curso'] });
