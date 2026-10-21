@@ -11,6 +11,7 @@ import { Materia } from '../materia/materia.entity';
 import { Persona } from '../persona/persona.entity';
 import { Examen } from '../examen/examen.entity';
 import { Material } from '../material/material.entity';
+import { ForoMensaje } from '../foro/foro.entity';
 
 @Entity({ tableName: 'dictados' })
 export class Dictado {
@@ -56,4 +57,7 @@ export class Dictado {
 
   @OneToMany(() => Material, (material) => material.dictado)
   materiales = new Collection<Material>(this);
+
+  @OneToMany(() => ForoMensaje, (mensaje) => mensaje.dictado)
+  mensajesForo = new Collection<ForoMensaje>(this);
 }

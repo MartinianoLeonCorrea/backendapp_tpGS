@@ -16,6 +16,7 @@ import evaluacionRoutes from './modules/evaluacion/evaluacion.routes';
 import authRoutes from './modules/auth/auth.routes';
 import userRoutes from './modules/user/user.routes';
 import materialRoutes from './modules/material/material.routes';
+import foroRoutes from './modules/foro/foro.routes';
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.use('/api/evaluaciones', evaluacionRoutes);
 app.use('/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/materiales', materialRoutes);
+app.use('/api/foros', foroRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
